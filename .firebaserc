@@ -1,0 +1,18 @@
+{
+  "projects": {
+    "default": "disha-consultancy-app"
+  },
+  "targets": {
+    "disha-consultancy-app": {
+      "hosting": {
+        "prod": [
+          "disha-consultancy-app"
+        ],
+        "staging": [
+          "stag-disha-consultancy-app"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
