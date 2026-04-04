@@ -38,6 +38,7 @@ export default function AcceptInvitePage() {
 
   const [verifyState, setVerifyState] = useState<VerifyState>({ status: "loading" });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     if (!token) {
@@ -93,8 +94,7 @@ export default function AcceptInvitePage() {
   });
 
   const acceptMutation = useMutation({
-    mutationFn: ({ password }: PasswordValues) =>
-      inviteAuthApi.acceptInvite(token, password),
+    mutationFn: ({ password }: PasswordValues) => inviteAuthApi.acceptInvite(token, password),
     onSuccess: (res) => {
       setSession(res.data.access_token, res.data.user);
       navigate("/dashboard", { replace: true });
@@ -142,9 +142,10 @@ export default function AcceptInvitePage() {
           </p>
         </header>
 
-        <p className="rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-muted-foreground">
-          Email: <span className="font-medium text-foreground">{email}</span>
-        </p>
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 text-sm leading-none font-medium select-none">Email</label>
+          <div className="rounded-md border border-zinc-200 bg-white px-3 py-3 text-base font-medium text-zinc-900">{email}</div>
+        </div>
 
         <Form {...form}>
           <form
@@ -165,6 +166,7 @@ export default function AcceptInvitePage() {
                         className="pr-10"
                         autoFocus
                         disabled={acceptMutation.isPending}
+                        style={{ color: "#09090B" }}
                         {...field}
                       />
                       <Button
@@ -176,11 +178,7 @@ export default function AcceptInvitePage() {
                         aria-label={showPassword ? "Hide password" : "Show password"}
                         disabled={acceptMutation.isPending}
                       >
-                        {showPassword ? (
-                          <EyeOff className="size-4 text-muted-foreground" />
-                        ) : (
-                          <Eye className="size-4 text-muted-foreground" />
-                        )}
+                        {showPassword ? <EyeOff className="size-4 text-muted-foreground" /> : <Eye className="size-4 text-muted-foreground" />}
                       </Button>
                     </div>
                   </FormControl>
@@ -197,7 +195,27 @@ export default function AcceptInvitePage() {
                 <FormItem>
                   <FormLabel>Confirm password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" disabled={acceptMutation.isPending} {...field} />
+                    <div className="relative">
+                      <Input
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        className="pr-10"
+                        disabled={acceptMutation.isPending}
+                        style={{ color: "#09090B" }}
+                        {...field}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowConfirmPassword((prev) => !prev)}
+                        aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                        disabled={acceptMutation.isPending}
+                      >
+                        {showConfirmPassword ? <EyeOff className="size-4 text-muted-foreground" /> : <Eye className="size-4 text-muted-foreground" />}
+                      </Button>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -211,14 +229,8 @@ export default function AcceptInvitePage() {
               </p>
             )}
 
-            <Button
-              type="submit"
-              className="h-10 w-full bg-[#EE3338] text-white hover:bg-[#D42D31]"
-              disabled={acceptMutation.isPending}
-            >
-              {acceptMutation.isPending && (
-                <Loader2 className="mr-2 size-4 animate-spin" />
-              )}
+            <Button type="submit" className="h-10 w-full bg-[#EE3338] text-white hover:bg-[#D42D31]" disabled={acceptMutation.isPending}>
+              {acceptMutation.isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
               {acceptMutation.isPending ? "Setting password..." : "Set password & sign in"}
             </Button>
           </form>

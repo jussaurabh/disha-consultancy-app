@@ -4,7 +4,7 @@ export interface Invite {
   _id: string;
   email: string;
   role_id: { _id: string; name: string };
-  invited_by: { _id: string; email: string };
+  invited_by?: { _id: string; email: string };
   status: "pending" | "accepted" | "cancelled";
   expires_at: string;
   created_at: string;

@@ -6,6 +6,8 @@ export interface ConsultancyUser {
   /** Backend may return populated objects or just role IDs. */
   role_ids: ({ _id: string; name: string } | string)[];
   created_at: string;
+  updated_at?: string;
+  is_archived?: boolean;
 }
 
 /** Backend returns paginated list like orgs. */
@@ -26,4 +28,10 @@ export const usersApi = {
 
   deleteUser: (userId: string) =>
     apiClient.delete(`/api/consultancy/users/${userId}`),
+
+  archiveUser: (userId: string) =>
+    apiClient.patch<ConsultancyUser>(`/api/consultancy/users/${userId}/archive`, {}),
+
+  unarchiveUser: (userId: string) =>
+    apiClient.patch<ConsultancyUser>(`/api/consultancy/users/${userId}/unarchive`, {}),
 };
