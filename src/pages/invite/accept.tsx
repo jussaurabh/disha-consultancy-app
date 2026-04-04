@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -39,6 +39,7 @@ export default function AcceptInvitePage() {
   const [verifyState, setVerifyState] = useState<VerifyState>({ status: "loading" });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
 
   useEffect(() => {
     if (!token) {
@@ -88,8 +89,6 @@ export default function AcceptInvitePage() {
       });
   }, [token]);
 
-  const [passwordValue, setPasswordValue] = useState("");
-
   const form = useForm<PasswordValues>({
     resolver: zodResolver(passwordSchema),
     defaultValues: { password: "", confirmPassword: "" },
@@ -103,12 +102,9 @@ export default function AcceptInvitePage() {
     },
   });
 
-  useEffect(() => {
-    const subscription = form.watch((data) => {
-      setPasswordValue(data.password ?? "");
-    });
-    return () => subscription.unsubscribe();
-  }, [form]);
+  const handlePasswordChange = useCallback((value: string) => {
+    setCurrentPassword(value);
+  }, []);
 
   if (verifyState.status === "loading") {
     return (
@@ -175,6 +171,10 @@ export default function AcceptInvitePage() {
                         disabled={acceptMutation.isPending}
                         style={{ color: "#09090B" }}
                         {...field}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          handlePasswordChange(e.target.value);
+                        }}
                       />
                       <Button
                         type="button"
@@ -190,7 +190,7 @@ export default function AcceptInvitePage() {
                     </div>
                   </FormControl>
                   <FormMessage />
-                  <PasswordStrengthIndicator password={passwordValue} />
+                  <PasswordStrengthIndicator password={currentPassword} />
                 </FormItem>
               )}
             />
