@@ -36,20 +36,16 @@ export default function AcceptInvitePage() {
   const { setSession } = useAuth();
   const token = searchParams.get("token") ?? "";
 
-  const [verifyState, setVerifyState] = useState<VerifyState>({ status: "loading" });
+  const [verifyState, setVerifyState] = useState<VerifyState>(() => {
+    return token ? { status: "loading" } : { status: "invalid", title: "Invite link invalid", message: "Invalid or missing invite link." };
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
 
   useEffect(() => {
-    if (!token) {
-      setVerifyState({
-        status: "invalid",
-        title: "Invite link invalid",
-        message: "Invalid or missing invite link.",
-      });
-      return;
-    }
+    if (!token) return;
+
     inviteAuthApi
       .verifyInvite(token)
       .then((res) => {
