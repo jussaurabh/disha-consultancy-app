@@ -88,6 +88,8 @@ export default function AcceptInvitePage() {
       });
   }, [token]);
 
+  const [passwordValue, setPasswordValue] = useState("");
+
   const form = useForm<PasswordValues>({
     resolver: zodResolver(passwordSchema),
     defaultValues: { password: "", confirmPassword: "" },
@@ -101,7 +103,12 @@ export default function AcceptInvitePage() {
     },
   });
 
-  const passwordValue = form.watch("password");
+  useEffect(() => {
+    const subscription = form.watch((data) => {
+      setPasswordValue(data.password ?? "");
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   if (verifyState.status === "loading") {
     return (
