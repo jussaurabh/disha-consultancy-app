@@ -1,12 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { orgsApi } from "@/api/orgs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, MoreVertical } from "lucide-react";
 
 export default function OrganizationsPage() {
+  const navigate = useNavigate();
   const { data: response, isLoading } = useQuery({
     queryKey: ["orgs"],
     queryFn: () => orgsApi.listOrgs().then((r) => r.data),
@@ -22,7 +29,7 @@ export default function OrganizationsPage() {
           <p className="text-muted-foreground mt-2">Manage your client organizations.</p>
         </div>
         <Link to="/organizations/new">
-          <Button className="gap-2 bg-[#EE3338] hover:bg-[#D42D31]">
+          <Button className="gap-2 bg-[#EE3338] hover:bg-[#D42D31] text-white">
             <Plus className="h-4 w-4" />
             Create Organization
           </Button>
@@ -53,22 +60,44 @@ export default function OrganizationsPage() {
                 </TableHeader>
                 <TableBody>
                   {orgs.map((org) => (
-                    <TableRow key={org._id}>
-                      <TableCell className="font-medium">{org.company_name}</TableCell>
+                    <TableRow
+                      key={org._id}
+                      className="cursor-pointer hover:bg-muted/30"
+                      onClick={() => navigate(`/organizations/${org._id}`)}
+                    >
+                      <TableCell className="font-medium">
+                        <Link
+                          to={`/organizations/${org._id}`}
+                          className="text-foreground hover:underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {org.company_name}
+                        </Link>
+                      </TableCell>
                       <TableCell>{org.state}</TableCell>
                       <TableCell>
-                        <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                          org.status === "active" 
-                            ? "bg-green-50 text-green-700" 
-                            : "bg-gray-50 text-gray-700"
-                        }`}>
+                        <span
+                          className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                            org.status === "active" ? "bg-green-50 text-green-700" : "bg-gray-50 text-gray-700"
+                          }`}
+                        >
                           {org.status || "active"}
                         </span>
                       </TableCell>
-                      <TableCell className="text-right">
-                        <Link to={`/organizations/${org._id}`}>
-                          <Button variant="ghost" size="sm">View</Button>
-                        </Link>
+                      <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button size="icon" variant="ghost" className="size-8">
+                              <MoreVertical className="size-4" />
+                              <span className="sr-only">Open actions</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem asChild>
+                              <Link to={`/organizations/${org._id}`}>View</Link>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </TableCell>
                     </TableRow>
                   ))}
