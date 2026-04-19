@@ -19,10 +19,19 @@ interface ConsultancyAuthResponse {
   user: ConsultancyUser;
 }
 
+export interface PermissionInRole {
+  _id: string;
+  code: string;
+  name: string;
+  description?: string;
+  category: string;
+  is_system: boolean;
+}
+
 export interface RoleInfo {
   _id: string;
   name: string;
-  permission_codes: string[];
+  permissions: PermissionInRole[];
 }
 
 export interface User {

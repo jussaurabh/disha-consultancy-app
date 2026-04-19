@@ -50,7 +50,7 @@ function RoleForm({
     resolver: zodResolver(roleSchema),
     defaultValues: {
       name: role?.name ?? "",
-      permission_codes: role?.permission_codes ?? [],
+      permission_codes: role?.permissions?.map((p) => p.code) ?? [],
     },
   });
 
@@ -61,7 +61,20 @@ function RoleForm({
   });
 
   const createMutation = useMutation({
-    mutationFn: (values: RoleFormValues) => rolesApi.createRole(values).then((r) => r.data),
+    mutationFn: (values: RoleFormValues) => {
+      // Build map: code -> ID from the permissions list
+      const permissionIdMap = Object.fromEntries(
+        (permissions || []).map((p) => [p.code, p._id])
+      );
+
+      // Map selected codes to IDs before sending
+      const payload = {
+        name: values.name,
+        permission_ids: values.permission_codes.map((code) => permissionIdMap[code]),
+      };
+
+      return rolesApi.createRole(payload).then((r) => r.data);
+    },
     onSuccess: () => {
       onSuccess();
       form.reset();
@@ -75,8 +88,22 @@ function RoleForm({
   });
 
   const updateMutation = useMutation({
-    mutationFn: (values: RoleFormValues) =>
-      role ? rolesApi.updateRole(role._id, values).then((r) => r.data) : Promise.reject(new Error("No role")),
+    mutationFn: (values: RoleFormValues) => {
+      if (!role) return Promise.reject(new Error("No role"));
+
+      // Build map: code -> ID from the permissions list
+      const permissionIdMap = Object.fromEntries(
+        (permissions || []).map((p) => [p.code, p._id])
+      );
+
+      // Map selected codes to IDs before sending
+      const payload = {
+        name: values.name,
+        permission_ids: values.permission_codes.map((code) => permissionIdMap[code]),
+      };
+
+      return rolesApi.updateRole(role._id, payload).then((r) => r.data);
+    },
     onSuccess: () => {
       onSuccess();
       form.reset();
@@ -294,7 +321,7 @@ export default function RolesPage() {
                     </div>
                   </td>
                   <td className="py-3 px-4 text-muted-foreground">
-                    {role.permission_codes.length} permission{role.permission_codes.length !== 1 ? "s" : ""}
+                    {role.permissions.length} permission{role.permissions.length !== 1 ? "s" : ""}
                   </td>
                   <td className="py-3 px-4 text-muted-foreground">
                     {format(new Date(role.created_at), "MMM d, yyyy")}
