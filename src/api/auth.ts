@@ -7,7 +7,7 @@ interface AuthResponse {
   user: {
     id: string;
     email: string;
-    auth0_id: string;
+    clerk_id: string;
   };
 }
 
@@ -37,7 +37,7 @@ export interface RoleInfo {
 export interface User {
   id: string;
   email: string;
-  auth0_id: string;
+  clerk_id: string;
 }
 
 /** Consultancy user: base user + consultancy_id, roles and permission_codes (from backend). */
