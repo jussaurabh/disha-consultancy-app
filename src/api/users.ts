@@ -21,17 +21,17 @@ export interface ListUsersResponse {
 
 export const usersApi = {
   listUsers: (params?: { page?: number; limit?: number }) =>
-    apiClient.get<ListUsersResponse>("/api/consultancy/users", { params }),
+    apiClient.get<ListUsersResponse>("/api/users", { params }),
 
   updateUserRole: (userId: string, role_id: string) =>
-    apiClient.patch<ConsultancyUser>(`/api/consultancy/users/${userId}/role`, { role_id }),
+    apiClient.patch<ConsultancyUser>(`/api/users/${userId}/role`, { role_id }),
 
   deleteUser: (userId: string) =>
-    apiClient.delete(`/api/consultancy/users/${userId}`),
+    apiClient.delete(`/api/users/${userId}`),
 
   archiveUser: (userId: string) =>
-    apiClient.patch<ConsultancyUser>(`/api/consultancy/users/${userId}/archive`, {}),
+    apiClient.patch<ConsultancyUser>(`/api/users/${userId}/archive`, {}),
 
   unarchiveUser: (userId: string) =>
-    apiClient.patch<ConsultancyUser>(`/api/consultancy/users/${userId}/unarchive`, {}),
+    apiClient.patch<ConsultancyUser>(`/api/users/${userId}/unarchive`, {}),
 };

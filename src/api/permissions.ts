@@ -11,14 +11,14 @@ export interface Permission {
 
 export const permissionsApi = {
   listPermissions: () =>
-    apiClient.get<Permission[]>("/api/consultancy/permissions"),
+    apiClient.get<Permission[]>("/api/permissions"),
 
   createPermission: (body: { code: string; name: string; description?: string; category?: string }) =>
-    apiClient.post<Permission>("/api/consultancy/permissions", body),
+    apiClient.post<Permission>("/api/permissions", body),
 
   updatePermission: (id: string, body: { code?: string; name?: string; description?: string; category?: string }) =>
-    apiClient.patch<Permission>(`/api/consultancy/permissions/${id}`, body),
+    apiClient.patch<Permission>(`/api/permissions/${id}`, body),
 
   deletePermission: (id: string) =>
-    apiClient.delete(`/api/consultancy/permissions/${id}`),
+    apiClient.delete(`/api/permissions/${id}`),
 };

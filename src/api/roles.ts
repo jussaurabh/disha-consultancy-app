@@ -14,24 +14,25 @@ export interface Role {
   name: string;
   permissions: PermissionInRole[];
   is_system?: boolean;
-  consultancy_id?: string;
+  scope?: string;
+  scope_id?: string | null;
   created_at: string;
   updated_at: string;
 }
 
 export const rolesApi = {
   listRoles: () =>
-    apiClient.get<Role[]>("/api/consultancy/roles"),
+    apiClient.get<Role[]>("/api/roles"),
 
   getRole: (id: string) =>
-    apiClient.get<Role>(`/api/consultancy/roles/${id}`),
+    apiClient.get<Role>(`/api/roles/${id}`),
 
   createRole: (body: { name: string; permission_ids: string[] }) =>
-    apiClient.post<Role>("/api/consultancy/roles", body),
+    apiClient.post<Role>("/api/roles", body),
 
   updateRole: (id: string, body: { name?: string; permission_ids?: string[] }) =>
-    apiClient.patch<Role>(`/api/consultancy/roles/${id}`, body),
+    apiClient.patch<Role>(`/api/roles/${id}`, body),
 
   deleteRole: (id: string) =>
-    apiClient.delete(`/api/consultancy/roles/${id}`),
+    apiClient.delete(`/api/roles/${id}`),
 };
