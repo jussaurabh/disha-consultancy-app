@@ -1,77 +1,53 @@
 import { apiClient, publicApi } from "@/lib/api-client";
 
-interface AuthResponse {
-  access_token: string;
-  token_type: string;
-  expires_in: number;
-  user: {
-    id: string;
-    email: string;
-    clerk_id: string;
-  };
-}
-
-/** Consultancy login response includes roles and permission_codes. */
-interface ConsultancyAuthResponse {
-  access_token: string;
-  token_type: string;
-  expires_in: number;
-  user: ConsultancyUser;
-}
-
-export interface PermissionInRole {
-  _id: string;
-  code: string;
-  name: string;
-  description?: string;
-  category: string;
-  is_system: boolean;
-}
+export type UserScope = "superadmin" | "consultant" | "org";
 
 export interface RoleInfo {
   _id: string;
   name: string;
-  permissions: PermissionInRole[];
+  permission_codes: string[];
 }
 
-export interface User {
+export interface LoginUser {
   id: string;
   email: string;
   clerk_id: string;
+  scope: UserScope;
+  scope_id: string | null;
+  roles: RoleInfo[];
+  permission_codes: string[];
 }
 
-/** Consultancy user: base user + consultancy_id, roles and permission_codes (from backend). */
-export interface ConsultancyUser extends User {
-  consultancy_id: string;
-  roles?: RoleInfo[];
-  permission_codes?: string[];
+export interface LoginResponse {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  user: LoginUser;
+}
+
+export interface SignupResponse {
+  clerk_id: string;
+  email: string;
 }
 
 export interface ResetPasswordResponse {
   message: string;
   access_token?: string;
-  user?: ConsultancyUser;
+  user?: LoginUser;
 }
 
 export const authApi = {
   signup: (email: string, password: string) =>
-    apiClient.post<AuthResponse>("/auth/signup", { email, password }),
+    apiClient.post<SignupResponse>("/auth/signup", { email, password }),
 
   login: (email: string, password: string) =>
-    apiClient.post<AuthResponse>("/auth/login", { email, password }),
+    apiClient.post<LoginResponse>("/auth/login", { email, password }),
 
-  /** Consultancy app: login and get user with roles + permission_codes. */
-  loginConsultancy: (email: string, password: string) =>
-    apiClient.post<ConsultancyAuthResponse>("/auth/consultancy/login", {
-      email,
-      password,
-    }),
-
-  me: () => apiClient.get<User>("/auth/me"),
+  me: () => apiClient.get<LoginUser>("/auth/me"),
 
   /** Consultancy app: current user with roles + permission_codes. */
   meConsultancy: () =>
-    apiClient.get<ConsultancyUser>("/api/consultancy/me"),
+    apiClient.get<LoginUser>("/api/consultancy/me"),
 };
 
 /** Public – no auth header. Forgot/reset password. */
@@ -95,7 +71,7 @@ export const inviteAuthApi = {
     ),
 
   acceptInvite: (token: string, password: string) =>
-    publicApi.post<{ access_token: string; user: ConsultancyUser }>(
+    publicApi.post<{ access_token: string; user: LoginUser }>(
       "/auth/consultancy/invite/accept",
       { token, password }
     ),

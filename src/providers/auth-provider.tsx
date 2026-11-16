@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { authApi, type ConsultancyUser } from "@/api/auth";
+import { authApi, type LoginUser } from "@/api/auth";
 import { AuthContext } from "./auth-context";
 
 const TOKEN_KEY = "auth_token";
@@ -19,11 +19,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
 
   const setSession = useCallback(
-    (accessToken: string, user?: ConsultancyUser | null) => {
+    (accessToken: string, user?: LoginUser | null) => {
       localStorage.setItem(TOKEN_KEY, accessToken);
 
       if (user) {
-        queryClient.setQueryData<ConsultancyUser>(["me"], user);
+        queryClient.setQueryData<LoginUser>(["me"], user);
       } else {
         queryClient.invalidateQueries({ queryKey: ["me"] });
       }
@@ -34,13 +34,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const login = async (email: string, password: string) => {
-    const res = await authApi.loginConsultancy(email, password);
+    const res = await authApi.login(email, password);
     setSession(res.data.access_token, res.data.user);
   };
 
   const signup = async (email: string, password: string) => {
-    const res = await authApi.signup(email, password);
-    setSession(res.data.access_token);
+    await authApi.signup(email, password);
   };
 
   const logout = () => {
@@ -63,8 +62,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user: meQuery.data ?? null,
         isAuthenticated: !!meQuery.data,
-        // isLoading = isPending && isFetching: true only while actively fetching,
-        // false when disabled (no token) or after fetch completes.
         isLoading: meQuery.isLoading,
         login,
         signup,
