@@ -65,14 +65,20 @@ export const passwordResetApi = {
 /** Public – no auth header. Invite verify and accept. */
 export const inviteAuthApi = {
   verifyInvite: (token: string) =>
-    publicApi.post<{ email: string; role: { _id: string; name: string } }>(
-      "/auth/consultancy/invite/verify",
+    publicApi.post<{
+      invite_id: string;
+      email: string;
+      role: { _id: string; name: string };
+      scope: string;
+      scope_id: string | null;
+    }>(
+      "/auth/invites/verify",
       { token }
     ),
 
   acceptInvite: (token: string, password: string) =>
     publicApi.post<{ access_token: string; user: LoginUser }>(
-      "/auth/consultancy/invite/accept",
+      "/auth/invites/accept",
       { token, password }
     ),
 };
