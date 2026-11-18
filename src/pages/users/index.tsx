@@ -41,7 +41,7 @@ function InviteModal({ open, onClose, onSuccess }: { open: boolean; onClose: () 
   });
 
   const mutation = useMutation({
-    mutationFn: (values: InviteValues) => invitesApi.createInvite(values).then((r) => r.data),
+    mutationFn: (values: InviteValues) => invitesApi.createInvite({ ...values, invite_type: "consultancy_user" }).then((r) => r.data),
     onSuccess: () => {
       onSuccess();
       form.reset();
@@ -197,7 +197,7 @@ export default function UsersPage() {
   });
 
   const resendInviteMutation = useMutation({
-    mutationFn: (invite: Invite) => invitesApi.resendInvite(invite),
+    mutationFn: (invite: Invite) => invitesApi.resendInvite(invite._id),
     onSuccess: () => {
       toast.success("Invite resent");
       queryClient.invalidateQueries({ queryKey: ["invites"] });
