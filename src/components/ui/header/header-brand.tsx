@@ -12,7 +12,7 @@ function HeaderBrand({ className, ...props }: React.ComponentProps<"div">) {
       <div className="flex size-8 items-center justify-center rounded-lg bg-primary font-semibold text-primary-foreground">
         D
       </div>
-      <span className="text-base font-semibold">Disha</span>
+      <span className="text-base font-semibold text-foreground">Disha</span>
       <Badge variant="secondary">SILVER CRAFT</Badge>
     </div>
   )

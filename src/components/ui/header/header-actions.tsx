@@ -18,7 +18,7 @@ function HeaderActions({ className, ...props }: React.ComponentProps<"div">) {
 function HeaderBell({ className, ...props }: React.ComponentProps<"button">) {
   return (
     <Button variant="ghost" size="icon" data-slot="header-bell" className={cn("size-9", className)} {...props}>
-      <Bell className="size-4" />
+      <Bell className="size-4 text-foreground" />
     </Button>
   )
 }
