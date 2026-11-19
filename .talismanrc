@@ -1,4 +1,6 @@
 fileignoreconfig:
-- filename: src/pages/organizations/users-section.tsx
-  checksum: 33323cf228a40583473f6b3376d114f7bb2a77a7690a0edb4dee50bd3b4f88e6
+- filename: src/pages/organizations/filters-bar.tsx
+  checksum: 602db6c9d64609ad7f49b5cc9c222f17862cd8bbfa5bcb430f06ab9e6d5e373c
+- filename: src/pages/organizations/index.tsx
+  checksum: 23e1f9657c16a75caeecf7ec2c791b6036192cee2180489ff3c678a52abb9c2f
 version: "1.0"
