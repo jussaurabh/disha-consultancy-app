@@ -23,15 +23,15 @@ import { UiVariation } from "@/components/ui/ui-variation";
 import { TabSwitcher } from "@/components/ui/tab-switcher";
 import { FiltersBar } from "./filters-bar";
 import { Plus, Loader2, MoreVertical } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 export default function OrganizationsPage() {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const tab = searchParams.get("tab") === "employees" ? "employees" : "organizations";
 
   const { data: response, isLoading } = useQuery({
     queryKey: ["orgs"],
-    queryFn: () => orgsApi.listOrgs(),
+    queryFn: () => orgsApi.listOrgs().then((r) => r.data),
   });
 
   const orgs = response?.data ?? [];

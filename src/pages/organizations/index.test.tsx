@@ -30,8 +30,10 @@ const { listOrgsMock, listResponse } = vi.hoisted(() => {
     limit: 10,
     totalPages: 3,
   };
+  // Wrap in AxiosResponse-like object with .data property
+  const axiosResponse = { data: listResponse };
   return {
-    listOrgsMock: vi.fn().mockResolvedValue(listResponse),
+    listOrgsMock: vi.fn().mockResolvedValue(axiosResponse),
     listResponse,
   };
 });
@@ -64,7 +66,7 @@ function renderPage(initialEntry = "/organizations") {
 
 beforeEach(() => {
   listOrgsMock.mockClear();
-  listOrgsMock.mockResolvedValue(listResponse);
+  listOrgsMock.mockResolvedValue({ data: listResponse });
 });
 
 afterEach(() => {
