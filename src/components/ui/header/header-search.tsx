@@ -7,7 +7,7 @@ function HeaderSearch({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="header-search"
-      className={cn("relative ml-auto w-64", className)}
+      className={cn("relative w-64", className)}
       {...props}
     >
       <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />

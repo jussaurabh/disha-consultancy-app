@@ -5,13 +5,15 @@ import { HeaderSearch } from "./header-search"
 import { HeaderActions, HeaderBell, HeaderUser } from "./header-actions"
 import { cn } from "@/lib/utils"
 
-function HeaderRoot(props: React.ComponentProps<"header">) {
+function HeaderRoot({ children, className, ...props }: React.ComponentProps<"header">) {
   return (
     <header
       data-slot="header"
-      className={cn("flex h-18 w-full items-center gap-4 border-b border-border bg-background px-6", props.className)}
+      className={cn("flex h-18 w-full items-center gap-4 border-b border-border bg-background px-6", className)}
       {...props}
-    />
+    >
+      {children}
+    </header>
   )
 }
 

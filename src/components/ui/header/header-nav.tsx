@@ -26,7 +26,7 @@ function HeaderNav({ className, ...props }: React.ComponentProps<"nav">) {
   return (
     <nav
       data-slot="header-nav"
-      className={cn("flex items-center gap-1 mr-4", className)}
+      className={cn("flex items-center gap-1", className)}
       {...props}
     />
   )
