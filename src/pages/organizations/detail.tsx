@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Banknote, Building2, ChevronRight, HeartPulse, Landmark, Loader2, MapPin, Settings, ShieldCheck, Users } from "lucide-react";
+import { Banknote, Building2, Ellipsis, HeartPulse, Landmark, Loader2, MapPin, Settings, ShieldCheck, Users } from "lucide-react";
 import { toast } from "sonner";
 import { orgsApi, type Organization, type UpdateOrgBody } from "@/api/orgs";
 import {
@@ -24,9 +24,8 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
+import { SecondaryHeader } from "@/components/ui/secondary-header";
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
@@ -1825,35 +1824,36 @@ export default function OrganizationDetailPage() {
     ...SECTIONS.filter((section) => section.id !== "settings" || canDelete),
   ].filter((section) => section.id !== "users" || canListUsers);
   const activeSectionLabel = visibleSections.find((section) => section.id === activeSection)?.label ?? SECTION_COPY.company.title;
-  const statusBadgeClass = org.status === "inactive" ? "border-zinc-200 bg-zinc-100 text-zinc-600" : "border-green-200 bg-green-50 text-green-700";
+  const initial = org.company_name.charAt(0).toUpperCase();
+  const statusBadge = org.status
+    ? {
+        text: org.status === "active" ? "Active" : "Inactive",
+        tone: org.status === "active" ? ("accent" as const) : ("danger" as const),
+      }
+    : undefined;
 
   return (
     <>
       <div className="space-y-6">
-        {/* Breadcrumb */}
-        <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-sm text-muted-foreground">
-          <Link to="/organizations" className="hover:text-foreground transition-colors">
-            Organizations
-          </Link>
-          <ChevronRight className="size-3.5" />
-          <span className="text-foreground">{org.company_name}</span>
-        </nav>
-
-        {/* Header */}
-        <div className="flex items-start gap-4">
-          <Avatar className="size-12 rounded-lg">
-            <AvatarFallback className="rounded-lg bg-zinc-100 text-lg font-semibold text-zinc-600">
-              {org.company_name.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <div className="min-w-0 flex-1 space-y-1">
-            <h1 className="truncate text-xl font-semibold text-foreground">{org.company_name}</h1>
-            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <span>CNO: {org.cno}</span>
-              <Badge className={cn("text-xs", statusBadgeClass)}>{org.status === "inactive" ? "Inactive" : "Active"}</Badge>
-            </div>
-          </div>
-        </div>
+        {/* Context strip */}
+        <SecondaryHeader className="px-0 py-5" data-testid="detail-context-strip">
+          <SecondaryHeader.Breadcrumb segments={[{ label: "Organizations", url: "/organizations" }]} />
+          <SecondaryHeader.Divider />
+          <SecondaryHeader.Title avatar={initial} name={org.company_name} badge={statusBadge} />
+          <SecondaryHeader.Actions>
+            <button
+              type="button"
+              data-slot="detail-more"
+              aria-label="More actions"
+              className="flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-ground"
+            >
+              <Ellipsis className="size-[15px] text-muted" />
+            </button>
+            <Button size="sm" disabled={!canEdit}>
+              Edit organization
+            </Button>
+          </SecondaryHeader.Actions>
+        </SecondaryHeader>
 
         <div className="sm:hidden">
           <Select value={activeSection} onValueChange={(value) => setActiveSection(value as SectionId)}>
