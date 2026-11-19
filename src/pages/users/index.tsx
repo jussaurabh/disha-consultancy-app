@@ -29,6 +29,7 @@ const inviteSchema = z.object({
 type InviteValues = z.infer<typeof inviteSchema>;
 
 function InviteModal({ open, onClose, onSuccess }: { open: boolean; onClose: () => void; onSuccess: () => void }) {
+  const { user } = useAuth();
   const form = useForm<InviteValues>({
     resolver: zodResolver(inviteSchema),
     defaultValues: { email: "", role_id: "" },
@@ -36,7 +37,10 @@ function InviteModal({ open, onClose, onSuccess }: { open: boolean; onClose: () 
 
   const { data: roles } = useQuery({
     queryKey: ["roles"],
-    queryFn: () => rolesApi.listRoles().then((r) => r.data),
+    queryFn: () =>
+      rolesApi
+        .listRoles({ scope: user!.scope, scope_id: user!.scope_id ?? undefined })
+        .then((r) => r.data),
     enabled: open,
   });
 

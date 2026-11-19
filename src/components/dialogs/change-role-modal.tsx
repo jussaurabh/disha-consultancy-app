@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { rolesApi } from "@/api/roles";
+import { useAuth } from "@/providers/use-auth";
 
 export function ChangeRoleModal({
   user,
@@ -17,6 +18,7 @@ export function ChangeRoleModal({
   onSuccess: () => void;
   onUpdateRole: (userId: string, roleId: string) => Promise<unknown>;
 }) {
+  const { user: currentUser } = useAuth();
   const [roleId, setRoleId] = useState(() => {
     const first = user?.role_ids?.[0];
     return typeof first === "string" ? first : first?._id ?? "";
@@ -24,7 +26,13 @@ export function ChangeRoleModal({
 
   const { data: roles } = useQuery({
     queryKey: ["roles"],
-    queryFn: () => rolesApi.listRoles().then((r) => r.data),
+    queryFn: () =>
+      rolesApi
+        .listRoles({
+          scope: currentUser!.scope,
+          scope_id: currentUser!.scope_id ?? undefined,
+        })
+        .then((r) => r.data),
     enabled: open,
   });
 

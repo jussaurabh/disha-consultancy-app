@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/api-client";
+import type { UserScope } from "@/api/auth";
 
 export interface PermissionInRole {
   _id: string;
@@ -21,8 +22,8 @@ export interface Role {
 }
 
 export const rolesApi = {
-  listRoles: () =>
-    apiClient.get<Role[]>("/api/roles"),
+  listRoles: (params: { scope: UserScope; scope_id?: string }) =>
+    apiClient.get<Role[]>("/api/roles", { params }),
 
   getRole: (id: string) =>
     apiClient.get<Role>(`/api/roles/${id}`),

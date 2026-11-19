@@ -224,7 +224,10 @@ export default function RolesPage() {
 
   const { data: roles, isLoading } = useQuery({
     queryKey: ["roles"],
-    queryFn: () => rolesApi.listRoles().then((r) => r.data),
+    queryFn: () =>
+      rolesApi
+        .listRoles({ scope: user!.scope, scope_id: user!.scope_id ?? undefined })
+        .then((r) => r.data),
   });
 
   const deleteMutation = useMutation({
