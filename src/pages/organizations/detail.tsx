@@ -1,9 +1,10 @@
+import { useState, type ReactNode } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Building2, Ellipsis, Loader2 } from "lucide-react";
+import { Building2, Ellipsis } from "lucide-react";
 import { toast } from "sonner";
 import { orgsApi, type Organization, type UpdateOrgBody } from "@/api/orgs";
 import {
@@ -17,8 +18,7 @@ import { useAuth } from "@/providers/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { SecondaryHeader } from "@/components/ui/secondary-header";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TabSwitcher } from "@/components/ui/tab-switcher";
@@ -95,19 +95,73 @@ const SECTION_COPY: Record<SectionId, { title: string; description: string; succ
   },
 };
 
-const SECTION_CARD = "gap-0 p-0";
-const SECTION_HEADER = "border-b pt-6 !pb-5";
-const SECTION_CONTENT = "pt-5 pb-6";
-const SECTION_FOOTER = "border-t !pt-4 pb-4 justify-end";
-const FORM_GRID_2 = "grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2";
-
 function getMutationErrorMessage(error: unknown) {
   return (error as ApiError)?.response?.data?.message ?? "Failed to save changes";
 }
 
 // --- Company details tab ---
 
-function CompanyDetailsForm({ org, canEdit }: { org: Organization; canEdit: boolean }) {
+function DetailRow({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div data-slot="detail-row" data-testid="detail-row" className="flex min-h-12 items-center gap-6 border-b border-line px-6 py-3 last:border-b-0">
+      <span className="w-[220px] shrink-0 text-[13px] leading-4 text-muted">{label}</span>
+      {children}
+    </div>
+  );
+}
+
+function DetailRowValue({ children, muted }: { children: ReactNode; muted?: boolean }) {
+  return (
+    <span
+      data-slot="detail-row-value"
+      className={muted ? "text-[14px] leading-[18px] text-muted" : "text-[14px] leading-[18px] font-semibold text-ink"}
+    >
+      {children}
+    </span>
+  );
+}
+
+function StatsRail({ usersTotal }: { usersTotal: number | undefined }) {
+  return (
+    <aside data-slot="stats-rail" className="flex w-[320px] shrink-0 flex-col gap-5">
+      <div data-slot="stats-tile" className="flex w-full flex-col gap-2 rounded-lg border border-line bg-surface px-6 py-5">
+        <span className="text-[11px] leading-[14px] font-semibold uppercase tracking-[0.09em] text-muted">EMPLOYEES</span>
+        <span data-slot="stats-tile-value" data-testid="stats-tile-value" className="font-display text-[30px] font-extrabold leading-none tracking-[-0.02em] text-ink">
+          —
+        </span>
+        <Link to="/organizations?tab=employees" className="text-[12px] leading-4 font-semibold text-accent">
+          View employees →
+        </Link>
+      </div>
+      <div data-slot="stats-tile" className="flex w-full flex-col gap-2 rounded-lg border border-line bg-surface px-6 py-5">
+        <span className="text-[11px] leading-[14px] font-semibold uppercase tracking-[0.09em] text-muted">PORTAL USERS</span>
+        <span data-slot="stats-tile-value" data-testid="stats-tile-value" className="font-display text-[30px] font-extrabold leading-none tracking-[-0.02em] text-ink">
+          {usersTotal ?? "—"}
+        </span>
+      </div>
+      <div data-slot="stats-tile" className="flex w-full flex-col gap-2 rounded-lg border border-line bg-surface px-6 py-5">
+        <span className="text-[11px] leading-[14px] font-semibold uppercase tracking-[0.09em] text-muted">NEXT PAYROLL</span>
+        <span data-slot="stats-tile-value" data-testid="stats-tile-value" className="font-display text-[30px] font-extrabold leading-none tracking-[-0.02em] text-copper">
+          —
+        </span>
+      </div>
+    </aside>
+  );
+}
+
+function CompanyDetailsSection({
+  org,
+  canEdit,
+  isEditing,
+  onEditOpen,
+  onEditClose,
+}: {
+  org: Organization;
+  canEdit: boolean;
+  isEditing: boolean;
+  onEditOpen: () => void;
+  onEditClose: () => void;
+}) {
   const queryClient = useQueryClient();
 
   const form = useForm<CompanyDetailsValues>({
@@ -129,204 +183,248 @@ function CompanyDetailsForm({ org, canEdit }: { org: Organization; canEdit: bool
     onSuccess: (updated) => {
       queryClient.setQueryData(["org", org._id], updated);
       toast.success(SECTION_COPY.company.success);
+      onEditClose();
     },
     onError: (error) => {
       toast.error(getMutationErrorMessage(error));
     },
   });
 
+  const stateLabel = STATES_OPTIONS.find((o) => o.value === org.state)?.label ?? org.state;
+
   return (
-    <Card className={SECTION_CARD}>
-      <CardHeader className={SECTION_HEADER}>
-        <CardTitle className="text-base">{SECTION_COPY.company.title}</CardTitle>
-        <CardDescription>{SECTION_COPY.company.description}</CardDescription>
-      </CardHeader>
+    <div className="min-w-0 flex-1 overflow-hidden rounded-lg border border-line bg-surface">
+      {/* Band */}
+      <div className="flex h-10 shrink-0 items-center justify-between border-b border-line bg-ground px-6">
+        <span className="text-[11px] leading-[14px] font-semibold uppercase tracking-[0.09em] text-muted">
+          {SECTION_COPY.company.title}
+        </span>
+        {isEditing ? (
+          <div className="flex items-center gap-2">
+            <Button type="button" variant="outline" size="sm" className="h-[30px] rounded-sm px-3 font-semibold" onClick={() => { form.reset(); onEditClose(); }}>
+              Cancel
+            </Button>
+            <Button type="submit" size="sm" className="h-[30px] rounded-sm px-3.5 font-semibold" disabled={mutation.isPending} form="company-details-form">
+              Update
+            </Button>
+          </div>
+        ) : (
+          <button type="button" data-slot="detail-band-edit" disabled={!canEdit} className="text-[12px] leading-4 font-semibold text-accent disabled:opacity-40" onClick={onEditOpen}>
+            Edit
+          </button>
+        )}
+      </div>
+
       <Form {...form}>
-        <form onSubmit={form.handleSubmit((v) => mutation.mutate(v))} className="space-y-4">
-          <CardContent className={SECTION_CONTENT}>
-            <div className={FORM_GRID_2}>
-              <FormField
-                control={form.control}
-                name="company_name"
-                render={({ field }) => (
-                  <FormItem className="sm:col-span-2">
-                    <FormLabel>Company name</FormLabel>
-                    <FormControl>
-                      <Input disabled={!canEdit} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="cno"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>CNO</FormLabel>
-                    <FormControl>
-                      <Input readOnly disabled={!canEdit} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="state"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>State</FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange} disabled={!canEdit}>
+        <form id="company-details-form" onSubmit={form.handleSubmit((v) => mutation.mutate(v))}>
+          {isEditing ? (
+            <div data-slot="detail-band-edit">
+              <DetailRow label="Company name">
+                <FormField
+                  control={form.control}
+                  name="company_name"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
                       <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue />
-                        </SelectTrigger>
+                        <Input className="rounded-sm" {...field} />
                       </FormControl>
-                      <SelectContent>
-                        {STATES_OPTIONS.map((state) => (
-                          <SelectItem key={state.value} value={state.value}>
-                            {state.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select value={field.value ?? "active"} onValueChange={(v) => field.onChange(v as "active" | "inactive")} disabled={!canEdit}>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </DetailRow>
+              <DetailRow label="CNO">
+                <FormField
+                  control={form.control}
+                  name="cno"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
                       <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue />
-                        </SelectTrigger>
+                        <Input className="rounded-sm" {...field} />
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="inactive">Inactive</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="est_type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Establishment type</FormLabel>
-                    <Select value={field.value || undefined} onValueChange={field.onChange} disabled={!canEdit}>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </DetailRow>
+              <DetailRow label="State">
+                <FormField
+                  control={form.control}
+                  name="state"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {STATES_OPTIONS.map((state) => (
+                            <SelectItem key={state.value} value={state.value}>
+                              {state.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </DetailRow>
+              <DetailRow label="Status">
+                <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <Select value={field.value ?? "active"} onValueChange={(v) => field.onChange(v as "active" | "inactive")}>
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="active">Active</SelectItem>
+                          <SelectItem value="inactive">Inactive</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </DetailRow>
+              <DetailRow label="Establishment type">
+                <FormField
+                  control={form.control}
+                  name="est_type"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <Select value={field.value || undefined} onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select…" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {EST_TYPE_OPTIONS.map((o) => (
+                            <SelectItem key={o} value={o}>
+                              {o}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </DetailRow>
+              <DetailRow label="Unit / Contractor name">
+                <FormField
+                  control={form.control}
+                  name="unit_cont_name"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
                       <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select…" />
-                        </SelectTrigger>
+                        <Input className="rounded-sm" {...field} />
                       </FormControl>
-                      <SelectContent>
-                        {EST_TYPE_OPTIONS.map((o) => (
-                          <SelectItem key={o} value={o}>
-                            {o}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="unit_cont_name"
-                render={({ field }) => (
-                  <FormItem className="sm:col-span-2">
-                    <FormLabel>Unit / Contractor name</FormLabel>
-                    <FormControl>
-                      <Input disabled={!canEdit} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="company_view"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Company view</FormLabel>
-                    <Select value={field.value || undefined} onValueChange={field.onChange} disabled={!canEdit}>
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select…" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {COMPANY_VIEW_OPTIONS.map((o) => (
-                          <SelectItem key={o} value={o}>
-                            {o}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="rule_type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Rule type</FormLabel>
-                    <Select value={field.value || undefined} onValueChange={field.onChange} disabled={!canEdit}>
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select…" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {RULE_TYPE_OPTIONS.map((o) => (
-                          <SelectItem key={o} value={o}>
-                            {o}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </DetailRow>
+              <DetailRow label="Company view">
+                <FormField
+                  control={form.control}
+                  name="company_view"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <Select value={field.value || undefined} onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select…" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {COMPANY_VIEW_OPTIONS.map((o) => (
+                            <SelectItem key={o} value={o}>
+                              {o}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </DetailRow>
+              <DetailRow label="Rule type">
+                <FormField
+                  control={form.control}
+                  name="rule_type"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <Select value={field.value || undefined} onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select…" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {RULE_TYPE_OPTIONS.map((o) => (
+                            <SelectItem key={o} value={o}>
+                              {o}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </DetailRow>
             </div>
-          </CardContent>
-          {canEdit && (
-            <CardFooter className={SECTION_FOOTER}>
-              <Button type="submit" size="sm" disabled={mutation.isPending}>
-                {mutation.isPending ? (
-                  <>
-                    <Loader2 className="size-4 animate-spin" />
-                    Saving...
-                  </>
+          ) : (
+            <div>
+              <DetailRow label="Company name">
+                <DetailRowValue>{org.company_name}</DetailRowValue>
+              </DetailRow>
+              <DetailRow label="CNO">
+                <DetailRowValue>{org.cno}</DetailRowValue>
+              </DetailRow>
+              <DetailRow label="State">
+                <DetailRowValue>{stateLabel}</DetailRowValue>
+              </DetailRow>
+              <DetailRow label="Status">
+                {org.status === "inactive" ? (
+                  <span className="flex items-center gap-[7px]">
+                    <span className="size-[7px] shrink-0 rounded-full bg-destructive" />
+                    <span className="text-[14px] leading-[18px] font-medium text-destructive">Inactive</span>
+                  </span>
                 ) : (
-                  "Save changes"
+                  <span className="flex items-center gap-[7px]">
+                    <span className="size-[7px] shrink-0 rounded-full bg-accent" />
+                    <span className="text-[14px] leading-[18px] font-medium text-ink">Active</span>
+                  </span>
                 )}
-              </Button>
-            </CardFooter>
+              </DetailRow>
+              <DetailRow label="Establishment type">
+                <DetailRowValue muted={!org.est_type}>{org.est_type ?? "—"}</DetailRowValue>
+              </DetailRow>
+              <DetailRow label="Unit / Contractor name">
+                <DetailRowValue muted={!org.unit_cont_name}>{org.unit_cont_name ?? "—"}</DetailRowValue>
+              </DetailRow>
+              <DetailRow label="Company view">
+                <DetailRowValue muted={!org.company_view}>{org.company_view ?? "—"}</DetailRowValue>
+              </DetailRow>
+              <DetailRow label="Rule type">
+                <DetailRowValue muted={!org.rule_type}>{org.rule_type ?? "—"}</DetailRowValue>
+              </DetailRow>
+            </div>
           )}
         </form>
       </Form>
-    </Card>
+    </div>
   );
 }
 
@@ -336,6 +434,7 @@ export default function OrganizationDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { hasPermission } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [isEditing, setIsEditing] = useState(false);
 
   const canEdit = hasPermission("org:update");
   const canDelete = hasPermission("org:delete");
@@ -439,7 +538,7 @@ export default function OrganizationDetailPage() {
             >
               <Ellipsis className="size-[15px] text-muted" />
             </button>
-            <Button size="sm" disabled={!canEdit}>
+            <Button size="sm" disabled={!canEdit} onClick={() => setIsEditing(true)}>
               Edit organization
             </Button>
           </SecondaryHeader.Actions>
@@ -457,7 +556,18 @@ export default function OrganizationDetailPage() {
           }))}
         />
 
-        {tab === "company" && <CompanyDetailsForm org={org} canEdit={canEdit} />}
+        {tab === "company" && (
+          <div className="flex items-start gap-8 pt-8 pb-14">
+            <CompanyDetailsSection
+              org={org}
+              canEdit={canEdit}
+              isEditing={isEditing}
+              onEditOpen={() => setIsEditing(true)}
+              onEditClose={() => setIsEditing(false)}
+            />
+            <StatsRail usersTotal={usersTotal} />
+          </div>
+        )}
       </div>
     </>
   );
