@@ -15,3 +15,27 @@ export const BrandOnly: Story = {
     </Header>
   ),
 }
+
+export const Default: Story = {
+  render: () => (
+    <Header>
+      <Header.Brand />
+      <Header.Nav>
+        <Header.NavItem href="#" isActive label="Dashboard" />
+        <Header.NavItem href="#" label="Organizations" badge={12} />
+        <Header.NavItem href="#" label="Users" />
+        <Header.NavItem href="#" label="Roles" />
+        <Header.NavItem href="#" label="Permissions" />
+      </Header.Nav>
+    </Header>
+  ),
+}
+
+export const EmptyNav: Story = {
+  render: () => (
+    <Header>
+      <Header.Brand />
+      <Header.Nav />
+    </Header>
+  ),
+}

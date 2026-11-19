@@ -1,5 +1,6 @@
 import * as React from "react"
 import { HeaderBrand } from "./header-brand"
+import { HeaderNav, HeaderNavItem } from "./header-nav"
 import { cn } from "@/lib/utils"
 
 function HeaderRoot(props: React.ComponentProps<"header">) {
@@ -12,4 +13,4 @@ function HeaderRoot(props: React.ComponentProps<"header">) {
   )
 }
 
-export const Header = Object.assign(HeaderRoot, { Brand: HeaderBrand })
+export const Header = Object.assign(HeaderRoot, { Brand: HeaderBrand, Nav: HeaderNav, NavItem: HeaderNavItem })
