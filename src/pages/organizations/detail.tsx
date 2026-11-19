@@ -1878,7 +1878,9 @@ export default function OrganizationDetailPage() {
               onClick={() => setActiveSection(section.id)}
               className={cn(
                 "inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
-                activeSection === section.id ? "bg-zinc-900 text-white" : "bg-zinc-100 text-muted-foreground hover:bg-zinc-200",
+                activeSection === section.id
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
               )}
             >
               <section.icon className="size-3.5" />
@@ -1898,7 +1900,9 @@ export default function OrganizationDetailPage() {
                   onClick={() => setActiveSection(section.id)}
                   className={cn(
                     "flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors",
-                    activeSection === section.id ? "bg-zinc-100 text-foreground" : "text-muted-foreground hover:bg-zinc-50 hover:text-foreground",
+                    activeSection === section.id
+                      ? "bg-muted text-foreground"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
                   )}
                 >
                   <section.icon className="size-4 shrink-0" />
