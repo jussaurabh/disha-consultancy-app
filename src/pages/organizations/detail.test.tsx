@@ -140,3 +140,90 @@ describe("OrganizationDetailPage — tabs", () => {
     expect(screen.getByRole("tab", { name: /settings/i })).toBeInTheDocument();
   });
 });
+
+describe("OrganizationDetailPage — company details", () => {
+  it("renders the read-only detail rows from the org data", async () => {
+    renderDetailPage();
+    expect(await screen.findByText("Company Details")).toBeInTheDocument();
+    const rows = screen.getAllByTestId("detail-row");
+    expect(rows).toHaveLength(8);
+    expect(within(rows[0]).getByText("Sri Venkateswara Textiles Pvt Ltd")).toBeInTheDocument();
+    expect(screen.getByText("CNO-2019-4471")).toBeInTheDocument();
+    expect(screen.getByText("Karnataka")).toBeInTheDocument();
+    expect(screen.getByText("Factory")).toBeInTheDocument();
+    expect(screen.getByText("Main")).toBeInTheDocument();
+    expect(screen.getByText("Unit 1 — Mysuru")).toBeInTheDocument();
+    expect(screen.getByText("Minimum wages")).toBeInTheDocument();
+  });
+
+  it("renders the status pill and the stats rail tiles", async () => {
+    renderDetailPage();
+    await screen.findByText("Company Details");
+    const rows = screen.getAllByTestId("detail-row");
+    expect(within(rows[3]).getByText("Active")).toBeInTheDocument();
+    expect(screen.getByText("EMPLOYEES")).toBeInTheDocument();
+    expect(screen.getByText("PORTAL USERS")).toBeInTheDocument();
+    expect(screen.getByText("NEXT PAYROLL")).toBeInTheDocument();
+    const tileValues = screen.getAllByTestId("stats-tile-value");
+    expect(tileValues[0]).toHaveTextContent("—");
+    expect(tileValues[1]).toHaveTextContent("12");
+    expect(tileValues[2]).toHaveTextContent("—");
+  });
+
+  it("opens edit mode from the band Edit button and reverts on Cancel", async () => {
+    const user = userEvent.setup();
+    renderDetailPage();
+    await screen.findByText("Company Details");
+    await user.click(screen.getByRole("button", { name: "Edit" }));
+    expect(screen.getByRole("button", { name: "Cancel" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Update" })).toBeInTheDocument();
+    const nameInput = screen.getByDisplayValue("Sri Venkateswara Textiles Pvt Ltd");
+    await user.clear(nameInput);
+    await user.type(nameInput, "Renamed Textiles");
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    const rows = screen.getAllByTestId("detail-row");
+    expect(within(rows[0]).getByText("Sri Venkateswara Textiles Pvt Ltd")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Update" })).not.toBeInTheDocument();
+  });
+
+  it("submits the edited values on Update and exits edit mode", async () => {
+    const user = userEvent.setup();
+    vi.mocked(orgsApi.updateOrg).mockResolvedValue({
+      data: { ...orgFixture, company_name: "Renamed Textiles" },
+    } as unknown as AxiosResponse<Organization>);
+    const { queryClient } = renderDetailPage();
+    vi.spyOn(queryClient, "setQueryData");
+    await screen.findByText("Company Details");
+    await user.click(screen.getByRole("button", { name: "Edit" }));
+    const nameInput = screen.getByDisplayValue("Sri Venkateswara Textiles Pvt Ltd");
+    await user.clear(nameInput);
+    await user.type(nameInput, "Renamed Textiles");
+    await user.click(screen.getByRole("button", { name: "Update" }));
+    await waitFor(() => {
+      const rows = screen.getAllByTestId("detail-row");
+      expect(within(rows[0]).getByText("Renamed Textiles")).toBeInTheDocument();
+    });
+    expect(vi.mocked(queryClient.setQueryData)).toHaveBeenCalledWith(
+      ["org", "org-1"],
+      expect.objectContaining({ company_name: "Renamed Textiles" }),
+    );
+    expect(orgsApi.updateOrg).toHaveBeenCalledWith("org-1", expect.objectContaining({ company_name: "Renamed Textiles" }));
+    expect(screen.queryByRole("button", { name: "Update" })).not.toBeInTheDocument();
+  });
+
+  it("opens edit mode from the strip Edit organization button", async () => {
+    const user = userEvent.setup();
+    renderDetailPage();
+    await screen.findByText("Company Details");
+    await user.click(screen.getByRole("button", { name: "Edit organization" }));
+    expect(screen.getByRole("button", { name: "Update" })).toBeInTheDocument();
+  });
+
+  it("disables edit entry without the org:update permission", async () => {
+    authMock.hasPermission.mockImplementation((code: string) => code !== "org:update");
+    renderDetailPage();
+    await screen.findByText("Company Details");
+    expect(screen.getByRole("button", { name: "Edit organization" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Edit" })).toBeDisabled();
+  });
+});
