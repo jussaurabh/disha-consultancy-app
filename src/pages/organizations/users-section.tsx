@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { invitesApi, type Invite } from "@/api/invites";
 import { usersApi, type ConsultancyUser } from "@/api/users";
+import { rolesApi } from "@/api/roles";
 import { useAuth } from "@/providers/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArchiveConfirmDialog } from "@/components/dialogs/archive-confirm-dialog";
 import { ConfirmDialog } from "@/components/dialogs/confirm-dialog";
 
@@ -24,6 +26,7 @@ type ApiError = { response?: { data?: { message?: string } } };
 
 const inviteSchema = z.object({
   email: z.string().email("Enter a valid email"),
+  role_id: z.string().min(1, "Select a role"),
 });
 
 type InviteValues = z.infer<typeof inviteSchema>;
@@ -41,13 +44,25 @@ function OrgInviteModal({
 }) {
   const form = useForm<InviteValues>({
     resolver: zodResolver(inviteSchema),
-    defaultValues: { email: "" },
+    defaultValues: { email: "", role_id: "" },
+  });
+
+  const { data: roles } = useQuery({
+    queryKey: ["roles", "org", orgId],
+    queryFn: () =>
+      rolesApi.listRoles({ scope: "org", scope_id: orgId }).then((r) => r.data),
+    enabled: open,
   });
 
   const mutation = useMutation({
     mutationFn: (values: InviteValues) =>
       invitesApi
-        .createInvite({ invite_type: "org_user", email: values.email, scope_id: orgId })
+        .createInvite({
+          invite_type: "org_user",
+          email: values.email,
+          scope_id: orgId,
+          role_id: values.role_id,
+        })
         .then((r) => r.data),
     onSuccess: () => {
       onSuccess();
@@ -81,7 +96,33 @@ function OrgInviteModal({
                 </FormItem>
               )}
             />
-            <p className="text-sm text-muted-foreground">New members join with the Employee role.</p>
+            <FormField
+              control={form.control}
+              name="role_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Role</FormLabel>
+                  <Select
+                    value={field.value || undefined}
+                    onValueChange={field.onChange}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select role…" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {(roles ?? []).map((r) => (
+                        <SelectItem key={r._id} value={r._id}>
+                          {r.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancel
