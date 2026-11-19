@@ -1,6 +1,8 @@
 import * as React from "react"
 import { HeaderBrand } from "./header-brand"
 import { HeaderNav, HeaderNavItem } from "./header-nav"
+import { HeaderSearch } from "./header-search"
+import { HeaderActions, HeaderBell, HeaderUser } from "./header-actions"
 import { cn } from "@/lib/utils"
 
 function HeaderRoot(props: React.ComponentProps<"header">) {
@@ -13,4 +15,4 @@ function HeaderRoot(props: React.ComponentProps<"header">) {
   )
 }
 
-export const Header = Object.assign(HeaderRoot, { Brand: HeaderBrand, Nav: HeaderNav, NavItem: HeaderNavItem })
+export const Header = Object.assign(HeaderRoot, { Brand: HeaderBrand, Nav: HeaderNav, NavItem: HeaderNavItem, Search: HeaderSearch, Actions: HeaderActions, Bell: HeaderBell, User: HeaderUser })
