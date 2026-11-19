@@ -20,7 +20,7 @@ export interface ListUsersResponse {
 }
 
 export const usersApi = {
-  listUsers: (params?: { page?: number; limit?: number }) =>
+  listUsers: (params?: { page?: number; limit?: number; org_id?: string }) =>
     apiClient.get<ListUsersResponse>("/api/users", { params }),
 
   updateUserRole: (userId: string, role_id: string) =>

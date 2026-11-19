@@ -14,11 +14,14 @@ export interface Invite {
 }
 
 export const invitesApi = {
-  createInvite: (body: { invite_type: "consultancy_user"; email: string; role_id: string }) =>
-    apiClient.post<Invite>("/api/invites", body),
+  createInvite: (
+    body:
+      | { invite_type: "consultancy_user"; email: string; role_id: string }
+      | { invite_type: "org_user"; email: string; scope_id: string },
+  ) => apiClient.post<Invite>("/api/invites", body),
 
-  listInvites: () =>
-    apiClient.get<Invite[]>("/api/invites"),
+  listInvites: (params?: { invite_type?: "org_user"; scope_id?: string }) =>
+    apiClient.get<Invite[]>("/api/invites", { params }),
 
   cancelInvite: (id: string) =>
     apiClient.delete(`/api/invites/${id}`),
