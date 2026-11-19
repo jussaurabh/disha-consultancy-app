@@ -1,0 +1,4 @@
+fileignoreconfig:
+- filename: src/pages/organizations/users-section.tsx
+  checksum: 33323cf228a40583473f6b3376d114f7bb2a77a7690a0edb4dee50bd3b4f88e6
+version: "1.0"
