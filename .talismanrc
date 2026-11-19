@@ -5,4 +5,6 @@ fileignoreconfig:
   checksum: 23e1f9657c16a75caeecf7ec2c791b6036192cee2180489ff3c678a52abb9c2f
 - filename: src/components/ui/secondary-header.tsx
   checksum: a8d3fb18e009633f3f258133c38fe88541628a723e35c1f5fe23ba0c1d507ae0
+- filename: src/pages/organizations/detail.tsx
+  checksum: 7f5a84c08772f56ef8eec2b2cd69fe17a1062e49c27ea21e3744b065d9156506
 version: "1.0"
