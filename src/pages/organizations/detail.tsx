@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Banknote, Building2, ChevronRight, HeartPulse, Landmark, Loader2, MapPin, Settings, ShieldCheck } from "lucide-react";
+import { Banknote, Building2, ChevronRight, HeartPulse, Landmark, Loader2, MapPin, Settings, ShieldCheck, Users } from "lucide-react";
 import { toast } from "sonner";
 import { orgsApi, type Organization, type UpdateOrgBody } from "@/api/orgs";
 import {
@@ -32,6 +32,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import OrgUsersSection from "./users-section";
 
 // --- Schemas ---
 
@@ -126,6 +127,7 @@ const SECTIONS = [
   { id: "payroll", label: "Payroll", icon: Banknote },
   { id: "pf", label: "PF", icon: ShieldCheck },
   { id: "esi", label: "ESI", icon: HeartPulse },
+  { id: "users", label: "Users", icon: Users },
   { id: "settings", label: "Settings", icon: Settings },
 ] as const;
 
@@ -166,6 +168,11 @@ const SECTION_COPY: Record<SectionId, { title: string; description: string; succ
     title: "Settings",
     description: "Organization settings and administration",
     success: "Settings saved",
+  },
+  users: {
+    title: "Users",
+    description: "Members and pending invites for this organization",
+    success: "Users updated",
   },
 };
 
@@ -1742,6 +1749,7 @@ export default function OrganizationDetailPage() {
 
   const canEdit = hasPermission("org:update");
   const canDelete = hasPermission("org:delete");
+  const canListUsers = hasPermission("org_user:list");
 
   const {
     data: org,
@@ -1813,7 +1821,9 @@ export default function OrganizationDetailPage() {
 
   if (!org) return null;
 
-  const visibleSections = canDelete ? SECTIONS : SECTIONS.filter((section) => section.id !== "settings");
+  const visibleSections = [
+    ...SECTIONS.filter((section) => section.id !== "settings" || canDelete),
+  ].filter((section) => section.id !== "users" || canListUsers);
   const activeSectionLabel = visibleSections.find((section) => section.id === activeSection)?.label ?? SECTION_COPY.company.title;
   const statusBadgeClass = org.status === "inactive" ? "border-zinc-200 bg-zinc-100 text-zinc-600" : "border-green-200 bg-green-50 text-green-700";
 
@@ -1905,6 +1915,7 @@ export default function OrganizationDetailPage() {
             {activeSection === "payroll" && <PayrollLeaveForm org={org} canEdit={canEdit} />}
             {activeSection === "pf" && <PFForm org={org} canEdit={canEdit} />}
             {activeSection === "esi" && <ESIForm org={org} canEdit={canEdit} />}
+            {activeSection === "users" && canListUsers && <OrgUsersSection orgId={id!} />}
             {activeSection === "settings" && canDelete && (
               <SettingsForm org={org} canDelete={canDelete} onDeleteClick={() => setOrgNameToDelete(org.company_name)} />
             )}
