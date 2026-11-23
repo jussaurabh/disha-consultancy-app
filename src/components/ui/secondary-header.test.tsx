@@ -1,6 +1,7 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { SecondaryHeader } from "./secondary-header";
+import { StickyActionBar } from "./sticky-action-bar";
 
 describe("SecondaryHeader.Title", () => {
   it("renders the avatar as a rounded square with soft accent background", () => {
@@ -32,5 +33,20 @@ describe("SecondaryHeader root band", () => {
     );
     expect(root).not.toHaveClass("py-4");
     expect(root).not.toHaveClass("min-h-14");
+  });
+});
+
+describe("Shared gutter", () => {
+  it("aligns SecondaryHeader and StickyActionBar on the same gutter", () => {
+    const { container } = render(
+      <>
+        <SecondaryHeader />
+        <StickyActionBar />
+      </>,
+    );
+    const header = container.querySelector('[data-slot="secondary-header"]')!;
+    const bar = container.querySelector('[data-slot="sticky-action-bar"]')!;
+    expect(header).toHaveClass("px-4", "md:px-6");
+    expect(bar).toHaveClass("px-4", "md:px-6");
   });
 });
