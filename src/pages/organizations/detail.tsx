@@ -15,7 +15,7 @@ import {
 } from "@/lib/org-options";
 import { usersApi } from "@/api/users";
 import { useAuth } from "@/providers/use-auth";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
@@ -525,7 +525,7 @@ export default function OrganizationDetailPage() {
     <>
       <div className="space-y-6">
         {/* Context strip */}
-        <SecondaryHeader className="px-0 py-5" data-testid="detail-context-strip">
+        <SecondaryHeader className="py-5" data-testid="detail-context-strip">
           <SecondaryHeader.Breadcrumb segments={[{ label: "Organizations", url: "/organizations" }]} />
           <SecondaryHeader.Divider />
           <SecondaryHeader.Title avatar={initial} name={org.company_name} badge={statusBadge} />

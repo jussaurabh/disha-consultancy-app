@@ -22,3 +22,15 @@ describe("SecondaryHeader.Title", () => {
     expect(dot).toHaveClass("size-1.5", "rounded-full");
   });
 });
+
+describe("SecondaryHeader root band", () => {
+  it("renders the 54px full-width band with the shared gutter", () => {
+    const { container } = render(<SecondaryHeader />);
+    const root = container.querySelector('[data-slot="secondary-header"]')!;
+    expect(root).toHaveClass(
+      "min-h-[54px]", "w-full", "items-center", "border-b", "bg-card", "px-4", "md:px-6",
+    );
+    expect(root).not.toHaveClass("py-4");
+    expect(root).not.toHaveClass("min-h-14");
+  });
+});

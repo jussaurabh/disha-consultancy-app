@@ -30,7 +30,7 @@ function SecondaryHeaderRoot({
     <div
       data-slot="secondary-header"
       className={cn(
-        "flex min-h-14 w-full items-center gap-4 border-b border-border bg-card px-10 py-4",
+        "flex min-h-[54px] w-full items-center gap-4 border-b border-border bg-card px-4 md:px-6",
         className,
       )}
       {...props}
