@@ -63,4 +63,10 @@ describe("TabSwitcher", () => {
     expect(container.querySelector('[role="tablist"]')).toBeInTheDocument()
     expect(container.querySelectorAll('[role="tab"]')).toHaveLength(0)
   })
+
+  it("applies the shared gutter with px-4 md:px-6 on the tab list", () => {
+    const { container } = render(<TabSwitcher defaultValue="orgs" items={items} />)
+    const list = container.querySelector('[data-slot="tab-switcher-list"]')!
+    expect(list).toHaveClass("px-4", "md:px-6")
+  })
 })

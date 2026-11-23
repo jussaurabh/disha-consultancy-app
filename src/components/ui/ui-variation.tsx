@@ -21,7 +21,7 @@ export function UiVariation({
   className,
 }: UiVariationProps): React.JSX.Element {
   const rootClasses = cn(
-    "flex w-full flex-wrap items-end justify-between gap-6 px-10",
+    "flex w-full flex-wrap items-end justify-between gap-6 px-4 pt-4 md:px-6 md:pt-6",
     className,
   )
 

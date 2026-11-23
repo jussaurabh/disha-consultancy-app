@@ -35,7 +35,7 @@ export function FiltersBar(props: FiltersBarProps): React.JSX.Element {
   return (
     <div
       data-slot="filters-bar"
-      className={cn("flex w-full items-center gap-3", className)}
+      className={cn("flex w-full items-center gap-3 px-4 md:px-6", className)}
     >
       <div
         data-slot="filters-bar-search"

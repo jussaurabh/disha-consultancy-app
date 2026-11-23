@@ -39,4 +39,10 @@ describe("FiltersBar", () => {
     await user.click(screen.getByText("Clear filters"));
     expect(input).toHaveValue("");
   });
+
+  it("applies the shared gutter with px-4 md:px-6", () => {
+    const { container } = render(<FiltersBar tab="organizations" />);
+    const root = container.querySelector('[data-slot="filters-bar"]')!;
+    expect(root).toHaveClass("px-4", "md:px-6");
+  });
 });

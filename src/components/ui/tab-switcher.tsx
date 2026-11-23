@@ -26,7 +26,7 @@ export function TabSwitcher({
   className,
 }: TabSwitcherProps): React.JSX.Element {
   const rootClasses = cn("data-slot=tab-switcher", className)
-  const listClasses = "flex w-full items-center gap-8 border-b border-line"
+  const listClasses = "flex w-full items-center gap-8 border-b border-line px-4 md:px-6"
   const triggerClasses = cn(
     "group/tab-trigger flex h-11 items-center gap-2 border-b-2 border-transparent -mb-px text-sm font-medium text-muted transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 data-[state=active]:border-accent data-[state=active]:font-semibold data-[state=active]:text-ink",
   )
