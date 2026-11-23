@@ -122,7 +122,13 @@ describe("OrganizationsPage", () => {
   it("aligns the title zone with the shell padding", async () => {
     const { container } = renderPage();
     await screen.findByText("Organizations");
-    expect(container.querySelector('[data-slot="ui-variation"]')).toHaveClass("px-0");
+    expect(container.querySelector('[data-slot="ui-variation"]')).toHaveClass("px-4", "md:px-6");
+  });
+
+  it("insets the organization table card with the shared gutter", async () => {
+    const { container } = renderPage();
+    await screen.findByText("Organizations");
+    expect(container.querySelector('[data-slot="card"]')).toHaveClass("mx-4", "md:mx-6");
   });
 
   it("does not leak search text across tab switches", async () => {

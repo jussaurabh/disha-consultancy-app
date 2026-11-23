@@ -557,7 +557,7 @@ export default function OrganizationDetailPage() {
         />
 
         {tab === "company" && (
-          <div className="flex items-start gap-8 pt-8 pb-14">
+          <div className="flex items-start gap-8 px-4 pt-8 pb-14 md:px-6">
             <CompanyDetailsSection
               org={org}
               canEdit={canEdit}

@@ -53,15 +53,15 @@ export default function PermissionsPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 pb-4 md:pb-6">
+      <div className="flex items-center justify-between p-4 md:p-6">
         <h1 className="text-2xl font-bold">Permissions</h1>
         <p className="text-sm text-muted-foreground">
           {permissions.length} permission{permissions.length !== 1 ? "s" : ""} available
         </p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-6 px-4 md:px-6">
         {Object.entries(grouped).map(([category, perms]) => (
           <div key={category}>
             <h2 className="mb-3 text-lg font-semibold capitalize">{category}</h2>

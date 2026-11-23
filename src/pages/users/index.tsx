@@ -10,7 +10,7 @@ import { invitesApi, type Invite } from "@/api/invites";
 import { usersApi, type ConsultancyUser } from "@/api/users";
 import { rolesApi } from "@/api/roles";
 import { useAuth } from "@/providers/use-auth";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -218,8 +218,8 @@ export default function UsersPage() {
   const filteredInvites = inviteStatusFilter === "all" ? inviteList : inviteList.filter((inv) => inv.status === inviteStatusFilter);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 pb-4 md:pb-6">
+      <div className="flex items-center justify-between p-4 md:p-6">
         <div>
           <h1 className="text-2xl font-semibold">User management</h1>
           <p className="text-muted-foreground text-sm">Active users and invites.</p>
@@ -232,7 +232,7 @@ export default function UsersPage() {
         )}
       </div>
 
-      <Tabs defaultValue="users" className="w-full">
+      <Tabs defaultValue="users" className="w-full px-4 md:px-6">
         <TabsList>
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="invites">Invites</TabsTrigger>

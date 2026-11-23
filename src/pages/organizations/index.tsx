@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { orgsApi } from "@/api/orgs";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -50,7 +50,6 @@ export default function OrganizationsPage() {
         variant: "index" as const,
         eyebrow: showCounts ? `Client companies · ${total} total` : undefined,
         title: "Organizations",
-        className: "px-0",
         actions: (
           <>
             <Button
@@ -72,7 +71,6 @@ export default function OrganizationsPage() {
         variant: "index" as const,
         eyebrow: "People",
         title: "Employees",
-        className: "px-0",
         actions: (
           <>
             <Button
@@ -90,7 +88,7 @@ export default function OrganizationsPage() {
       };
 
   return (
-    <div>
+    <div className="pb-4 md:pb-6">
       <UiVariation {...uiVariationProps} />
       <TabSwitcher
         className="mt-9"
@@ -103,7 +101,7 @@ export default function OrganizationsPage() {
       />
       <FiltersBar key={filtersBarKey} tab={tab} className="mt-6" />
       {isOrganizationsTab ? (
-        <Card className="mt-6">
+        <Card className="mx-4 mt-6 md:mx-6">
           <CardContent>
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
@@ -183,7 +181,7 @@ export default function OrganizationsPage() {
           </CardContent>
         </Card>
       ) : (
-        <Card className="mt-6">
+        <Card className="mx-4 mt-6 md:mx-6">
           <CardContent>
             <p className="text-sm text-muted text-center py-4">
               No employees to show yet.

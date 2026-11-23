@@ -8,7 +8,7 @@ import { CheckCircle2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { orgsApi, type Organization } from "@/api/orgs";
 import { STATES_OPTIONS } from "@/lib/org-options";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -58,9 +58,9 @@ export default function NewOrganizationPage() {
   }, [createdOrg, navigate]);
 
   return (
-    <div className="space-y-6 max-w-lg">
+    <div className="space-y-6 pb-4 max-w-lg md:pb-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 p-4 md:p-6">
         <Button
           variant="ghost"
           size="icon"
@@ -139,7 +139,7 @@ export default function NewOrganizationPage() {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit((v) => mutation.mutate(v))}
-                className="space-y-4"
+                className="space-y-4 px-4 md:px-6"
               >
                 <FormField
                   control={form.control}

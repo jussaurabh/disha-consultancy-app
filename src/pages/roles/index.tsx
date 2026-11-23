@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { rolesApi, type Role } from "@/api/roles";
 import { permissionsApi, type Permission } from "@/api/permissions";
 import { useAuth } from "@/providers/use-auth";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -283,8 +283,8 @@ export default function RolesPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 pb-4 md:pb-6">
+      <div className="flex items-center justify-between p-4 md:p-6">
         <h1 className="text-2xl font-bold">Roles</h1>
         {canCreate && (
           <Button onClick={openCreateForm} size="sm">
@@ -295,7 +295,7 @@ export default function RolesPage() {
       </div>
 
       {roles.length === 0 ? (
-        <div className="rounded-lg border border-dashed p-8 text-center">
+        <div className="mx-4 rounded-lg border border-dashed p-8 text-center md:mx-6">
           <p className="text-muted-foreground">No roles yet</p>
           {canCreate && (
             <Button onClick={openCreateForm} variant="outline" className="mt-4">
@@ -304,7 +304,7 @@ export default function RolesPage() {
           )}
         </div>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="mx-4 overflow-x-auto md:mx-6">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b">
