@@ -7,7 +7,7 @@ interface AuthShellProps {
 
 export function AuthShell({ children }: AuthShellProps) {
   return (
-    <div className="min-h-dvh bg-zinc-50 lg:flex">
+    <div className="min-h-dvh bg-zinc-50 lg:flex light">
       <div className="h-[72px] md:h-[120px] lg:h-auto lg:w-1/2">
         <BrandPanel />
       </div>
