@@ -15,7 +15,7 @@ import {
 } from "@/lib/org-options";
 import { usersApi } from "@/api/users";
 import { useAuth } from "@/providers/use-auth";
-import { Button } from "@/components/ui/button/button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";

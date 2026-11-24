@@ -28,3 +28,9 @@ dist-ssr
 /graft/
 AGENTS.md
 opencode.json
+docs
+
+*storybook.log
+storybook-static
+.vitest
+tests

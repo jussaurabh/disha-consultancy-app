@@ -8,7 +8,7 @@ import { CheckCircle2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { orgsApi, type Organization } from "@/api/orgs";
 import { STATES_OPTIONS } from "@/lib/org-options";
-import { Button } from "@/components/ui/button/button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";

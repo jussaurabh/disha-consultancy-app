@@ -5,16 +5,44 @@
 @theme inline {
   --font-display: "Archivo Variable", sans-serif;
   --font-body: "Inter Variable", sans-serif;
-  --color-ground: #F2EFE8;
-  --color-surface: #FBFAF6;
-  --color-ink: #201E19;
-  --color-muted: #6F695C;
-  --color-line: #E2DDD1;
-  --color-accent: #2F6B5B;
-  --color-accent-soft: #E4EBE5;
-  --color-copper: #B0653A;
-  --color-copper-soft: #F3E4D8;
-  --color-danger: #8C3A2E;
+  /* DC palette — raw light/dark values live in :root and .dark */
+  --color-ground: var(--dc-ground);
+  --color-surface: var(--dc-surface);
+  --color-ink: var(--dc-ink);
+  --color-muted: var(--dc-muted);
+  --color-line: var(--dc-line);
+  --color-accent: var(--dc-accent);
+  --color-accent-soft: var(--dc-accent-soft);
+  --color-copper: var(--copper); /* #B0653A light · oklch(0.655 0.112 49.9) dark — raw values in :root/.dark */
+  --color-copper-soft: var(--dc-copper-soft);
+  --color-danger: var(--dc-danger);
+  --color-danger-foreground: var(--dc-danger-foreground);
+  /* Interaction states from the "12 / Buttons" design system board (V1.0) */
+  --color-accent-hover: var(--accent-hover); /* #285E4F light · #77B7A0 dark */
+  --color-accent-active: var(--accent-active); /* #204C40 light · #619280 dark */
+  --color-danger-hover: var(--dc-danger-hover);
+  --color-danger-active: var(--dc-danger-active);
+  --color-line-strong: var(--dc-line-strong);
+  --color-line-stronger: var(--dc-line-stronger);
+  --color-surface-pressed: var(--dc-surface-pressed);
+  --color-field: var(--dc-field);
+  /* shadcn semantic tokens -> Tailwind color utilities (bg-background, border-border, ...) */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -27,19 +55,49 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  --radius: 0.625rem;
   --background: var(--color-ground);
   --card: var(--color-surface);
+  --card-foreground: var(--color-ink);
+  --popover: var(--color-surface);
+  --popover-foreground: var(--color-ink);
   --foreground: var(--color-ink);
   --muted-foreground: var(--color-muted);
   --border: var(--color-line);
+  --input: var(--color-line);
+  --ring: var(--color-accent);
   --primary: var(--color-accent);
-  --primary-foreground: #FBFAF6;
+  --primary-foreground: #FFFFFF; /* text on accent — synced with Paper (13 / Color) */
   --secondary: var(--color-accent-soft);
+  --secondary-foreground: var(--color-ink);
+  --accent: var(--color-accent-soft);
+  --accent-foreground: var(--color-ink);
   --destructive: var(--color-danger);
+  /* raw values for dark-aware brand tokens (consumed by @theme inline) */
+  --copper: #B0653A;
+  --dc-copper-soft: #F3E4D8;
+  --accent-hover: #285E4F;
+  --accent-active: #204C40;
+  /* DC palette, light register — Paper "dc" · 12 / Buttons */
+  --dc-ground: #F2EFE8;
+  --dc-surface: #FBFAF6;
+  --dc-ink: #201E19;
+  --dc-muted: #6F695C;
+  --dc-line: #E2DDD1;
+  --dc-accent: #2F6B5B;
+  --dc-accent-soft: #E4EBE5;
+  --dc-danger: #8C3A2E;
+  --dc-danger-foreground: #FFFFFF;
+  --dc-line-strong: #C6BFAF;
+  --dc-line-stronger: #B3AA97;
+  --dc-surface-pressed: #EAE6DB;
+  --dc-danger-hover: #7C342A;
+  --dc-danger-active: #6A2C23;
+  --dc-field: #FFFFFF; /* field fill — synced with Paper (04 / Inputs): white in light, card #24231F in dark */
 }
 
 .dark {
-  /* the exact current :root values from src/index.css:49, unchanged */
+  /* mineral nocturne — dark register of the Paper `dc` palette (13 / Color) */
   --background: oklch(0.222 0.006 91.6);
   --foreground: oklch(0.94 0.01 93.6);
   --card: oklch(0.256 0.007 95.4);
@@ -55,6 +113,10 @@
   --accent: oklch(0.34 0.018 168.1);
   --accent-foreground: oklch(0.909 0.015 158.2);
   --destructive: oklch(0.608 0.13 30.2);
+  /* brand tokens, dark register (Paper 13 / Color · Dark) */
+  --copper: oklch(0.655 0.112 49.9);
+  --accent-hover: oklch(0.73 0.075 169);
+  --accent-active: oklch(0.62 0.06 169.5);
   --border: oklch(0.341 0.009 88.7);
   --input: oklch(0.341 0.009 88.7);
   --ring: oklch(0.686 0.068 169.2);
@@ -71,6 +133,23 @@
   --sidebar-accent-foreground: oklch(0.94 0.01 93.6);
   --sidebar-border: oklch(0.341 0.009 88.7);
   --sidebar-ring: oklch(0.686 0.068 169.2);
+  /* DC palette, dark register — Paper "dc" · 12 / Buttons · Dark */
+  --dc-ground: #1C1B18;
+  --dc-surface: #24231F;
+  --dc-ink: #EDEBE4;
+  --dc-muted: #A29B8C;
+  --dc-line: #3A3833;
+  --dc-accent: #6FA893;
+  --dc-accent-soft: oklch(0.34 0.018 168.1);
+  --dc-copper-soft: oklch(0.34 0.03 55);
+  --dc-danger: oklch(0.608 0.13 30.2);
+  --dc-danger-foreground: #1C1B18;
+  --dc-line-strong: #504D46;
+  --dc-line-stronger: #55524B;
+  --dc-surface-pressed: #2F2E29;
+  --dc-danger-hover: oklch(0.66 0.13 30.2);
+  --dc-danger-active: oklch(0.55 0.12 30.2);
+  --dc-field: #24231F; /* field fill — synced with Paper (04 / Inputs): = --dc-surface in dark */
 }
 
 #root {

@@ -1,6 +1,6 @@
-import * as React from "react"
-import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 function HeaderBrand({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -13,9 +13,9 @@ function HeaderBrand({ className, ...props }: React.ComponentProps<"div">) {
         D
       </div>
       <span className="text-base font-semibold text-foreground">Disha</span>
-      <Badge variant="secondary">SILVER CRAFT</Badge>
+      <Badge variant="secondary">Consultancy</Badge>
     </div>
-  )
+  );
 }
 
-export { HeaderBrand }
+export { HeaderBrand };
