@@ -30,6 +30,7 @@ export function Stepper({
   steps,
   current,
   orientation = "vertical",
+  size = "default",
   onStepSelect,
   className,
   ...props
@@ -38,24 +39,76 @@ export function Stepper({
     return <StepperHorizontal steps={steps} current={current} onStepSelect={onStepSelect} className={className} {...props} />
   }
 
+  const isCompact = size === "compact"
+
   return (
     <ol
       data-slot="stepper"
       data-orientation="vertical"
-      className={cn("relative flex flex-col gap-[22px]", className)}
+      className={cn("relative flex flex-col", isCompact ? "" : "gap-[22px]", className)}
       {...props}
     >
       {steps.length > 1 && (
         <span
           data-slot="stepper-connector"
           aria-hidden="true"
-          className="absolute left-[14px] top-[15px] bottom-[15px] w-px bg-line"
+          className={cn(
+            "absolute w-px bg-line",
+            isCompact ? "left-3 top-3 bottom-3" : "left-[14px] top-[15px] bottom-[15px]"
+          )}
         />
       )}
       {steps.map((step, index) => {
         const state = resolveStepState(step, index, current)
         const isCurrent = state === "current"
         const isInteractive = typeof onStepSelect === "function"
+
+        if (isCompact) {
+          return (
+            <li
+              key={index}
+              data-slot="stepper-item"
+              data-state={state}
+              aria-current={isCurrent ? "step" : undefined}
+              className={cn(
+                "flex items-center gap-x-3 pt-1 pb-3.5",
+                isInteractive && "cursor-pointer"
+              )}
+              onClick={isInteractive ? () => onStepSelect!(index) : undefined}
+            >
+              <span
+                data-slot="stepper-indicator"
+                className={cn(
+                  "relative z-10 grid size-6 place-items-center rounded-full font-body",
+                  isCurrent || state === "completed" ? "text-[11px]" : "text-xs",
+                  "leading-4",
+                  indicatorClasses[state]
+                )}
+              >
+                {state === "completed" ? (
+                  <Check data-slot="stepper-check" className="size-3" aria-hidden="true" />
+                ) : (
+                  String(index + 1)
+                )}
+              </span>
+              <div className="flex min-w-0 flex-col">
+                <span
+                  className={cn(
+                    "text-sm font-semibold leading-[18px]",
+                    isCurrent ? "text-ink" : "text-muted-foreground"
+                  )}
+                >
+                  {step.title}
+                </span>
+                {isCurrent && (
+                  <Badge size="sm" shape="pill" className="uppercase tracking-[0.06em]">
+                    Current
+                  </Badge>
+                )}
+              </div>
+            </li>
+          )
+        }
 
         return (
           <li

@@ -241,3 +241,37 @@ export const HorizontalDark: Story = {
 export const Dark: Story = {
   render: () => <DarkStory />,
 }
+
+export const Compact: Story = {
+  render: () => (
+    <div className="min-h-screen w-full bg-background px-8 py-10 md:px-16">
+      <div className="mx-auto flex max-w-[1180px] flex-col">
+        <div className="flex items-center gap-2">
+          <Caption>Component library</Caption>
+          <span className="font-body text-[10px] text-muted-foreground">·</span>
+          <Caption>DC design system · V1.0</Caption>
+        </div>
+        <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight text-foreground">
+          Stepper — Compact
+        </h2>
+        <p className="mt-2 max-w-xl font-body text-sm leading-6 text-muted-foreground">
+          Compact rail with 24px circles, titles only (no subtitles), tighter row padding.
+          Titles carry state by color; Current badge still shows.
+        </p>
+        <Block title="Compact">
+          <Row label="Default (current=2)" note="24px circles, titles only, pt-1 pb-3.5, gap-x-3">
+            <Stepper steps={STEPS} current={2} size="compact" />
+          </Row>
+        </Block>
+      </div>
+    </div>
+  ),
+}
+
+export const CompactDark: Story = {
+  render: () => (
+    <div className="dark bg-ground p-8">
+      <Stepper steps={STEPS} current={2} size="compact" />
+    </div>
+  ),
+}

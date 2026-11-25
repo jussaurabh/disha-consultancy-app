@@ -244,6 +244,93 @@ describe("Stepper — horizontal", () => {
   })
 })
 
+describe("Stepper — compact", () => {
+  it("items are center-aligned rows with pt-1 pb-3.5 and gap-x-3", () => {
+    const { container } = render(<Stepper steps={STEPS} current={2} size="compact" />)
+    const items = container.querySelectorAll('[data-slot="stepper-item"]')
+    items.forEach((item) => {
+      expect(item.className).toContain("items-center")
+      expect(item.className).toContain("pt-1")
+      expect(item.className).toContain("pb-3.5")
+      expect(item.className).toContain("gap-x-3")
+    })
+  })
+
+  it("circles are size-6 (24px) not size-[29px]", () => {
+    const { container } = render(<Stepper steps={STEPS} current={2} size="compact" />)
+    const items = container.querySelectorAll('[data-slot="stepper-item"]')
+    items.forEach((item) => {
+      const indicator = item.querySelector('[data-slot="stepper-indicator"]')
+      expect(indicator?.className).toContain("size-6")
+      expect(indicator?.className).not.toContain("size-[29px]")
+    })
+  })
+
+  it("subtitles are not rendered even when provided", () => {
+    const { container } = render(<Stepper steps={STEPS} current={2} size="compact" />)
+    expect(container.querySelector('[data-slot="stepper-subtitle"]')).toBeNull()
+  })
+
+  it("completed titles text-muted-foreground; current title text-ink; Current badge still shows", () => {
+    const { container } = render(<Stepper steps={STEPS} current={2} size="compact" />)
+    const items = container.querySelectorAll('[data-slot="stepper-item"]')
+    // Completed items (0, 1) should have text-muted-foreground titles
+    const completedTitle0 = items[0].querySelector("span.text-sm") as HTMLElement
+    const completedTitle1 = items[1].querySelector("span.text-sm") as HTMLElement
+    expect(completedTitle0.className).toContain("text-muted-foreground")
+    expect(completedTitle1.className).toContain("text-muted-foreground")
+    // Current item (2) should have text-ink title
+    const currentTitle = items[2].querySelector("span.text-sm") as HTMLElement
+    expect(currentTitle.className).toContain("text-ink")
+    // Current badge still shows
+    expect(items[2].textContent).toContain("Current")
+  })
+
+  it("spine is at left-3 and bg-line", () => {
+    const { container } = render(<Stepper steps={STEPS} current={2} size="compact" />)
+    const spine = container.querySelector('[data-slot="stepper-connector"]') as HTMLElement
+    expect(spine).not.toBeNull()
+    expect(spine.className).toContain("left-3")
+    expect(spine.className).toContain("bg-line")
+  })
+
+  it("completed circle shows check (size-3), current shows number", () => {
+    const { container } = render(<Stepper steps={STEPS} current={2} size="compact" />)
+    const items = container.querySelectorAll('[data-slot="stepper-item"]')
+    // Completed items show check
+    const completedIndicator0 = items[0].querySelector('[data-slot="stepper-indicator"]')
+    const completedIndicator1 = items[1].querySelector('[data-slot="stepper-indicator"]')
+    expect(completedIndicator0?.querySelector('[data-slot="stepper-check"]')).not.toBeNull()
+    expect(completedIndicator1?.querySelector('[data-slot="stepper-check"]')).not.toBeNull()
+    // Current item shows number "3"
+    const currentIndicator = items[2].querySelector('[data-slot="stepper-indicator"]')
+    expect(currentIndicator?.textContent).toBe("3")
+  })
+
+  it("size=default rendering unchanged (vertical assertions still pass)", () => {
+    const { container } = render(<Stepper steps={STEPS} current={2} size="default" />)
+    const ol = container.querySelector('[data-slot="stepper"]') as HTMLElement
+    expect(ol.dataset.orientation).toBe("vertical")
+    const items = container.querySelectorAll('[data-slot="stepper-item"]')
+    expect(items).toHaveLength(6)
+    expect(items[0].dataset.state).toBe("completed")
+    expect(items[0].querySelector('[data-slot="stepper-check"]')).not.toBeNull()
+    expect(items[1].dataset.state).toBe("completed")
+    expect(items[1].querySelector('[data-slot="stepper-check"]')).not.toBeNull()
+    expect(items[2].dataset.state).toBe("current")
+    for (let i = 3; i < 6; i++) {
+      expect(items[i].dataset.state).toBe("upcoming")
+    }
+  })
+
+  it("rendered HTML contains no hex color tokens", () => {
+    const { container } = render(<Stepper steps={STEPS} current={2} size="compact" />)
+    const html = container.innerHTML
+    expect(html).not.toMatch(/#[0-9a-f]{3}\b/i)
+    expect(html).not.toMatch(/#[0-9a-f]{6}\b/i)
+  })
+})
+
 describe("resolveStepState", () => {
   it("index < current => completed", () => {
     expect(resolveStepState({ title: "A" }, 0, 2)).toBe("completed")
