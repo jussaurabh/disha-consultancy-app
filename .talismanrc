@@ -11,4 +11,6 @@ fileignoreconfig:
   checksum: 93d18bb673b806cc19d0a7ec931727f991da6b0924992e8dca34efa021c67495
 - filename: src/pages/organizations/bank-panel.tsx
   checksum: 6aa9b1071039e0f42b66b6ac72ecaab157b496337745098c1a5c36af0c414e5f
+- filename: src/pages/organizations/payroll-panel.tsx
+  checksum: e441a6ec2b6761fd0c0aebf4010cac307e7b278a49091fd3c050716bfd174c23
 version: "1.0"
