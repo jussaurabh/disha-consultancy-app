@@ -1,28 +1,30 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import type { ComponentType } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { SecondaryHeader } from "@/components/ui/secondary-header";
 import { PageHeader } from "@/components/ui/page-header";
 import { Stepper } from "@/components/ui/stepper";
 import { InfoNote } from "@/components/ui/info-note";
 import { StickyActionBar } from "@/components/ui/sticky-action-bar";
-import { FormPanel } from "@/components/ui/form-panel";
-import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
-import { STEPS, panelHeaderProps } from "./new-shared";
+import { STEPS, panelHeaderProps, type StepKey } from "./new-shared";
 import { CompanyPanel } from "./company-panel";
+import { ContactPanel } from "./contact-panel";
+import { BankPanel } from "./bank-panel";
+import { PayrollPanel } from "./payroll-panel";
+import { PfPanel } from "./pf-panel";
+import { EsiPanel } from "./esi-panel";
+import { readDraft } from "@/lib/org-new-draft";
 
-function PlaceholderPanel({ step, index }: { step: (typeof STEPS)[number]; index: number }) {
-  return (
-    <FormPanel {...panelHeaderProps(step, index)}>
-      <EmptyState
-        title="Coming soon"
-        subTitle={`The ${step.title} form is not implemented in this milestone.`}
-        className="py-16"
-      />
-    </FormPanel>
-  );
-}
+const PANEL_COMPONENTS: Record<StepKey, ComponentType> = {
+  Company: CompanyPanel,
+  Contact: ContactPanel,
+  Bank: BankPanel,
+  Payroll: PayrollPanel,
+  PF: PfPanel,
+  ESI: EsiPanel,
+};
 
 export default function NewOrganizationPage() {
   const navigate = useNavigate();
@@ -34,6 +36,12 @@ export default function NewOrganizationPage() {
   const goToStep = (index: number) =>
     setCurrent(Math.max(0, Math.min(STEPS.length - 1, index)));
   const advance = () => goToStep(current + 1);
+
+  const handleCreate = () => {
+    console.log(readDraft());
+  };
+
+  const Panel = PANEL_COMPONENTS[step.key];
 
   return (
     <div className="flex min-h-full flex-col">
@@ -58,15 +66,9 @@ export default function NewOrganizationPage() {
         title="Create organization"
         description="Register a client company, then configure payroll, statutory and banking setup."
         actions={
-          <>
-            <Button variant="ghost" onClick={() => navigate("/organizations")}>
-              Cancel
-            </Button>
-            <Button variant="outline" onClick={advance}>
-              Save draft
-              <ArrowRight />
-            </Button>
-          </>
+          <Button variant="ghost" onClick={() => navigate("/organizations")}>
+            Cancel
+          </Button>
         }
       />
 
@@ -82,11 +84,7 @@ export default function NewOrganizationPage() {
           </InfoNote>
         </div>
 
-        {current === 0 ? (
-          <CompanyPanel />
-        ) : (
-          <PlaceholderPanel step={step} index={current} />
-        )}
+        <Panel />
       </div>
 
       <StickyActionBar>
@@ -117,7 +115,7 @@ export default function NewOrganizationPage() {
             <ArrowLeft />
             Back
           </Button>
-          <Button disabled={isLast} onClick={advance}>
+          <Button onClick={isLast ? handleCreate : advance}>
             {isLast
               ? "Create organization"
               : `Continue to ${STEPS[current + 1].short}`}
