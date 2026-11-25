@@ -7,4 +7,6 @@ fileignoreconfig:
   checksum: a8d3fb18e009633f3f258133c38fe88541628a723e35c1f5fe23ba0c1d507ae0
 - filename: src/pages/organizations/detail.tsx
   checksum: b732f868ae8a060363d774ee8d1f2ea46b3d7b7fc17df8f62460497452db03eb
+- filename: src/components/ui/tabs/tabs.stories.tsx
+  checksum: 903c2a5e9d4719e6d0eafc794222a74afd90ee3eeada070386f311bb7b4a1e1e
 version: "1.0"

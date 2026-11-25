@@ -8,14 +8,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs"
 /**
  * DC design system — Tabs board (V1.0).
  *
- * Radix tabs. Two TabsList registers: "default" — muted pill container
- * (bg-muted, h-8 horizontal), active trigger = bg-background + text-foreground
- * + shadow-sm; "line" — transparent container, gap-1, active trigger shows a
- * 2px bottom rule (horizontal) or right bar (vertical) via ::after.
+ * Radix tabs. Three TabsList registers: "default" — segmented accent-soft
+ * track (dark: surface-pressed), active trigger lifts onto surface with a
+ * hairline border and a 2px shadow; "line" — transparent track with a bottom
+ * border, active trigger paints a 2px accent rule; "pill" — transparent
+ * rounded-full triggers, active tints accent-soft with accent text.
  *
- * Triggers: rounded-md · px-1.5 py-0.5 · text-sm font-medium · gap-1.5 ·
- * icons 16 with data-icon="inline-start" | "inline-end". Disabled = 50%
- * opacity, no pointer events. Keyboard: ← → ↑ ↓ · Home · End.
+ * Triggers: Inter 13px · h-36px (h-40 on the line) · inactive 500 muted,
+ * active 600 · icons 16 with gap-2 · copper count badge after the label ·
+ * focus = 2px accent outline offset 2 · disabled = 40% opacity. Vertical
+ * roots render the list as a 200px side-rail card. `scrollable` wraps the
+ * list between chevrons with a right-edge fade. Keyboard: arrow keys, Home
+ * and End.
  */
 const meta = {
   title: "UI/Tabs",
@@ -26,7 +30,12 @@ const meta = {
     docs: {
       description: {
         component:
-          "Radix tabs with two list registers — default (muted pill, h-8 horizontal) and line (transparent with an active rule). Triggers are rounded-md, text-sm font-medium, gap-1.5. Arrow keys, Home and End move between triggers.",
+          "Radix tabs with three list registers. The default register is a segmented " +
+          "accent-soft track, the line register is an underline with a 2px active rule, " +
+          "the pill register uses soft rounded-full triggers. Triggers are Inter 13px on " +
+          "a 36px frame (40px on the line), inactive muted, active semibold. Icons, " +
+          "copper count badges, a 200px vertical side rail and a scrollable list with " +
+          "chevrons. Arrow keys, Home and End move between triggers.",
       },
     },
   },
@@ -35,7 +44,7 @@ const meta = {
       control: "radio",
       options: ["horizontal", "vertical"],
       description:
-        "horizontal stacks the list above the content; vertical lays the list beside it and stacks triggers full width, left aligned.",
+        "horizontal stacks the list above the content; vertical lays the list beside it as a 200px rail card and stacks triggers full width, left aligned.",
     },
     activationMode: {
       control: "radio",
@@ -101,29 +110,11 @@ function Row({ label, note, children }: { label: string; note?: string; children
   )
 }
 
-function State({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="flex flex-col items-start gap-3">
-      {children}
-      <Caption>{label}</Caption>
-    </div>
-  )
-}
-
-/** The two TabsList registers — muted pill and transparent line. */
-function Variants() {
+/** The three list registers — underline, boxed segmented and soft pill. */
+function Styles() {
   return (
     <div className="flex flex-col">
-      <Row label="Default" note="bg-muted pill · h-8 · active lifts onto background + shadow-sm">
-        <Tabs defaultValue="overview">
-          <TabsList>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="employees">Employees</TabsTrigger>
-            <TabsTrigger value="payroll">Payroll</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </Row>
-      <Row label="Line" note="Transparent · gap-1 · active rule sits 5px under the trigger">
+      <Row label="Underline" note="Transparent track with a bottom border · active paints a 2px accent rule">
         <Tabs defaultValue="overview">
           <TabsList variant="line">
             <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -132,96 +123,47 @@ function Variants() {
           </TabsList>
         </Tabs>
       </Row>
-    </div>
-  )
-}
-
-/** Orientation — the list reads above the content or beside it. */
-function Orientation() {
-  return (
-    <div className="flex flex-col">
-      <Row label="Horizontal" note="List above · triggers flex-1 across the container">
-        <Tabs defaultValue="profile" className="w-full max-w-md">
+      <Row label="Boxed · Segmented" note="Accent-soft track · active lifts onto surface with a hairline border and a 2px shadow">
+        <Tabs defaultValue="overview">
           <TabsList>
-            <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="security">Security</TabsTrigger>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="employees">Employees</TabsTrigger>
+            <TabsTrigger value="payroll">Payroll</TabsTrigger>
           </TabsList>
-          <TabsContent value="profile" className="rounded-lg border p-4 text-muted-foreground">
-            Horizontal content — arrows move ← →.
-          </TabsContent>
-          <TabsContent value="security" className="rounded-lg border p-4 text-muted-foreground">
-            Security content.
-          </TabsContent>
         </Tabs>
       </Row>
-      <Row label="Vertical" note="List beside · triggers stack full width, left aligned">
-        <Tabs defaultValue="profile" orientation="vertical" className="w-full max-w-md">
-          <TabsList className="w-40">
-            <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="security">Security</TabsTrigger>
+      <Row label="Pill · Soft" note="Rounded-full triggers · active tints accent-soft with accent text">
+        <Tabs defaultValue="overview">
+          <TabsList variant="pill">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="employees">Employees</TabsTrigger>
+            <TabsTrigger value="payroll">Payroll</TabsTrigger>
           </TabsList>
-          <TabsContent value="profile" className="rounded-lg border p-4 text-muted-foreground">
-            Vertical content — arrows move ↑ ↓.
-          </TabsContent>
-          <TabsContent value="security" className="rounded-lg border p-4 text-muted-foreground">
-            Security content.
-          </TabsContent>
         </Tabs>
       </Row>
-      <Row label="Vertical · line" note="Active rule runs down the right edge">
-        <Tabs defaultValue="profile" orientation="vertical" className="w-full max-w-md">
-          <TabsList variant="line" className="w-40">
-            <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="security">Security</TabsTrigger>
-          </TabsList>
-          <TabsContent value="profile" className="rounded-lg border p-4 text-muted-foreground">
-            The line register paints a 2px bar on the trailing edge.
-          </TabsContent>
-          <TabsContent value="security" className="rounded-lg border p-4 text-muted-foreground">
-            Security content.
-          </TabsContent>
-        </Tabs>
-      </Row>
-    </div>
-  )
-}
-
-/** Icons ride inline-start or inline-end via data-icon. */
-function WithIcons() {
-  return (
-    <div className="flex flex-col">
-      <Row label="Leading" note="data-icon=inline-start — icon before the label">
+      <Row label="With icons" note="16px icons with a gap-2 to the label">
         <Tabs defaultValue="add">
           <TabsList>
             <TabsTrigger value="add">
-              <Plus data-icon="inline-start" aria-hidden />
+              <Plus aria-hidden />
               Add employee
             </TabsTrigger>
-            <TabsTrigger value="import">Import</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </Row>
-      <Row label="Trailing" note="data-icon=inline-end — icon after the label">
-        <Tabs defaultValue="settings">
-          <TabsList>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
             <TabsTrigger value="compliance">
               Compliance
-              <ShieldCheck data-icon="inline-end" aria-hidden />
+              <ShieldCheck aria-hidden />
             </TabsTrigger>
           </TabsList>
         </Tabs>
       </Row>
-      <Row label="Line · icons" note="Icons on the line register">
-        <Tabs defaultValue="org">
-          <TabsList variant="line">
-            <TabsTrigger value="org">
-              <Building2 data-icon="inline-start" aria-hidden />
-              Organization
+      <Row label="With counts" note="18px copper badge after the label — the count rides the trigger's gap-2">
+        <Tabs defaultValue="employees">
+          <TabsList>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="employees" count={128}>
+              Employees
             </TabsTrigger>
-            <TabsTrigger value="people">
-              <Users data-icon="inline-start" aria-hidden />
-              People
+            <TabsTrigger value="payroll" count={12}>
+              Payroll
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -230,21 +172,14 @@ function WithIcons() {
   )
 }
 
-/** Trigger states — active, inactive, disabled. */
+/** Trigger states — disabled sinks, focus paints the accent outline. */
 function States() {
   return (
     <div className="flex flex-col">
-      <Row label="Default register" note="Active trigger sits on background with shadow-sm">
-        <State label="Active">
-          <Tabs defaultValue="one">
-            <TabsList>
-              <TabsTrigger value="one">One</TabsTrigger>
-              <TabsTrigger value="two">Two</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </State>
-      </Row>
-      <Row label="Disabled" note="50% opacity · no pointer events · skipped by arrows">
+      <Row
+        label="Disabled · Focus"
+        note="Disabled drops to 40% opacity and keeps no pointer events · focus paints a 2px accent outline, offset 2 — tab into the group to see it"
+      >
         <Tabs defaultValue="active">
           <TabsList>
             <TabsTrigger value="active">Active</TabsTrigger>
@@ -257,12 +192,60 @@ function States() {
           </TabsList>
         </Tabs>
       </Row>
-      <Row label="Manual activation" note="Arrow keys move focus · Enter or Space activates">
-        <Tabs defaultValue="drafts" activationMode="manual">
+    </div>
+  )
+}
+
+/** Orientation — the side rail and the scrollable overflow. */
+function Orientation() {
+  return (
+    <div className="flex flex-col">
+      <Row
+        label="Side rail"
+        note="Vertical lays the list beside the content as a 200px rail card · the board only shows the default register vertically"
+      >
+        <Tabs defaultValue="overview" orientation="vertical" className="w-full max-w-md">
           <TabsList>
-            <TabsTrigger value="drafts">Drafts</TabsTrigger>
-            <TabsTrigger value="sent">Sent</TabsTrigger>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="employees">Employees</TabsTrigger>
+            <TabsTrigger value="payroll">Payroll</TabsTrigger>
           </TabsList>
+          <TabsContent value="overview" className="flex flex-col gap-2 rounded-lg border border-line bg-field p-4">
+            <span className="h-3 w-2/3 animate-skeleton-pulse rounded-full bg-line" />
+            <span className="h-3 w-full animate-skeleton-pulse rounded-full bg-line" />
+            <span className="h-3 w-1/2 animate-skeleton-pulse rounded-full bg-line" />
+          </TabsContent>
+          <TabsContent value="employees" className="flex flex-col gap-2 rounded-lg border border-line bg-field p-4">
+            <span className="h-3 w-full animate-skeleton-pulse rounded-full bg-line" />
+            <span className="h-3 w-3/4 animate-skeleton-pulse rounded-full bg-line" />
+          </TabsContent>
+          <TabsContent value="payroll" className="flex flex-col gap-2 rounded-lg border border-line bg-field p-4">
+            <span className="h-3 w-1/2 animate-skeleton-pulse rounded-full bg-line" />
+            <span className="h-3 w-2/3 animate-skeleton-pulse rounded-full bg-line" />
+          </TabsContent>
+        </Tabs>
+      </Row>
+      <Row
+        label="Overflow · Scrollable"
+        note="Chevrons page the list by 240px behind a right-edge fade · chevrons are verified manually; no scroll assertion exists."
+      >
+        <Tabs defaultValue="tab-3" className="w-full max-w-md">
+          <TabsList scrollable>
+            <TabsTrigger value="tab-1">Org profile</TabsTrigger>
+            <TabsTrigger value="tab-2">Establishments</TabsTrigger>
+            <TabsTrigger value="tab-3">Employees</TabsTrigger>
+            <TabsTrigger value="tab-4">Payroll runs</TabsTrigger>
+            <TabsTrigger value="tab-5">Statutory</TabsTrigger>
+            <TabsTrigger value="tab-6">Reports</TabsTrigger>
+            <TabsTrigger value="tab-7">Invites</TabsTrigger>
+            <TabsTrigger value="tab-8">Audit log</TabsTrigger>
+          </TabsList>
+          <TabsContent value="tab-3" className="rounded-lg border p-4 text-muted-foreground">
+            The rail fades at the right edge — chevrons page the hidden tabs.
+          </TabsContent>
+          <TabsContent value="tab-4" className="rounded-lg border p-4 text-muted-foreground">
+            Payroll runs panel.
+          </TabsContent>
         </Tabs>
       </Row>
     </div>
@@ -346,20 +329,18 @@ function Board() {
           Tabs
         </h2>
         <p className="mt-2 max-w-xl font-body text-sm leading-6 text-muted-foreground">
-          Sections inside one view without leaving the page. Two registers — the muted pill and
-          the line — share one trigger anatomy: rounded-md, text-sm font-medium, gap-1.5.
+          Sections inside one view without leaving the page. Three registers — the segmented
+          track, the underline and the soft pill — share one trigger anatomy: Inter 13px,
+          inactive 500 muted, active 600.
         </p>
-        <Block title="Variants">
-          <Variants />
-        </Block>
-        <Block title="Orientation">
-          <Orientation />
-        </Block>
-        <Block title="With icons">
-          <WithIcons />
+        <Block title="Styles">
+          <Styles />
         </Block>
         <Block title="States">
           <States />
+        </Block>
+        <Block title="Orientation">
+          <Orientation />
         </Block>
         <Block title="Controlled">
           <Controlled />
@@ -371,8 +352,8 @@ function Board() {
           <Keyboard />
         </Block>
         <p className="mt-12 border-t border-border pt-6 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-          h-8 horizontal list · rounded-md triggers · gap-1.5 · text-sm font-medium · one panel
-          per value
+          TAB 40 · UNDERLINE 2PX · ICON 16 · BADGE 18 · ONE ACTIVE TAB PER GROUP · ARROWS MOVE ·
+          ENTER SELECTS
         </p>
       </div>
     </div>
@@ -425,11 +406,11 @@ export const Playground: Story = {
   ),
 }
 
-export const OnlyVariants: Story = {
+export const OnlyStyles: Story = {
   render: () => (
     <Screen>
-      <Block title="Variants">
-        <Variants />
+      <Block title="Styles">
+        <Styles />
       </Block>
     </Screen>
   ),
@@ -440,16 +421,6 @@ export const OnlyOrientation: Story = {
     <Screen>
       <Block title="Orientation">
         <Orientation />
-      </Block>
-    </Screen>
-  ),
-}
-
-export const OnlyIcons: Story = {
-  render: () => (
-    <Screen>
-      <Block title="With icons">
-        <WithIcons />
       </Block>
     </Screen>
   ),
@@ -477,15 +448,15 @@ export const SettingsPanel: Story = {
         <Tabs defaultValue="org">
           <TabsList>
             <TabsTrigger value="org">
-              <Building2 data-icon="inline-start" aria-hidden />
+              <Building2 aria-hidden />
               Organization
             </TabsTrigger>
             <TabsTrigger value="people">
-              <Users data-icon="inline-start" aria-hidden />
+              <Users aria-hidden />
               People
             </TabsTrigger>
             <TabsTrigger value="billing">
-              <CreditCard data-icon="inline-start" aria-hidden />
+              <CreditCard aria-hidden />
               Billing
             </TabsTrigger>
           </TabsList>
