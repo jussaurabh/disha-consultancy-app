@@ -128,20 +128,27 @@ describe("OrganizationDetailPage — tabs", () => {
     await waitFor(() => expect(usersTab.querySelector('[data-slot="tabs-count"]')).toHaveTextContent("12"));
   });
 
-  it("clicking a tab writes ?tab= and renders blank content", async () => {
+  it("clicking a tab writes ?tab= and renders the contact section", async () => {
     const user = userEvent.setup();
     renderDetailPage();
     await screen.findByRole("tab", { name: /company/i });
     await user.click(screen.getByRole("tab", { name: /contact/i }));
     expect(screen.getByTestId("location")).toHaveTextContent("/organizations/org-1?tab=contact");
     expect(screen.getByRole("tab", { name: /contact/i })).toHaveAttribute("data-state", "active");
+    expect(await screen.findByText("Contact & Address")).toBeInTheDocument();
     expect(screen.queryByText("Company Details")).not.toBeInTheDocument();
-    expect(screen.queryByText("Contact & Address")).not.toBeInTheDocument();
   });
 
   it("renders the tab from a deep link", async () => {
     renderDetailPage("/organizations/org-1?tab=bank");
     expect(await screen.findByRole("tab", { name: /bank/i })).toHaveAttribute("data-state", "active");
+    expect(screen.queryByText("Company Details")).not.toBeInTheDocument();
+  });
+
+  it("renders the contact section from a deep link", async () => {
+    renderDetailPage("/organizations/org-1?tab=contact");
+    expect(await screen.findByRole("tab", { name: /contact/i })).toHaveAttribute("data-state", "active");
+    expect(await screen.findByText("Contact & Address")).toBeInTheDocument();
     expect(screen.queryByText("Company Details")).not.toBeInTheDocument();
   });
 
