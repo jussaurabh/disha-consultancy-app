@@ -1,25 +1,25 @@
 import { ArrowRight, Plus } from "lucide-react"
 import { Button } from "../button"
-import { UiVariation, UiVariationMeta } from "./ui-variation"
+import { PageHeader, PageHeaderMeta } from "./page-header"
 
 export default {
-  title: "UI/UiVariation",
-  component: UiVariation,
+  title: "UI/PageHeader",
+  component: PageHeader,
 }
 
 export const Greeting = () => (
   <div className="bg-ground pt-12">
-    <UiVariation
+    <PageHeader
       variant="greeting"
       title="Good morning, Arjun."
-      actions={<UiVariationMeta label="Next payroll run" value="01 Dec" suffix="· 12 days" />}
+      actions={<PageHeaderMeta label="Next payroll run" value="01 Dec" suffix="· 12 days" />}
     />
   </div>
 )
 
 export const Organizations = () => (
   <div className="bg-ground pt-12">
-    <UiVariation
+    <PageHeader
       variant="index"
       eyebrow="Client companies · 24 total"
       title="Organizations"
@@ -40,7 +40,7 @@ export const Organizations = () => (
 
 export const Employees = () => (
   <div className="bg-ground pt-12">
-    <UiVariation
+    <PageHeader
       variant="index"
       eyebrow="People · 1,208 across 24 organizations"
       title="Employees"
@@ -61,7 +61,7 @@ export const Employees = () => (
 
 export const CreateOrganization = () => (
   <div className="bg-ground pt-12">
-    <UiVariation
+    <PageHeader
       variant="form"
       eyebrow="CLIENT COMPANIES — NEW RECORD"
       title="Create organization"
@@ -83,7 +83,7 @@ export const CreateOrganization = () => (
 
 export const Dark = () => (
   <div className="dark bg-ground p-8">
-    <UiVariation
+    <PageHeader
       variant="index"
       eyebrow="Client companies · 24 total"
       title="Organizations"

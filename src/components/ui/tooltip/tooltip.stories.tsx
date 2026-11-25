@@ -212,133 +212,137 @@ function Delay() {
 /** Bubble content registers — plain, shortcut, icon, interactive. */
 function Content() {
   return (
-    <div className="flex flex-col">
-      <Row label="Plain" note="One short line, max-w-xs">
-        <Tooltip defaultOpen>
-          <TooltipTrigger asChild>
-            <Button variant="outline" size="sm">
-              Save changes
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Saves the draft for every consultant</TooltipContent>
-        </Tooltip>
-      </Row>
-      <Row label="Shortcut" note="kbd rides the bubble — the shell trims its right padding">
-        <Tooltip defaultOpen>
-          <TooltipTrigger asChild>
-            <Button variant="outline" size="sm">
-              Undo
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            Undo
-            <kbd
-              data-slot="kbd"
-              className="rounded-sm bg-background/15 px-1 font-mono text-[10px] font-semibold"
-            >
-              ⌘Z
-            </kbd>
-          </TooltipContent>
-        </Tooltip>
-      </Row>
-      <Row label="With icon" note="Icon leads the line">
-        <Tooltip defaultOpen>
-          <TooltipTrigger asChild>
-            <Button variant="outline" size="icon-sm" aria-label="More information">
-              <Info aria-hidden />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <Info aria-hidden className="size-3.5" />
-            Locked after payroll closes
-          </TooltipContent>
-        </Tooltip>
-      </Row>
-      <Row label="Interactive" note="Pointer can move onto the bubble — links stay clickable">
-        <TooltipProvider disableHoverableContent={false}>
+    <TooltipProvider>
+      <div className="flex flex-col">
+        <Row label="Plain" note="One short line, max-w-xs">
           <Tooltip defaultOpen>
             <TooltipTrigger asChild>
               <Button variant="outline" size="sm">
-                PF policy
+                Save changes
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Saves the draft for every consultant</TooltipContent>
+          </Tooltip>
+        </Row>
+        <Row label="Shortcut" note="kbd rides the bubble — the shell trims its right padding">
+          <Tooltip defaultOpen>
+            <TooltipTrigger asChild>
+              <Button variant="outline" size="sm">
+                Undo
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              Wages above the statutory ceiling are excluded.{" "}
-              <a
-                href="#policy"
-                onClick={(event) => event.preventDefault()}
-                className="underline underline-offset-2"
+              Undo
+              <kbd
+                data-slot="kbd"
+                className="rounded-sm bg-background/15 px-1 font-mono text-[10px] font-semibold"
               >
-                View policy
-              </a>
+                ⌘Z
+              </kbd>
             </TooltipContent>
           </Tooltip>
-        </TooltipProvider>
-      </Row>
-    </div>
+        </Row>
+        <Row label="With icon" note="Icon leads the line">
+          <Tooltip defaultOpen>
+            <TooltipTrigger asChild>
+              <Button variant="outline" size="icon-sm" aria-label="More information">
+                <Info aria-hidden />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <Info aria-hidden className="size-3.5" />
+              Locked after payroll closes
+            </TooltipContent>
+          </Tooltip>
+        </Row>
+        <Row label="Interactive" note="Pointer can move onto the bubble — links stay clickable">
+          <TooltipProvider disableHoverableContent={false}>
+            <Tooltip defaultOpen>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="sm">
+                  PF policy
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                Wages above the statutory ceiling are excluded.{" "}
+                <a
+                  href="#policy"
+                  onClick={(event) => event.preventDefault()}
+                  className="underline underline-offset-2"
+                >
+                  View policy
+                </a>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </Row>
+      </div>
+    </TooltipProvider>
   )
 }
 
 /** Any element can carry the trigger — via asChild. */
 function Triggers() {
   return (
-    <div className="flex flex-col">
-      <Row label="Button" note="TooltipTrigger asChild wraps the Button">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="outline" size="sm">
-              Export payroll
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Exports the current month as XLSX</TooltipContent>
-        </Tooltip>
-      </Row>
-      <Row label="Inline link" note="Trigger on an anchor inside prose">
-        <p className="text-sm text-muted-foreground">
-          Read the{" "}
+    <TooltipProvider>
+      <div className="flex flex-col">
+        <Row label="Button" note="TooltipTrigger asChild wraps the Button">
           <Tooltip>
             <TooltipTrigger asChild>
-              <a
-                href="#policy"
-                onClick={(event) => event.preventDefault()}
-                className="underline underline-offset-2"
-              >
-                leave policy
-              </a>
-            </TooltipTrigger>
-            <TooltipContent>Applies from the joining date</TooltipContent>
-          </Tooltip>{" "}
-          before raising the request.
-        </p>
-      </Row>
-      <Row label="Icon button" note="aria-label stays the accessible name">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" aria-label="Settings">
-              <Settings aria-hidden />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Settings</TooltipContent>
-        </Tooltip>
-      </Row>
-      <Row label="Disabled" note="Disabled buttons swallow pointer events — wrap the trigger">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="inline-flex cursor-not-allowed">
-              <Button
-                variant="outline"
-                size="sm"
-                aria-disabled
-                className="pointer-events-none opacity-50"
-              >
-                Process payroll
+              <Button variant="outline" size="sm">
+                Export payroll
               </Button>
-            </span>
-          </TooltipTrigger>
-          <TooltipContent>Disabled until the attendance lock on the 25th</TooltipContent>
-        </Tooltip>
-      </Row>
-    </div>
+            </TooltipTrigger>
+            <TooltipContent>Exports the current month as XLSX</TooltipContent>
+          </Tooltip>
+        </Row>
+        <Row label="Inline link" note="Trigger on an anchor inside prose">
+          <p className="text-sm text-muted-foreground">
+            Read the{" "}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <a
+                  href="#policy"
+                  onClick={(event) => event.preventDefault()}
+                  className="underline underline-offset-2"
+                >
+                  leave policy
+                </a>
+              </TooltipTrigger>
+              <TooltipContent>Applies from the joining date</TooltipContent>
+            </Tooltip>{" "}
+            before raising the request.
+          </p>
+        </Row>
+        <Row label="Icon button" note="aria-label stays the accessible name">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="Settings">
+                <Settings aria-hidden />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Settings</TooltipContent>
+          </Tooltip>
+        </Row>
+        <Row label="Disabled" note="Disabled buttons swallow pointer events — wrap the trigger">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="inline-flex cursor-not-allowed">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  aria-disabled
+                  className="pointer-events-none opacity-50"
+                >
+                  Process payroll
+                </Button>
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>Disabled until the attendance lock on the 25th</TooltipContent>
+          </Tooltip>
+        </Row>
+      </div>
+    </TooltipProvider>
   )
 }
 
@@ -352,25 +356,27 @@ function SidebarPattern() {
   ]
 
   return (
-    <div className="flex w-fit flex-col gap-1 rounded-lg border bg-sidebar p-2">
-      {items.map(({ icon: Icon, label, open }) => (
-        <Tooltip key={label} defaultOpen={open}>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label={label}
-              className="text-sidebar-foreground"
-            >
-              <Icon aria-hidden />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="right" align="center">
-            {label}
-          </TooltipContent>
-        </Tooltip>
-      ))}
-    </div>
+    <TooltipProvider>
+      <div className="flex w-fit flex-col gap-1 rounded-lg border bg-sidebar p-2">
+        {items.map(({ icon: Icon, label, open }) => (
+          <Tooltip key={label} defaultOpen={open}>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label={label}
+                className="text-sidebar-foreground"
+              >
+                <Icon aria-hidden />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right" align="center">
+              {label}
+            </TooltipContent>
+          </Tooltip>
+        ))}
+      </div>
+    </TooltipProvider>
   )
 }
 
@@ -424,7 +430,11 @@ function Screen({ children }: { children: ReactNode }) {
 
 /** Every variation on the light board. */
 export const Light: Story = {
-  render: () => <Board />,
+  render: () => (
+    <TooltipProvider>
+      <Board />
+    </TooltipProvider>
+  ),
 }
 
 /** Every variation on the dark board.
@@ -443,16 +453,18 @@ export const Dark: Story = {
 /** One tooltip driven by the controls panel — opens by default. */
 export const Playground: Story = {
   render: (args) => (
-    <div className="flex min-h-64 items-start justify-center bg-background p-16">
-      <Tooltip {...args}>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Hover me</Button>
-        </TooltipTrigger>
-        <TooltipContent side="top" align="center" sideOffset={0}>
-          Tooltip content
-        </TooltipContent>
-      </Tooltip>
-    </div>
+    <TooltipProvider>
+      <div className="flex min-h-64 items-start justify-center bg-background p-16">
+        <Tooltip {...args}>
+          <TooltipTrigger asChild>
+            <Button variant="outline">Hover me</Button>
+          </TooltipTrigger>
+          <TooltipContent side="top" align="center" sideOffset={0}>
+            Tooltip content
+          </TooltipContent>
+        </Tooltip>
+      </div>
+    </TooltipProvider>
   ),
 }
 
@@ -509,33 +521,35 @@ export const OnlySidebarPattern: Story = {
 /** Real world — form-field help on a payroll form. */
 export const FormFieldHelp: Story = {
   render: () => (
-    <div className="flex min-h-screen items-start justify-center bg-background p-10">
-      <div className="w-full max-w-sm space-y-2">
-        <div className="flex items-center gap-1.5">
-          <Label required htmlFor="tooltip-est-id">
-            PF establishment ID
-          </Label>
-          <Tooltip defaultOpen>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label="What is a PF establishment ID?"
-                className="text-muted-foreground"
-              >
-                <HelpCircle aria-hidden />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              The 7-character code your regional PF office issued — e.g. KRBNG/452.
-            </TooltipContent>
-          </Tooltip>
+    <TooltipProvider>
+      <div className="flex min-h-screen items-start justify-center bg-background p-10">
+        <div className="w-full max-w-sm space-y-2">
+          <div className="flex items-center gap-1.5">
+            <Label required htmlFor="tooltip-est-id">
+              PF establishment ID
+            </Label>
+            <Tooltip defaultOpen>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label="What is a PF establishment ID?"
+                  className="text-muted-foreground"
+                >
+                  <HelpCircle aria-hidden />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                The 7-character code your regional PF office issued — e.g. KRBNG/452.
+              </TooltipContent>
+            </Tooltip>
+          </div>
+          <Input id="tooltip-est-id" placeholder="e.g. KRBNG/452" />
+          <p className="text-xs leading-4 text-muted-foreground">
+            Shown on every PF and EPF report the app generates.
+          </p>
         </div>
-        <Input id="tooltip-est-id" placeholder="e.g. KRBNG/452" />
-        <p className="text-xs leading-4 text-muted-foreground">
-          Shown on every PF and EPF report the app generates.
-        </p>
       </div>
-    </div>
+    </TooltipProvider>
   ),
 }

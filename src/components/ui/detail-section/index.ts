@@ -1,0 +1,1 @@
+export { DetailSection, DetailSectionAction } from "./detail-section"

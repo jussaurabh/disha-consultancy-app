@@ -21,7 +21,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Status pill — h-22 rounded-full with soft accent, copper or danger tints, border-line for outline and secondary. Sizes sm (18), default (22) and lg (26). The dot prop renders a 6px status dot in bg-current; BadgeCount is the copper count bubble for icon corners.",
+          "Status pill — h-22 rounded-full with soft accent, copper or danger tints, border-line for outline and secondary. Sizes sm (18), default (22) and lg (26). Shape: pill (rounded-full) or tag (rounded-sm). The dot prop renders a 6px status dot in bg-current; BadgeCount is the copper count bubble for icon corners.",
       },
     },
   },
@@ -45,6 +45,11 @@ const meta = {
       options: ["sm", "default", "lg"],
       description: "sm drops to 18px with 10px type; lg lifts to 26px with 12px type.",
     },
+    shape: {
+      control: "radio",
+      options: ["pill", "tag"],
+      description: "pill = rounded-full (default); tag = rounded-sm for filter/label chips.",
+    },
     dot: {
       control: "boolean",
       description: "Renders a 6px status dot before the label in bg-current.",
@@ -58,6 +63,7 @@ const meta = {
   args: {
     variant: "default",
     size: "default",
+    shape: "pill",
     dot: false,
     asChild: false,
   },
@@ -165,12 +171,12 @@ function ShapesAndSizes() {
         <Badge>Default</Badge>
         <Badge size="lg">lg</Badge>
       </Row>
-      <Row label="Tag" note="rounded-sm lifts the corners for filter and label chips">
-        <Badge size="sm" className="rounded-sm">
+      <Row label="Tag" note="shape=tag lifts the corners for filter and label chips">
+        <Badge size="sm" shape="tag">
           sm
         </Badge>
-        <Badge className="rounded-sm">Default</Badge>
-        <Badge size="lg" className="rounded-sm">
+        <Badge shape="tag">Default</Badge>
+        <Badge size="lg" shape="tag">
           lg
         </Badge>
       </Row>
@@ -200,8 +206,8 @@ function CountOnIcon() {
 function Chip() {
   return (
     <div className="flex flex-col">
-      <Row label="Chip" note="lg + rounded-sm · 12px X icon clears the chip">
-        <Badge variant="secondary" size="lg" className="rounded-sm">
+      <Row label="Chip" note="lg + shape=tag · 12px X icon clears the chip">
+        <Badge variant="secondary" size="lg" shape="tag">
           Payroll run · Nov
           <X aria-hidden />
         </Badge>
@@ -243,7 +249,7 @@ function Board() {
           <Chip />
         </Block>
         <p className="mt-12 border-t border-border pt-6 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-          BADGE 22 · SM 18 · LG 26 · DOT 6 · RADIUS 6 FOR TAGS
+          BADGE 22 · SM 18 · LG 26 · DOT 6 · SHAPE: PILL | TAG
         </p>
       </div>
     </div>

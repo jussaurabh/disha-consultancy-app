@@ -5,7 +5,7 @@ import { Slot } from "radix-ui"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "group/badge inline-flex h-[22px] w-fit shrink-0 items-center justify-center gap-1.5 rounded-full border border-transparent px-2.5 font-body text-[11px] font-semibold leading-[14px] tracking-[0.02em] whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 [&>svg]:size-3 [&>svg]:pointer-events-none [&>svg]:shrink-0",
+  "group/badge inline-flex h-[22px] w-fit shrink-0 items-center justify-center gap-1.5 border border-transparent px-2.5 font-body text-[11px] font-semibold leading-[14px] tracking-[0.02em] whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 [&>svg]:size-3 [&>svg]:pointer-events-none [&>svg]:shrink-0",
   {
     variants: {
       size: {
@@ -23,10 +23,15 @@ const badgeVariants = cva(
         ghost: "text-muted-foreground",
         link: "text-primary underline-offset-4 hover:underline",
       },
+      shape: {
+        pill: "rounded-full",
+        tag: "rounded-sm",
+      },
     },
     defaultVariants: {
       size: "default",
       variant: "default",
+      shape: "pill",
     },
   }
 )
@@ -35,6 +40,7 @@ function Badge({
   className,
   variant = "default",
   size = "default",
+  shape = "pill",
   dot = false,
   asChild = false,
   children,
@@ -48,7 +54,8 @@ function Badge({
       data-slot="badge"
       data-variant={variant}
       data-size={size}
-      className={cn(badgeVariants({ variant, size }), className)}
+      data-shape={shape}
+      className={cn(badgeVariants({ variant, size, shape }), className)}
       {...props}
     >
       {dot ? (

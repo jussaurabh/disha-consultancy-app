@@ -50,14 +50,25 @@ function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
   )
 }
 
-function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
+function TableRow({ className, onClick, ...props }: React.ComponentProps<"tr">) {
+  const handleClick = (event: React.MouseEvent<HTMLTableRowElement>) => {
+    // Don't trigger row click if the target is an interactive element
+    const target = event.target as HTMLElement
+    const interactiveSelectors = "button, a, input, select, textarea, [role='button'], [role='menuitem'], [role='tab'], [role='option']"
+    if (target.closest(interactiveSelectors)) {
+      return
+    }
+    onClick?.(event)
+  }
+
   return (
     <tr
       data-slot="table-row"
       className={cn(
-        "border-b border-line transition-colors hover:bg-accent/5 data-[state=selected]:bg-accent/7",
+        "border-b border-line transition-colors hover:bg-accent-soft/40 data-[state=selected]:bg-accent/7",
         className
       )}
+      onClick={onClick ? handleClick : undefined}
       {...props}
     />
   )

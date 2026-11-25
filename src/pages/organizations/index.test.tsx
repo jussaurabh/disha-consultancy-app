@@ -89,7 +89,7 @@ describe("OrganizationsPage", () => {
     await screen.findByText("Organizations");
     await user.click(screen.getByRole("tab", { name: /employees/i }));
     expect(await screen.findByText("People")).toBeInTheDocument();
-    expect(container.querySelector('[data-slot="ui-variation-title"]')).toHaveTextContent("Employees");
+    expect(container.querySelector('[data-slot="page-header-title"]')).toHaveTextContent("Employees");
     expect(screen.getByTestId("location")).toHaveTextContent("/organizations?tab=employees");
     expect(screen.queryByText("Sri Venkateswara Textiles")).not.toBeInTheDocument();
     expect(screen.getByText("No employees to show yet.")).toBeInTheDocument();
@@ -102,7 +102,7 @@ describe("OrganizationsPage", () => {
   it("renders the employees variant on a deep link", async () => {
     const { container } = renderPage("/organizations?tab=employees");
     expect(await screen.findByText("People")).toBeInTheDocument();
-    expect(container.querySelector('[data-slot="ui-variation-title"]')).toHaveTextContent("Employees");
+    expect(container.querySelector('[data-slot="page-header-title"]')).toHaveTextContent("Employees");
     expect(screen.queryByText("Sri Venkateswara Textiles")).not.toBeInTheDocument();
   });
 
@@ -122,7 +122,7 @@ describe("OrganizationsPage", () => {
   it("aligns the title zone with the shell padding", async () => {
     const { container } = renderPage();
     await screen.findByText("Organizations");
-    expect(container.querySelector('[data-slot="ui-variation"]')).toHaveClass("px-4", "md:px-6");
+    expect(container.querySelector('[data-slot="page-header"]')).toHaveClass("px-4", "md:px-6");
   });
 
   it("insets the organization table card with the shared gutter", async () => {
@@ -137,7 +137,7 @@ describe("OrganizationsPage", () => {
     await screen.findByText("Organizations");
     await user.type(screen.getByPlaceholderText("Search companies…"), "sri");
     await user.click(screen.getByRole("tab", { name: /employees/i }));
-    expect(container.querySelector('[data-slot="ui-variation-title"]')).toHaveTextContent("Employees");
+    expect(container.querySelector('[data-slot="page-header-title"]')).toHaveTextContent("Employees");
     expect(screen.getByPlaceholderText("Search employees…")).toHaveValue("");
   });
 });

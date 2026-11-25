@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Building2, Ellipsis } from "lucide-react";
+import { Building2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { orgsApi, type Organization, type UpdateOrgBody } from "@/api/orgs";
 import {
@@ -18,10 +18,35 @@ import { useAuth } from "@/providers/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import { SecondaryHeader } from "@/components/ui/secondary-header";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  SearchableSelect,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  DetailSection,
+  DetailSectionAction,
+} from "@/components/ui/detail-section";
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown";
 
 // --- Schemas ---
 
@@ -52,7 +77,10 @@ const SECTIONS = [
 
 type SectionId = (typeof SECTIONS)[number]["id"];
 
-const SECTION_COPY: Record<SectionId, { title: string; description: string; success: string }> = {
+const SECTION_COPY: Record<
+  SectionId,
+  { title: string; description: string; success: string }
+> = {
   company: {
     title: "Company Details",
     description: "Basic registration information for the organization",
@@ -96,25 +124,49 @@ const SECTION_COPY: Record<SectionId, { title: string; description: string; succ
 };
 
 function getMutationErrorMessage(error: unknown) {
-  return (error as ApiError)?.response?.data?.message ?? "Failed to save changes";
+  return (
+    (error as ApiError)?.response?.data?.message ?? "Failed to save changes"
+  );
 }
 
 // --- Company details tab ---
 
-function DetailRow({ label, children }: { label: string; children: ReactNode }) {
+function DetailRow({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
   return (
-    <div data-slot="detail-row" data-testid="detail-row" className="flex min-h-12 items-center gap-6 border-b border-line px-6 py-3 last:border-b-0">
-      <span className="w-[220px] shrink-0 text-[13px] leading-4 text-muted">{label}</span>
+    <div
+      data-slot="detail-row"
+      data-testid="detail-row"
+      className="flex min-h-12 items-center gap-6 border-b border-line px-6 py-3 last:border-b-0"
+    >
+      <span className="w-[220px] shrink-0 text-[13px] leading-4 text-muted">
+        {label}
+      </span>
       {children}
     </div>
   );
 }
 
-function DetailRowValue({ children, muted }: { children: ReactNode; muted?: boolean }) {
+function DetailRowValue({
+  children,
+  muted,
+}: {
+  children: ReactNode;
+  muted?: boolean;
+}) {
   return (
     <span
       data-slot="detail-row-value"
-      className={muted ? "text-[14px] leading-[18px] text-muted" : "text-[14px] leading-[18px] font-semibold text-ink"}
+      className={
+        muted
+          ? "text-[14px] leading-[18px] text-muted"
+          : "text-[14px] leading-[18px] font-semibold text-ink"
+      }
     >
       {children}
     </span>
@@ -123,25 +175,58 @@ function DetailRowValue({ children, muted }: { children: ReactNode; muted?: bool
 
 function StatsRail({ usersTotal }: { usersTotal: number | undefined }) {
   return (
-    <aside data-slot="stats-rail" className="flex w-[320px] shrink-0 flex-col gap-5">
-      <div data-slot="stats-tile" className="flex w-full flex-col gap-2 rounded-lg border border-line bg-surface px-6 py-5">
-        <span className="text-[11px] leading-[14px] font-semibold uppercase tracking-[0.09em] text-muted">EMPLOYEES</span>
-        <span data-slot="stats-tile-value" data-testid="stats-tile-value" className="font-display text-[30px] font-extrabold leading-none tracking-[-0.02em] text-ink">
+    <aside
+      data-slot="stats-rail"
+      className="flex w-[320px] shrink-0 flex-col gap-5"
+    >
+      <div
+        data-slot="stats-tile"
+        className="flex w-full flex-col gap-2 rounded-lg border border-line bg-surface px-6 py-5"
+      >
+        <span className="text-[11px] leading-[14px] font-semibold uppercase tracking-[0.09em] text-muted">
+          EMPLOYEES
+        </span>
+        <span
+          data-slot="stats-tile-value"
+          data-testid="stats-tile-value"
+          className="font-display text-[30px] font-extrabold leading-none tracking-[-0.02em] text-ink"
+        >
           —
         </span>
-        <Link to="/organizations?tab=employees" className="text-[12px] leading-4 font-semibold text-accent">
+        <Link
+          to="/organizations?tab=employees"
+          className="text-[12px] leading-4 font-semibold text-accent"
+        >
           View employees →
         </Link>
       </div>
-      <div data-slot="stats-tile" className="flex w-full flex-col gap-2 rounded-lg border border-line bg-surface px-6 py-5">
-        <span className="text-[11px] leading-[14px] font-semibold uppercase tracking-[0.09em] text-muted">PORTAL USERS</span>
-        <span data-slot="stats-tile-value" data-testid="stats-tile-value" className="font-display text-[30px] font-extrabold leading-none tracking-[-0.02em] text-ink">
+      <div
+        data-slot="stats-tile"
+        className="flex w-full flex-col gap-2 rounded-lg border border-line bg-surface px-6 py-5"
+      >
+        <span className="text-[11px] leading-[14px] font-semibold uppercase tracking-[0.09em] text-muted">
+          PORTAL USERS
+        </span>
+        <span
+          data-slot="stats-tile-value"
+          data-testid="stats-tile-value"
+          className="font-display text-[30px] font-extrabold leading-none tracking-[-0.02em] text-ink"
+        >
           {usersTotal ?? "—"}
         </span>
       </div>
-      <div data-slot="stats-tile" className="flex w-full flex-col gap-2 rounded-lg border border-line bg-surface px-6 py-5">
-        <span className="text-[11px] leading-[14px] font-semibold uppercase tracking-[0.09em] text-muted">NEXT PAYROLL</span>
-        <span data-slot="stats-tile-value" data-testid="stats-tile-value" className="font-display text-[30px] font-extrabold leading-none tracking-[-0.02em] text-copper">
+      <div
+        data-slot="stats-tile"
+        className="flex w-full flex-col gap-2 rounded-lg border border-line bg-surface px-6 py-5"
+      >
+        <span className="text-[11px] leading-[14px] font-semibold uppercase tracking-[0.09em] text-muted">
+          NEXT PAYROLL
+        </span>
+        <span
+          data-slot="stats-tile-value"
+          data-testid="stats-tile-value"
+          className="font-display text-[30px] font-extrabold leading-none tracking-[-0.02em] text-copper"
+        >
           —
         </span>
       </div>
@@ -179,7 +264,8 @@ function CompanyDetailsSection({
   });
 
   const mutation = useMutation({
-    mutationFn: (values: UpdateOrgBody) => orgsApi.updateOrg(org._id, values).then((r) => r.data),
+    mutationFn: (values: UpdateOrgBody) =>
+      orgsApi.updateOrg(org._id, values).then((r) => r.data),
     onSuccess: (updated) => {
       queryClient.setQueryData(["org", org._id], updated);
       toast.success(SECTION_COPY.company.success);
@@ -190,33 +276,54 @@ function CompanyDetailsSection({
     },
   });
 
-  const stateLabel = STATES_OPTIONS.find((o) => o.value === org.state)?.label ?? org.state;
+  const stateLabel =
+    STATES_OPTIONS.find((o) => o.value === org.state)?.label ?? org.state;
 
   return (
-    <div className="min-w-0 flex-1 overflow-hidden rounded-lg border border-line bg-surface">
-      {/* Band */}
-      <div className="flex h-10 shrink-0 items-center justify-between border-b border-line bg-ground px-6">
-        <span className="text-[11px] leading-[14px] font-semibold uppercase tracking-[0.09em] text-muted">
-          {SECTION_COPY.company.title}
-        </span>
-        {isEditing ? (
-          <div className="flex items-center gap-2">
-            <Button type="button" variant="outline" size="sm" className="h-[30px] rounded-sm px-3 font-semibold" onClick={() => { form.reset(); onEditClose(); }}>
+    <DetailSection
+      title={SECTION_COPY.company.title}
+      description={SECTION_COPY.company.description}
+      action={
+        isEditing ? (
+          <DetailSectionAction>
+            <Button
+              type="button"
+              variant="outline"
+              size="xsm"
+              onClick={() => {
+                form.reset();
+                onEditClose();
+              }}
+            >
               Cancel
             </Button>
-            <Button type="submit" size="sm" className="h-[30px] rounded-sm px-3.5 font-semibold" disabled={mutation.isPending} form="company-details-form">
+            <Button
+              type="submit"
+              size="xsm"
+              disabled={mutation.isPending}
+              form="company-details-form"
+            >
               Update
             </Button>
-          </div>
+          </DetailSectionAction>
         ) : (
-          <button type="button" data-slot="detail-band-edit" disabled={!canEdit} className="text-[12px] leading-4 font-semibold text-accent disabled:opacity-40" onClick={onEditOpen}>
+          <button
+            type="button"
+            data-slot="detail-band-edit"
+            disabled={!canEdit}
+            className="text-[12px] leading-4 font-semibold text-accent disabled:opacity-40"
+            onClick={onEditOpen}
+          >
             Edit
           </button>
-        )}
-      </div>
-
+        )
+      }
+    >
       <Form {...form}>
-        <form id="company-details-form" onSubmit={form.handleSubmit((v) => mutation.mutate(v))}>
+        <form
+          id="company-details-form"
+          onSubmit={form.handleSubmit((v) => mutation.mutate(v))}
+        >
           {isEditing ? (
             <div data-slot="detail-band-edit">
               <DetailRow label="Company name">
@@ -226,7 +333,7 @@ function CompanyDetailsSection({
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <FormControl>
-                        <Input className="rounded-sm" {...field} />
+                        <Input {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -240,7 +347,7 @@ function CompanyDetailsSection({
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <FormControl>
-                        <Input className="rounded-sm" {...field} />
+                        <Input {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -253,20 +360,15 @@ function CompanyDetailsSection({
                   name="state"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <FormControl>
-                          <SelectTrigger className="w-full">
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {STATES_OPTIONS.map((state) => (
-                            <SelectItem key={state.value} value={state.value}>
-                              {state.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <SearchableSelect
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          options={STATES_OPTIONS}
+                          placeholder="Select state…"
+                          className="w-full"
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -278,7 +380,12 @@ function CompanyDetailsSection({
                   name="status"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <Select value={field.value ?? "active"} onValueChange={(v) => field.onChange(v as "active" | "inactive")}>
+                      <Select
+                        value={field.value ?? "active"}
+                        onValueChange={(v) =>
+                          field.onChange(v as "active" | "inactive")
+                        }
+                      >
                         <FormControl>
                           <SelectTrigger className="w-full">
                             <SelectValue />
@@ -300,7 +407,10 @@ function CompanyDetailsSection({
                   name="est_type"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <Select value={field.value || undefined} onValueChange={field.onChange}>
+                      <Select
+                        value={field.value || undefined}
+                        onValueChange={field.onChange}
+                      >
                         <FormControl>
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select…" />
@@ -326,7 +436,7 @@ function CompanyDetailsSection({
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <FormControl>
-                        <Input className="rounded-sm" {...field} />
+                        <Input {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -339,7 +449,10 @@ function CompanyDetailsSection({
                   name="company_view"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <Select value={field.value || undefined} onValueChange={field.onChange}>
+                      <Select
+                        value={field.value || undefined}
+                        onValueChange={field.onChange}
+                      >
                         <FormControl>
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select…" />
@@ -364,7 +477,10 @@ function CompanyDetailsSection({
                   name="rule_type"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <Select value={field.value || undefined} onValueChange={field.onChange}>
+                      <Select
+                        value={field.value || undefined}
+                        onValueChange={field.onChange}
+                      >
                         <FormControl>
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select…" />
@@ -397,34 +513,40 @@ function CompanyDetailsSection({
               </DetailRow>
               <DetailRow label="Status">
                 {org.status === "inactive" ? (
-                  <span className="flex items-center gap-[7px]">
-                    <span className="size-[7px] shrink-0 rounded-full bg-destructive" />
-                    <span className="text-[14px] leading-[18px] font-medium text-destructive">Inactive</span>
-                  </span>
+                  <Badge dot shape="tag" variant="destructive">
+                    Inactive
+                  </Badge>
                 ) : (
-                  <span className="flex items-center gap-[7px]">
-                    <span className="size-[7px] shrink-0 rounded-full bg-accent" />
-                    <span className="text-[14px] leading-[18px] font-medium text-ink">Active</span>
-                  </span>
+                  <Badge dot shape="tag">
+                    Active
+                  </Badge>
                 )}
               </DetailRow>
               <DetailRow label="Establishment type">
-                <DetailRowValue muted={!org.est_type}>{org.est_type ?? "—"}</DetailRowValue>
+                <DetailRowValue muted={!org.est_type}>
+                  {org.est_type ?? "—"}
+                </DetailRowValue>
               </DetailRow>
               <DetailRow label="Unit / Contractor name">
-                <DetailRowValue muted={!org.unit_cont_name}>{org.unit_cont_name ?? "—"}</DetailRowValue>
+                <DetailRowValue muted={!org.unit_cont_name}>
+                  {org.unit_cont_name ?? "—"}
+                </DetailRowValue>
               </DetailRow>
               <DetailRow label="Company view">
-                <DetailRowValue muted={!org.company_view}>{org.company_view ?? "—"}</DetailRowValue>
+                <DetailRowValue muted={!org.company_view}>
+                  {org.company_view ?? "—"}
+                </DetailRowValue>
               </DetailRow>
               <DetailRow label="Rule type">
-                <DetailRowValue muted={!org.rule_type}>{org.rule_type ?? "—"}</DetailRowValue>
+                <DetailRowValue muted={!org.rule_type}>
+                  {org.rule_type ?? "—"}
+                </DetailRowValue>
               </DetailRow>
             </div>
           )}
         </form>
       </Form>
-    </div>
+    </DetailSection>
   );
 }
 
@@ -453,12 +575,16 @@ export default function OrganizationDetailPage() {
 
   const { data: usersData } = useQuery({
     queryKey: ["users", "org", id],
-    queryFn: () => usersApi.listUsers({ page: 1, limit: 100, org_id: id! }).then((r) => r.data),
+    queryFn: () =>
+      usersApi
+        .listUsers({ page: 1, limit: 100, org_id: id! })
+        .then((r) => r.data),
     enabled: !!id && canListUsers,
   });
   const usersTotal = usersData?.total;
 
-  const isNotFound = (error as { response?: { status?: number } })?.response?.status === 404;
+  const isNotFound =
+    (error as { response?: { status?: number } })?.response?.status === 404;
 
   if (isLoading) {
     return (
@@ -494,8 +620,12 @@ export default function OrganizationDetailPage() {
           <Building2 className="size-8 text-zinc-400" />
         </div>
         <div className="space-y-1 text-center">
-          <h2 className="text-lg font-semibold text-foreground">Organization not found</h2>
-          <p className="text-sm text-muted-foreground">This organization may have been removed or you don't have access.</p>
+          <h2 className="text-lg font-semibold text-foreground">
+            Organization not found
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            This organization may have been removed or you don't have access.
+          </p>
         </div>
         <Button asChild variant="outline" size="sm">
           <Link to={backTo}>Back to organizations</Link>
@@ -511,13 +641,17 @@ export default function OrganizationDetailPage() {
   ].filter((section) => section.id !== "users" || canListUsers);
   const SECTION_IDS = visibleSections.map((section) => section.id);
   const rawTab = searchParams.get("tab");
-  const tab = SECTION_IDS.includes(rawTab as SectionId) ? (rawTab as SectionId) : "company";
-  const handleTabChange = (value: string) => setSearchParams(value === "company" ? {} : { tab: value });
+  const tab = SECTION_IDS.includes(rawTab as SectionId)
+    ? (rawTab as SectionId)
+    : "company";
+  const handleTabChange = (value: string) =>
+    setSearchParams(value === "company" ? {} : { tab: value });
   const initial = org.company_name.charAt(0).toUpperCase();
   const statusBadge = org.status
     ? {
         text: org.status === "active" ? "Active" : "Inactive",
-        tone: org.status === "active" ? ("accent" as const) : ("danger" as const),
+        tone:
+          org.status === "active" ? ("accent" as const) : ("danger" as const),
       }
     : undefined;
 
@@ -526,26 +660,33 @@ export default function OrganizationDetailPage() {
       <div className="space-y-6">
         {/* Context strip */}
         <SecondaryHeader className="py-5" data-testid="detail-context-strip">
-          <SecondaryHeader.Breadcrumb segments={[{ label: "Organizations", url: "/organizations" }]} />
+          <SecondaryHeader.Breadcrumb
+            segments={[{ label: "Organizations", url: "/organizations" }]}
+          />
           <SecondaryHeader.Divider />
-          <SecondaryHeader.Title avatar={initial} name={org.company_name} badge={statusBadge} />
+          <SecondaryHeader.Title
+            avatar={initial}
+            name={org.company_name}
+            badge={statusBadge}
+          />
           <SecondaryHeader.Actions>
-            <button
-              type="button"
-              data-slot="detail-more"
-              aria-label="More actions"
-              className="flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-ground"
+            <Button
+              size="sm"
+              disabled={!canEdit}
+              onClick={() => setIsEditing(true)}
             >
-              <Ellipsis className="size-[15px] text-muted" />
-            </button>
-            <Button size="sm" disabled={!canEdit} onClick={() => setIsEditing(true)}>
+              <Pencil />
               Edit organization
             </Button>
           </SecondaryHeader.Actions>
         </SecondaryHeader>
 
         {/* Section tabs */}
-        <Tabs value={tab} onValueChange={handleTabChange} className="bg-surface">
+        <Tabs
+          value={tab}
+          onValueChange={handleTabChange}
+          className="bg-surface md:px-6 px-4"
+        >
           <TabsList variant="line">
             {visibleSections.map((section) => (
               <TabsTrigger

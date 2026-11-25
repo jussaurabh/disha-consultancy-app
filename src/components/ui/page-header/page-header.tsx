@@ -1,10 +1,10 @@
 import { Fragment } from "react"
 import { cn } from "@/lib/utils"
 
-export type UiVariationVariant = "greeting" | "index" | "form"
+export type PageHeaderVariant = "greeting" | "index" | "form"
 
-export interface UiVariationProps {
-  variant?: UiVariationVariant
+export interface PageHeaderProps {
+  variant?: PageHeaderVariant
   eyebrow?: string
   title: string
   description?: string
@@ -12,14 +12,14 @@ export interface UiVariationProps {
   className?: string
 }
 
-export function UiVariation({
+export function PageHeader({
   variant = "index",
   eyebrow,
   title,
   description,
   actions,
   className,
-}: UiVariationProps): React.JSX.Element {
+}: PageHeaderProps): React.JSX.Element {
   const rootClasses = cn(
     "flex w-full flex-wrap items-end justify-between gap-6 px-4 pt-4 md:px-6 md:pt-6",
     className,
@@ -50,24 +50,24 @@ export function UiVariation({
   )
 
   return (
-    <div data-slot="ui-variation" className={rootClasses}>
+    <div data-slot="page-header" className={rootClasses}>
       <div className={leftColumnClasses}>
         {eyebrow && (
-          <span data-slot="ui-variation-eyebrow" className={eyebrowClasses}>
+          <span data-slot="page-header-eyebrow" className={eyebrowClasses}>
             {eyebrow}
           </span>
         )}
-        <span data-slot="ui-variation-title" className={titleClasses}>
+        <span data-slot="page-header-title" className={titleClasses}>
           {title}
         </span>
         {description && (
-          <span data-slot="ui-variation-description" className={descriptionClasses}>
+          <span data-slot="page-header-description" className={descriptionClasses}>
             {description}
           </span>
         )}
       </div>
       {actions && (
-        <div data-slot="ui-variation-actions" className={actionsWrapperClasses}>
+        <div data-slot="page-header-actions" className={actionsWrapperClasses}>
           {actions}
         </div>
       )}
@@ -75,7 +75,7 @@ export function UiVariation({
   )
 }
 
-export function UiVariationMeta({
+export function PageHeaderMeta({
   label,
   value,
   suffix,
@@ -89,7 +89,7 @@ export function UiVariationMeta({
   const suffixClasses = "font-body text-xs leading-4 text-muted"
 
   return (
-    <Fragment data-slot="ui-variation-meta">
+    <Fragment data-slot="page-header-meta">
       <span className={labelClasses}>{label}</span>
       <div className="flex items-baseline gap-1">
         <span className={valueClasses}>{value}</span>

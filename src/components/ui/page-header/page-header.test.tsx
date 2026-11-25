@@ -2,12 +2,12 @@
 
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
-import { UiVariation, UiVariationMeta } from "./ui-variation"
+import { PageHeader, PageHeaderMeta } from "./page-header"
 
-describe("UiVariation", () => {
+describe("PageHeader", () => {
   it("renders eyebrow, title and description in index variant", () => {
     render(
-      <UiVariation
+      <PageHeader
         variant="index"
         eyebrow="Client companies · 24 total"
         title="Organizations"
@@ -21,24 +21,24 @@ describe("UiVariation", () => {
 
   it("uses the 46px display title in form variant and 52px otherwise", () => {
     const { container, rerender } = render(
-      <UiVariation variant="form" eyebrow="Client companies — new record" title="Create organization" />,
+      <PageHeader variant="form" eyebrow="Client companies — new record" title="Create organization" />,
     )
-    expect(container.querySelector('[data-slot="ui-variation-title"]')).toHaveClass("text-[46px]")
-    rerender(<UiVariation title="Different title" />)
-    expect(container.querySelector('[data-slot="ui-variation-title"]')).toHaveClass("text-[52px]")
+    expect(container.querySelector('[data-slot="page-header-title"]')).toHaveClass("text-[46px]")
+    rerender(<PageHeader title="Different title" />)
+    expect(container.querySelector('[data-slot="page-header-title"]')).toHaveClass("text-[52px]")
   })
 
   it("renders a plain-text actions node instead of buttons", () => {
-    render(<UiVariation title="Employees" actions="Managed by settings" />)
+    render(<PageHeader title="Employees" actions="Managed by settings" />)
     expect(screen.getByText("Managed by settings")).toBeInTheDocument()
   })
 
-  it("renders UiVariationMeta label, value and suffix", () => {
+  it("renders PageHeaderMeta label, value and suffix", () => {
     render(
-      <UiVariation
+      <PageHeader
         variant="greeting"
         title="Good morning, Arjun."
-        actions={<UiVariationMeta label="Next payroll run" value="01 Dec" suffix="· 12 days" />}
+        actions={<PageHeaderMeta label="Next payroll run" value="01 Dec" suffix="· 12 days" />}
       />,
     )
     expect(screen.getByText("Next payroll run")).toBeInTheDocument()
@@ -48,8 +48,8 @@ describe("UiVariation", () => {
 
   it("wraps long content instead of clipping it", () => {
     const { container } = render(
-      <UiVariation title="A very long organization title that must wrap on narrow viewports instead of being clipped" />,
+      <PageHeader title="A very long organization title that must wrap on narrow viewports instead of being clipped" />,
     )
-    expect(container.querySelector('[data-slot="ui-variation"]')).toHaveClass("flex-wrap")
+    expect(container.querySelector('[data-slot="page-header"]')).toHaveClass("flex-wrap")
   })
 })

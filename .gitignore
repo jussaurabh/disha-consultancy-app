@@ -34,3 +34,5 @@ docs
 storybook-static
 .vitest
 tests
+
+talisman_report

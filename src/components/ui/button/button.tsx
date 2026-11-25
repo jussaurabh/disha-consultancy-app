@@ -20,6 +20,7 @@ const buttonVariants = cva(
   {
     variants: {
       size: {
+        xsm: "h-7.5 px-3 text-[12px] leading-3.5",
         sm: "h-9 px-4 text-[13px] leading-4",
         default: "h-11 px-5.5 leading-[18px]",
         lg: "h-13 px-6.5 leading-[18px]",
@@ -98,7 +99,7 @@ function Button({
           {loading ? (
             <DashRing
               aria-hidden
-              className={cn("shrink-0", size === "sm" ? "size-3.5" : "size-4")}
+              className={cn("shrink-0", size === "xsm" ? "size-3" : size === "sm" ? "size-3.5" : "size-4")}
             />
           ) : null}
           {children}

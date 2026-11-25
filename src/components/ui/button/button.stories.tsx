@@ -35,8 +35,8 @@ const meta = {
     },
     size: {
       control: "select",
-      options: ["sm", "default", "lg", "icon", "icon-sm", "icon-circle"],
-      description: "Heights 36 / 44 / 52. Icon sizes are 44, 32 and 38 square.",
+      options: ["xsm", "sm", "default", "lg", "icon", "icon-sm", "icon-circle"],
+      description: "Heights 30 / 36 / 44 / 52. Icon sizes are 44, 32 and 38 square.",
     },
     disabled: { control: "boolean" },
     loading: {
@@ -145,10 +145,13 @@ function Variants() {
   )
 }
 
-/** Height scale from the Paper board: 36, 44, 52. */
+/** Height scale from the Paper board: 30, 36, 44, 52. */
 function Sizes() {
   return (
     <div className="flex flex-wrap items-end gap-10 border-b border-border py-7">
+      <State label="X-Small · 30">
+        <Button size="xsm">Create organization</Button>
+      </State>
       <State label="Small · 36">
         <Button size="sm">Create organization</Button>
       </State>
@@ -236,7 +239,10 @@ function Loading() {
           Remove access
         </Button>
       </Row>
-      <Row label="Sizes" note="36 · 44 · 52">
+      <Row label="Sizes" note="30 · 36 · 44 · 52">
+        <Button size="xsm" loading>
+          Processing
+        </Button>
         <Button size="sm" loading>
           Processing
         </Button>

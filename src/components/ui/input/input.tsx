@@ -1,6 +1,6 @@
-import * as React from "react"
+import * as React from "react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 /**
  * DC design system — "04 / Inputs" board (DC DESIGN SYSTEM · V1.0).
@@ -23,11 +23,11 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
         "focus-visible:border-[1.5px] focus-visible:border-primary",
         "aria-invalid:border-destructive",
         "disabled:pointer-events-none disabled:cursor-not-allowed disabled:border-line disabled:bg-background dark:disabled:bg-muted disabled:text-muted-foreground/60 dark:disabled:text-muted-foreground",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
-export { Input }
+export { Input };

@@ -82,10 +82,13 @@ export const STATES_OPTIONS = [
   { value: "west_bengal", label: "West Bengal" },
   { value: "andaman_nicobar", label: "Andaman and Nicobar Islands" },
   { value: "chandigarh", label: "Chandigarh" },
-  { value: "dadra_nagar_haveli", label: "Dadra and Nagar Haveli and Daman and Diu" },
+  {
+    value: "dadra_nagar_haveli",
+    label: "Dadra and Nagar Haveli and Daman and Diu",
+  },
   { value: "lakshadweep", label: "Lakshadweep" },
   { value: "delhi", label: "National Capital Territory of Delhi" },
   { value: "puducherry", label: "Puducherry" },
   { value: "ladakh", label: "Ladakh" },
   { value: "jammu_kashmir", label: "Jammu and Kashmir" },
-] as const;
+];

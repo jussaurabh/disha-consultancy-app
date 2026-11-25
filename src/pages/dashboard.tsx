@@ -23,6 +23,7 @@ import {
   differenceInCalendarDays,
 } from "date-fns";
 import { MoveRight } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 export interface KpiBarItem {
   label: string;
@@ -123,22 +124,22 @@ export default function DashboardPage() {
         const status = org.status;
         if (status === "active") {
           return (
-            <span className="bg-accent text-xs font-bold text-accent-foreground rounded px-2">
+            <Badge dot shape="tag">
               Active
-            </span>
+            </Badge>
           );
         }
         if (status === "inactive") {
           return (
-            <span className="bg-muted text-xs font-bold text-muted-foreground rounded px-2">
+            <Badge dot variant="destructive" shape="tag">
               Inactive
-            </span>
+            </Badge>
           );
         }
         return (
-          <span className="bg-muted text-xs font-bold text-muted-foreground rounded px-2">
+          <Badge dot variant="ghost" shape="tag">
             {status}
-          </span>
+          </Badge>
         );
       },
     },
@@ -199,7 +200,12 @@ export default function DashboardPage() {
               <h2 className="font-display text-lg font-bold tracking-[-0.01em] text-ink">
                 Recently added
               </h2>
-              <Button variant="link" size="sm" asChild className="h-auto gap-1 px-0">
+              <Button
+                variant="link"
+                size="sm"
+                asChild
+                className="h-auto gap-1 px-0"
+              >
                 <Link to="/organizations">
                   View all
                   <MoveRight className="size-3.5" aria-hidden />
@@ -236,9 +242,7 @@ export default function DashboardPage() {
                 subTitle="Add your first organization to start running payroll."
                 actions={
                   <Button size="sm" asChild>
-                    <Link to="/organizations">
-                      Add your first organization
-                    </Link>
+                    <Link to="/organizations">Add your first organization</Link>
                   </Button>
                 }
               />
@@ -258,7 +262,7 @@ export default function DashboardPage() {
                     <TableRow
                       key={org._id}
                       onClick={() => navigate(`/organizations/${org._id}`)}
-                      className="cursor-pointer hover:bg-accent-soft/40"
+                      className="cursor-pointer"
                     >
                       {orgColumns.map((col) => (
                         <TableCell key={col.key} className={col.className}>

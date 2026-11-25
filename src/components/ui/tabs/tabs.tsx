@@ -33,7 +33,7 @@ const tabsListVariants = cva(
     variants: {
       variant: {
         default: "gap-1 rounded-lg bg-accent-soft p-1 dark:bg-surface-pressed",
-        line: "gap-1 rounded-none border-b border-line bg-transparent",
+        line: "gap-1 rounded-none bg-transparent",
         pill: "gap-1 bg-transparent",
       },
     },
@@ -113,11 +113,11 @@ function TabsTrigger({
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        "relative inline-flex items-center justify-center gap-2 whitespace-nowrap font-body text-[13px] font-medium leading-4 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:pointer-events-none disabled:opacity-40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "relative inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap font-body text-[13px] font-medium leading-4 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:pointer-events-none disabled:opacity-40 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         // Variant-scoped rules — the trigger cannot read the list variant, so
         // every register styles the trigger through the list's group name.
         "group-data-[variant=default]/tabs-list:h-[36px] group-data-[variant=default]/tabs-list:px-4 group-data-[variant=default]/tabs-list:rounded-lg group-data-[variant=default]/tabs-list:border group-data-[variant=default]/tabs-list:border-transparent group-data-[variant=default]/tabs-list:data-active:bg-surface dark:group-data-[variant=default]/tabs-list:data-active:bg-ground group-data-[variant=default]/tabs-list:data-active:border-line group-data-[variant=default]/tabs-list:data-active:text-foreground group-data-[variant=default]/tabs-list:data-active:font-semibold group-data-[variant=default]/tabs-list:data-active:shadow-[0_1px_2px_#201E191A] dark:group-data-[variant=default]/tabs-list:data-active:shadow-[0_1px_2px_#00000066]",
-        "group-data-[variant=line]/tabs-list:h-10 group-data-[variant=line]/tabs-list:px-3.5 group-data-[variant=line]/tabs-list:rounded-t-lg group-data-[variant=line]/tabs-list:-mb-px group-data-[variant=line]/tabs-list:border-b-2 group-data-[variant=line]/tabs-list:border-transparent group-data-[variant=line]/tabs-list:data-active:border-accent group-data-[variant=line]/tabs-list:data-active:text-foreground group-data-[variant=line]/tabs-list:data-active:font-semibold",
+        "group-data-[variant=line]/tabs-list:h-10 group-data-[variant=line]/tabs-list:px-3.5 group-data-[variant=line]/tabs-list:rounded-t-lg group-data-[variant=line]/tabs-list:-mb-px group-data-[variant=line]/tabs-list:data-active:border-b-2 group-data-[variant=line]/tabs-list:data-active:border-accent group-data-[variant=line]/tabs-list:data-active:text-foreground group-data-[variant=line]/tabs-list:data-active:font-semibold",
         "group-data-[variant=pill]/tabs-list:h-[36px] group-data-[variant=pill]/tabs-list:px-4 group-data-[variant=pill]/tabs-list:rounded-full group-data-[variant=pill]/tabs-list:data-active:bg-accent-soft group-data-[variant=pill]/tabs-list:data-active:text-accent group-data-[variant=pill]/tabs-list:data-active:font-semibold",
         // Side rail (vertical) — the rail is its own register, so its rules
         // carry !important where they compete with the variant-scoped rules

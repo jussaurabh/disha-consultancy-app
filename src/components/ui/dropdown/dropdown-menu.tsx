@@ -19,11 +19,13 @@ function DropdownMenuPortal({
 }
 
 function DropdownMenuTrigger({
+  className,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Trigger>) {
   return (
     <DropdownMenuPrimitive.Trigger
       data-slot="dropdown-menu-trigger"
+      className={cn("cursor-pointer data-[disabled]:cursor-not-allowed", className)}
       {...props}
     />
   )
@@ -63,15 +65,19 @@ function DropdownMenuItem({
   description,
   badge,
   children,
+  asChild,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Item> & {
   inset?: boolean
   variant?: "default" | "destructive"
   description?: React.ReactNode
   badge?: React.ReactNode
+  asChild?: boolean
 }) {
+  const PrimitiveItem = asChild ? DropdownMenuPrimitive.Item : DropdownMenuPrimitive.Item
+
   return (
-    <DropdownMenuPrimitive.Item
+    <PrimitiveItem
       data-slot="dropdown-menu-item"
       data-inset={inset}
       data-variant={variant}
@@ -81,18 +87,24 @@ function DropdownMenuItem({
       )}
       {...props}
     >
-      {children}
-      {description && (
-        <span className="ml-auto text-xs text-muted-foreground opacity-70 group-hover/dropdown-menu-item:text-accent-foreground group-focus/dropdown-menu-item:text-accent-foreground group-data-[highlighted]/dropdown-menu-item:text-accent-foreground">
-          {description}
-        </span>
+      {!asChild ? (
+        <>
+          {children}
+          {description && (
+            <span className="ml-auto text-xs text-muted-foreground opacity-70 group-hover/dropdown-menu-item:text-accent-foreground group-focus/dropdown-menu-item:text-accent-foreground group-data-[highlighted]/dropdown-menu-item:text-accent-foreground">
+              {description}
+            </span>
+          )}
+          {badge && (
+            <span className="ml-2 flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-medium text-muted-foreground bg-muted group-hover/dropdown-menu-item:bg-accent/10 group-hover/dropdown-menu-item:text-accent-foreground group-focus/dropdown-menu-item:bg-accent/10 group-focus/dropdown-menu-item:text-accent-foreground group-data-[highlighted]/dropdown-menu-item:bg-accent/10 group-data-[highlighted]/dropdown-menu-item:text-accent-foreground">
+              {badge}
+            </span>
+          )}
+        </>
+      ) : (
+        children
       )}
-      {badge && (
-        <span className="ml-2 flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-medium text-muted-foreground bg-muted group-hover/dropdown-menu-item:bg-accent/10 group-hover/dropdown-menu-item:text-accent-foreground group-focus/dropdown-menu-item:bg-accent/10 group-focus/dropdown-menu-item:text-accent-foreground group-data-[highlighted]/dropdown-menu-item:bg-accent/10 group-data-[highlighted]/dropdown-menu-item:text-accent-foreground">
-          {badge}
-        </span>
-      )}
-    </DropdownMenuPrimitive.Item>
+    </PrimitiveItem>
   )
 }
 
