@@ -19,6 +19,7 @@ import {
 import { ConfirmDialog } from "@/components/dialogs/confirm-dialog";
 import { CompanyDetailsSection } from "./company-section";
 import { ContactSection } from "./contact-section";
+import { BankSection } from "./bank-section";
 import { StatsRail } from "./detail-shared";
 import { SECTIONS, type SectionId } from "./sections";
 
@@ -223,6 +224,17 @@ export default function OrganizationDetailPage() {
         {tab === "contact" && (
           <div className="px-4 pt-8 pb-14 md:px-6">
             <ContactSection
+              org={org}
+              canEdit={canEdit}
+              isEditing={isEditing}
+              onEditOpen={() => setIsEditing(true)}
+              onEditClose={() => setIsEditing(false)}
+            />
+          </div>
+        )}
+        {tab === "bank" && (
+          <div className="px-4 pt-8 pb-14 md:px-6">
+            <BankSection
               org={org}
               canEdit={canEdit}
               isEditing={isEditing}
