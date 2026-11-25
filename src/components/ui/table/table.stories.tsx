@@ -21,6 +21,7 @@ import {
   PaginationPrevious,
 } from "../pagination/pagination"
 import { MoreHorizontal, MapPin, Eye, Edit, Trash2, ChevronDown, Download, X } from "lucide-react"
+import { EmptyState as EmptyStateComponent } from "../empty-state/empty-state"
 
 /**
  * Table component stories
@@ -598,8 +599,12 @@ export const EmptyState: Story = {
         </TableHeader>
         <TableBody>
           <TableRow>
-            <TableCell colSpan={4} className="py-12 text-center text-muted">
-              No organizations yet
+            <TableCell colSpan={4}>
+              <EmptyStateComponent
+                variant="no-data"
+                title="No organizations yet"
+                subTitle="Add your first organization to start running payroll."
+              />
             </TableCell>
           </TableRow>
         </TableBody>
@@ -609,7 +614,8 @@ export const EmptyState: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Empty state with centered message spanning all columns.",
+        story:
+          "Empty state with the no-data illustration spanning all columns via EmptyState.",
       },
     },
   },
