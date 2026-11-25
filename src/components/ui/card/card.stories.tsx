@@ -17,12 +17,13 @@ import {
 /**
  * DC design system — Cards board (DC DESIGN SYSTEM · V1.0).
  *
- * Radius 16 (rounded-xl) · gap-4 · py-4 · hairline ring-1 ring-foreground/10
- * on bg-card. CardHeader groups title, description and a trailing action in
- * a [1fr_auto] grid · CardContent carries the body · CardFooter sits on a
- * muted fill with a top border.
+ * Radius 14 (rounded-xl) · padding 20 (p-5) · gap-4 · 1px border-line on
+ * bg-field. CardHeader groups title, description and a trailing action in
+ * a [1fr_auto] grid · CardContent carries the body · CardFooter rides a
+ * 1px top divider with no fill.
  *
- * Size "sm" tightens gap and padding to 12 — use it for dense grids.
+ * Size "sm" tightens gap and padding to 16 — use it for dense grids.
+ * `selected` adds the 1.5px accent border and the accent-soft tint.
  */
 const meta = {
   title: "UI/Card",
@@ -33,7 +34,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Cards sit on bg-card with a hairline ring — radius 16 (rounded-xl), gap-4, py-4, ring-1 ring-foreground/10. CardHeader holds the title, description and trailing action; CardFooter carries the actions on a muted fill. Use size sm for dense grids.",
+          "Cards sit on bg-field with a 1px border-line — radius 14 (rounded-xl), gap-4, padding 20 (p-5). CardHeader holds the title, description and trailing action; CardFooter carries the actions on a 1px top divider. Use size sm for dense grids; use selected for the 1.5px accent state.",
       },
     },
   },
@@ -41,7 +42,11 @@ const meta = {
     size: {
       control: "select",
       options: ["default", "sm"],
-      description: "default pads 16 · sm tightens gap and padding to 12",
+      description: "default pads 20 · sm tightens gap and padding to 16",
+    },
+    selected: {
+      control: "boolean",
+      description: "1.5px accent border + accent-soft tint — selection state",
     },
     className: {
       control: "text",
@@ -50,6 +55,7 @@ const meta = {
   },
   args: {
     size: "default",
+    selected: false,
   },
 } satisfies Meta<typeof Card>
 
@@ -137,7 +143,7 @@ function Anatomy() {
           </CardContent>
         </Card>
       </Row>
-      <Row label="With footer" note="Footer carries the actions on a muted fill">
+      <Row label="With footer" note="Footer rides a 1px line divider — no fill">
         <Card className="w-96">
           <CardHeader>
             <CardTitle>Delete organization</CardTitle>
@@ -159,29 +165,70 @@ function Anatomy() {
   )
 }
 
-/** Padding scale: 16 on default, 12 on sm. */
+/** Padding scale: 20 on default, 16 on sm. */
 function Sizes() {
   return (
     <div className="flex flex-wrap items-start gap-6 border-b border-border py-7">
-      <State label="Default · 16">
+      <State label="Default · 20">
         <Card className="w-80">
           <CardHeader>
             <CardTitle>Default</CardTitle>
-            <CardDescription>gap-4 · py-4 · px-4</CardDescription>
+            <CardDescription>gap-4 · p-5</CardDescription>
           </CardHeader>
           <CardContent className="text-muted-foreground">
             The everyday card shell for dashboards and forms.
           </CardContent>
         </Card>
       </State>
-      <State label="Small · 12">
+      <State label="Small · 16">
         <Card size="sm" className="w-80">
           <CardHeader>
             <CardTitle>Small</CardTitle>
-            <CardDescription>gap-3 · py-3 · px-3</CardDescription>
+            <CardDescription>gap-3 · p-4</CardDescription>
           </CardHeader>
           <CardContent className="text-muted-foreground">
             For dense grids and list-adjacent cards.
+          </CardContent>
+        </Card>
+      </State>
+    </div>
+  )
+}
+
+/** Shell states — default, selected via prop, disabled via pressed fill. */
+function States() {
+  return (
+    <div className="flex flex-wrap items-start gap-6 border-b border-border py-7">
+      <State label="Default">
+        <Card className="w-80">
+          <CardHeader>
+            <CardTitle>Default</CardTitle>
+            <CardDescription>Field fill · 1px line border</CardDescription>
+          </CardHeader>
+          <CardContent className="text-muted-foreground">
+            The resting shell for every card surface.
+          </CardContent>
+        </Card>
+      </State>
+      <State label="Selected · 1.5px accent">
+        <Card selected className="w-80">
+          <CardHeader>
+            <CardTitle>Selected</CardTitle>
+            <CardDescription>border-accent · bg-accent-soft</CardDescription>
+          </CardHeader>
+          <CardContent className="text-muted-foreground">
+            Pickable cards — org tiles, payment methods, plan choice.
+          </CardContent>
+        </Card>
+      </State>
+      <State label="Disabled">
+        <Card className="w-80 bg-surface-pressed text-muted-foreground">
+          <CardHeader>
+            <CardTitle>Disabled</CardTitle>
+            <CardDescription>Pressed fill · dimmed text</CardDescription>
+          </CardHeader>
+          <CardContent>
+            Not available on the current plan.
           </CardContent>
         </Card>
       </State>
@@ -230,7 +277,7 @@ function Media() {
 function InContext() {
   return (
     <div className="flex flex-col">
-      <Row label="Stat tiles" note="size sm · dense grids">
+      <Row label="Stat cards" note="Board internals — 10px label · 30px figure · delta chip">
         {(
           [
             ["Employees", "84", "+6 this month"],
@@ -238,12 +285,18 @@ function InContext() {
             ["Next run", "01 Dec", "Acme Manufacturing"],
           ] as const
         ).map(([label, value, note]) => (
-          <Card key={label} size="sm" className="w-44">
-            <CardHeader>
-              <CardDescription>{label}</CardDescription>
-              <CardTitle className="font-display text-2xl">{value}</CardTitle>
-            </CardHeader>
-            <CardContent className="text-xs text-muted-foreground">{note}</CardContent>
+          <Card key={label} className="w-44">
+            <CardContent className="flex flex-col items-start gap-2">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.1em] leading-3 text-muted-foreground">
+                {label}
+              </span>
+              <span className="font-display text-[30px] font-extrabold leading-[34px] tracking-[-0.01em]">
+                {value}
+              </span>
+              <span className="inline-flex h-5 items-center rounded bg-accent-soft px-2 text-[11px] font-semibold text-accent">
+                {note}
+              </span>
+            </CardContent>
           </Card>
         ))}
       </Row>
@@ -292,14 +345,17 @@ function Board() {
           Cards
         </h2>
         <p className="mt-2 max-w-xl font-body text-sm leading-6 text-muted-foreground">
-          Surfaces that group related content and actions. Radius 16 · hairline ring ·
-          gap-4 py-4 — size sm tightens to 12.
+          Surfaces that group related content and actions. Radius 14 · 1px border-line ·
+          padding 20 — size sm tightens to 16, selected lifts to a 1.5px accent border.
         </p>
         <Block title="Anatomy">
           <Anatomy />
         </Block>
         <Block title="Sizes">
           <Sizes />
+        </Block>
+        <Block title="States">
+          <States />
         </Block>
         <Block title="With media">
           <Media />
@@ -308,7 +364,8 @@ function Board() {
           <InContext />
         </Block>
         <p className="mt-12 border-t border-border pt-6 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-          Radius 16 · ring-1 ring-foreground/10 · gap-4 py-4 · sm tightens to 12
+          RADIUS 14 · PADDING 20 · TITLE 14/600 · BODY 12 MUTED · FOOTER = 1PX TOP ·
+          SELECTED = 1.5PX ACCENT
         </p>
       </div>
     </div>
@@ -374,6 +431,16 @@ export const OnlySizes: Story = {
     <Screen>
       <Block title="Sizes">
         <Sizes />
+      </Block>
+    </Screen>
+  ),
+}
+
+export const OnlyStates: Story = {
+  render: () => (
+    <Screen>
+      <Block title="States">
+        <States />
       </Block>
     </Screen>
   ),
