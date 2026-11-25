@@ -52,7 +52,9 @@ const FormPanelField = React.forwardRef<HTMLInputElement, FormPanelFieldProps>(
   ({ label, placeholder, type = "text", className, ...props }, ref) => {
     return (
       <div className="flex flex-col gap-1.5 w-full min-w-0">
-        <span className="font-body text-xs leading-4 text-muted-foreground">{label}</span>
+        <span className="font-body text-xs leading-4 text-muted-foreground">
+          {label}
+        </span>
         <input
           ref={ref}
           type={type}
@@ -80,10 +82,10 @@ FormPanelField.displayName = "FormPanelField";
 /* Compound component type                                            */
 /* ------------------------------------------------------------------ */
 
-interface FormPanelFieldCompoundComponent
-  extends React.ForwardRefExoticComponent<
-    React.PropsWithoutRef<FormPanelFieldProps> & React.RefAttributes<HTMLInputElement>
-  > {
+interface FormPanelFieldCompoundComponent extends React.ForwardRefExoticComponent<
+  React.PropsWithoutRef<FormPanelFieldProps> &
+    React.RefAttributes<HTMLInputElement>
+> {
   Row: typeof FormPanelFieldRow;
 }
 
@@ -91,12 +93,13 @@ interface FormPanelFieldCompoundComponent
 /* FormPanelFieldRow – explicit row wrapper                           */
 /* ------------------------------------------------------------------ */
 
-function FormPanelFieldRow({ children, className, ...props }: FormPanelFieldRowProps) {
+function FormPanelFieldRow({
+  children,
+  className,
+  ...props
+}: FormPanelFieldRowProps) {
   return (
-    <div
-      className={cn("flex flex-wrap gap-4", className)}
-      {...props}
-    >
+    <div className={cn("flex flex-wrap gap-4", className)} {...props}>
       {children}
     </div>
   );
@@ -106,7 +109,13 @@ function FormPanelFieldRow({ children, className, ...props }: FormPanelFieldRowP
 /* FormPanelSection – vertical or horizontal layout                   */
 /* ------------------------------------------------------------------ */
 
-function FormPanelSection({ title, layout = "vertical", children, className, ...props }: FormPanelSectionProps) {
+function FormPanelSection({
+  title,
+  layout = "vertical",
+  children,
+  className,
+  ...props
+}: FormPanelSectionProps) {
   const isHorizontal = layout === "horizontal";
 
   return (
@@ -138,8 +147,11 @@ function FormPanelSection({ title, layout = "vertical", children, className, ...
 /* FormPanelSeparator – uses shared Separator component              */
 /* ------------------------------------------------------------------ */
 
-function FormPanelSeparator({ className, ...props }: React.ComponentProps<typeof Separator>) {
-  return <Separator className={cn("border-line", className)} {...props} />;
+function FormPanelSeparator({
+  className,
+  ...props
+}: React.ComponentProps<typeof Separator>) {
+  return <Separator className="my-6" {...props} />;
 }
 
 /* ------------------------------------------------------------------ */
@@ -176,7 +188,9 @@ export function FormPanel({
             {title}
           </div>
           {description && (
-            <p className="text-[13px] leading-4 text-muted-foreground">{description}</p>
+            <p className="text-[13px] leading-4 text-muted-foreground">
+              {description}
+            </p>
           )}
         </div>
         {meta && (
@@ -209,5 +223,15 @@ FormPanel.Separator = FormPanelSeparator;
 FormPanel.Field = FormPanelField as FormPanelFieldCompoundComponent;
 FormPanel.Field.Row = FormPanelFieldRow;
 
-export { FormPanelSection, FormPanelSeparator, FormPanelField, FormPanelFieldRow };
-export type { FormPanelSectionProps, FormPanelSeparatorProps, FormPanelFieldProps, FormPanelFieldRowProps };
+export {
+  FormPanelSection,
+  FormPanelSeparator,
+  FormPanelField,
+  FormPanelFieldRow,
+};
+export type {
+  FormPanelSectionProps,
+  FormPanelSeparatorProps,
+  FormPanelFieldProps,
+  FormPanelFieldRowProps,
+};
