@@ -15,6 +15,7 @@
   --color-accent-soft: var(--dc-accent-soft);
   --color-copper: var(--copper); /* #B0653A light · oklch(0.655 0.112 49.9) dark — raw values in :root/.dark */
   --color-copper-soft: var(--dc-copper-soft);
+  --color-danger-soft: var(--dc-danger-soft);
   --color-danger: var(--dc-danger);
   --color-danger-foreground: var(--dc-danger-foreground);
   /* Interaction states from the "12 / Buttons" design system board (V1.0) */
@@ -76,6 +77,7 @@
   /* raw values for dark-aware brand tokens (consumed by @theme inline) */
   --copper: #B0653A;
   --dc-copper-soft: #F3E4D8;
+  --dc-danger-soft: #F0E2DC;
   --accent-hover: #285E4F;
   --accent-active: #204C40;
   /* DC palette, light register — Paper "dc" · 12 / Buttons */
@@ -90,7 +92,7 @@
   --dc-danger-foreground: #FFFFFF;
   --dc-line-strong: #C6BFAF;
   --dc-line-stronger: #B3AA97;
-  --dc-surface-pressed: #EAE6DB;
+  --dc-surface-pressed: #F7F5EF;
   --dc-danger-hover: #7C342A;
   --dc-danger-active: #6A2C23;
   --dc-field: #FFFFFF; /* field fill — synced with Paper (04 / Inputs): white in light, card #24231F in dark */
@@ -142,11 +144,12 @@
   --dc-accent: #6FA893;
   --dc-accent-soft: oklch(0.34 0.018 168.1);
   --dc-copper-soft: oklch(0.34 0.03 55);
+  --dc-danger-soft: #3A2724;
   --dc-danger: oklch(0.608 0.13 30.2);
   --dc-danger-foreground: #1C1B18;
   --dc-line-strong: #504D46;
   --dc-line-stronger: #55524B;
-  --dc-surface-pressed: #2F2E29;
+  --dc-surface-pressed: #2A2925;
   --dc-danger-hover: oklch(0.66 0.13 30.2);
   --dc-danger-active: oklch(0.55 0.12 30.2);
   --dc-field: #24231F; /* field fill — synced with Paper (04 / Inputs): = --dc-surface in dark */
