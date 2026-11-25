@@ -127,11 +127,11 @@ describe("FormPanel.Section", () => {
 })
 
 describe("FormPanel.Separator", () => {
-  it("renders hr with border-line class", () => {
+  it("renders separator with border-line class", () => {
     const { container } = render(<FormPanel.Separator />)
-    const hr = container.querySelector("hr")
-    expect(hr).not.toBeNull()
-    expect(hr?.className).toContain("border-line")
+    const separator = container.querySelector('[data-slot="separator"]')
+    expect(separator).not.toBeNull()
+    expect(separator?.className).toContain("border-line")
   })
 })
 

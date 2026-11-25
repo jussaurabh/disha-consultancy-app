@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
 
 /* ------------------------------------------------------------------ */
 /* Types                                                              */
@@ -27,8 +28,6 @@ interface FormPanelSectionProps extends React.ComponentProps<"div"> {
   layout?: "vertical" | "horizontal";
   children: React.ReactNode;
 }
-
-type FormPanelSeparatorProps = React.ComponentProps<"hr">;
 
 interface FormPanelFieldProps extends React.ComponentProps<"input"> {
   /** Field label */
@@ -123,16 +122,11 @@ function FormPanelSection({ title, layout = "vertical", children, className, ...
 }
 
 /* ------------------------------------------------------------------ */
-/* FormPanelSeparator                                                 */
+/* FormPanelSeparator – uses shared Separator component              */
 /* ------------------------------------------------------------------ */
 
-function FormPanelSeparator({ className, ...props }: FormPanelSeparatorProps) {
-  return (
-    <hr
-      className={cn("border-line", className)}
-      {...props}
-    />
-  );
+function FormPanelSeparator({ className, ...props }: React.ComponentProps<typeof Separator>) {
+  return <Separator className={cn("border-line", className)} {...props} />;
 }
 
 /* ------------------------------------------------------------------ */
