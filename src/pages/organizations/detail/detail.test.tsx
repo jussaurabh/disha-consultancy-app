@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { AxiosResponse } from "axios";
 import { orgsApi, type Organization } from "@/api/orgs";
 import { usersApi } from "@/api/users";
-import OrganizationDetailPage from "./detail";
+import OrganizationDetailPage from "./index";
 
 const authMock = vi.hoisted(() => ({
   hasPermission: vi.fn<(code: string) => boolean>(() => true),
