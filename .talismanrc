@@ -7,4 +7,6 @@ fileignoreconfig:
   checksum: c690e6753dd455f5b95d423dea003d2bd3d1d77c915ea98f44ac79c86776d6a4
 - filename: src/pages/organizations/company-panel.tsx
   checksum: e4bc375b8ce8406ed5eb022800fb8371af651addd569db28d541ecf66e55baef
+- filename: src/pages/organizations/contact-panel.tsx
+  checksum: 93d18bb673b806cc19d0a7ec931727f991da6b0924992e8dca34efa021c67495
 version: "1.0"
