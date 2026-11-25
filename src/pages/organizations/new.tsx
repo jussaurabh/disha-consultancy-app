@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useBlocker } from "react-router-dom";
 import type { ComponentType } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { SecondaryHeader } from "@/components/ui/secondary-header";
@@ -8,14 +9,22 @@ import { Stepper } from "@/components/ui/stepper";
 import { InfoNote } from "@/components/ui/info-note";
 import { StickyActionBar } from "@/components/ui/sticky-action-bar";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { STEPS, panelHeaderProps, type StepKey } from "./new-shared";
-import { CompanyPanel } from "./company-panel";
-import { ContactPanel } from "./contact-panel";
-import { BankPanel } from "./bank-panel";
-import { PayrollPanel } from "./payroll-panel";
-import { PfPanel } from "./pf-panel";
-import { EsiPanel } from "./esi-panel";
-import { readDraft } from "@/lib/org-new-draft";
+import { CompanyPanel, COMPANY_DEFAULTS } from "./company-panel";
+import { ContactPanel, CONTACT_DEFAULTS } from "./contact-panel";
+import { BankPanel, BANK_DEFAULTS } from "./bank-panel";
+import { PayrollPanel, PAYROLL_DEFAULTS } from "./payroll-panel";
+import { PfPanel, PF_DEFAULTS } from "./pf-panel";
+import { EsiPanel, ESI_DEFAULTS } from "./esi-panel";
+import { readDraft, clearDraft, isDraftDirty } from "@/lib/org-new-draft";
 
 const PANEL_COMPONENTS: Record<StepKey, ComponentType> = {
   Company: CompanyPanel,
@@ -26,12 +35,23 @@ const PANEL_COMPONENTS: Record<StepKey, ComponentType> = {
   ESI: EsiPanel,
 };
 
+const DEFAULTS_BY_STEP: Record<StepKey, Record<string, string | boolean>> = {
+  Company: COMPANY_DEFAULTS,
+  Contact: CONTACT_DEFAULTS,
+  Bank: BANK_DEFAULTS,
+  Payroll: PAYROLL_DEFAULTS,
+  PF: PF_DEFAULTS,
+  ESI: ESI_DEFAULTS,
+};
+
 export default function NewOrganizationPage() {
   const navigate = useNavigate();
   const [current, setCurrent] = useState(0);
   const step = STEPS[current];
   const isLast = current === STEPS.length - 1;
   const filledSegments = Math.min(current + 1, STEPS.length - 1);
+
+  const blocker = useBlocker(() => isDraftDirty(DEFAULTS_BY_STEP));
 
   const goToStep = (index: number) =>
     setCurrent(Math.max(0, Math.min(STEPS.length - 1, index)));
@@ -123,6 +143,32 @@ export default function NewOrganizationPage() {
           </Button>
         </StickyActionBar.Right>
       </StickyActionBar>
+
+      <Dialog
+        open={blocker.state === "blocked"}
+        onOpenChange={(open) => {
+          if (!open) blocker.reset();
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Leave without saving?</DialogTitle>
+            <DialogDescription>All changes will be lost.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                clearDraft();
+                blocker.proceed();
+              }}
+            >
+              Cancel & navigate away
+            </Button>
+            <Button onClick={() => blocker.reset()}>Continue filling the form</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

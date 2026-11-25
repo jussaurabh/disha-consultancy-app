@@ -18,5 +18,7 @@ fileignoreconfig:
 - filename: src/pages/organizations/esi-panel.tsx
   checksum: f1af4f30429967fb52f4cd915e88aeaa372dd152cacddf40660db318aa36e880
 - filename: src/pages/organizations/new.tsx
-  checksum: 8debdf2ea6a166457a61115f28f5045599f35b80445a27ac047cb15438750911
+  checksum: a61e2753d6b24b9d3a6f8670e31de58fbfa2b1e13ff0814b663e49fe48a5ce3d
+- filename: src/pages/organizations/new.test.tsx
+  checksum: df22ce7b93b54682119f187a39ba18712af4daa7526dd0e4e62e64f1997672fe
 version: "1.0"

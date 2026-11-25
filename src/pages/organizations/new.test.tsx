@@ -52,3 +52,55 @@ describe("NewOrganizationPage", () => {
     expect(stored.Company.company_name).toBe("Acme Pvt Ltd");
   });
 });
+
+describe("NewOrganizationPage — navigation guard", () => {
+  const DIRTY_DRAFT = JSON.stringify({
+    Company: { company_name: "Acme Pvt Ltd" },
+    Bank: { ifsc_code: "SBIN0001234" },
+  });
+
+  it("does not block navigation when the draft is clean", async () => {
+    renderNewPage();
+    await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(await screen.findByText("organizations list")).toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("blocks a dirty draft and both dialog actions behave", async () => {
+    localStorage.setItem(ORG_NEW_DRAFT_KEY, DIRTY_DRAFT);
+    renderNewPage();
+
+    await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(await screen.findByRole("dialog")).toBeInTheDocument();
+    expect(screen.getByText("All changes will be lost.")).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: "Continue filling the form" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/Company name/)).toBeInTheDocument();
+    expect(localStorage.getItem(ORG_NEW_DRAFT_KEY)).toBe(DIRTY_DRAFT);
+  });
+
+  it("Cancel & navigate away clears the draft and leaves", async () => {
+    localStorage.setItem(ORG_NEW_DRAFT_KEY, DIRTY_DRAFT);
+    renderNewPage();
+
+    await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Cancel & navigate away" }),
+    );
+    expect(await screen.findByText("organizations list")).toBeInTheDocument();
+    expect(localStorage.getItem(ORG_NEW_DRAFT_KEY)).toBeNull();
+  });
+
+  it("ESC keeps the user on the page with the draft intact", async () => {
+    localStorage.setItem(ORG_NEW_DRAFT_KEY, DIRTY_DRAFT);
+    renderNewPage();
+
+    await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    await screen.findByRole("dialog");
+    await userEvent.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/Company name/)).toBeInTheDocument();
+    expect(localStorage.getItem(ORG_NEW_DRAFT_KEY)).toBe(DIRTY_DRAFT);
+  });
+});
