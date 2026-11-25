@@ -131,6 +131,8 @@ describe("FormPanel.Separator", () => {
     const { container } = render(<FormPanel.Separator />)
     const separator = container.querySelector('[data-slot="separator"]')
     expect(separator).not.toBeNull()
+    // Separator uses bg-border as base, FormPanel adds border-line
+    expect(separator?.className).toContain("bg-border")
     expect(separator?.className).toContain("border-line")
   })
 })

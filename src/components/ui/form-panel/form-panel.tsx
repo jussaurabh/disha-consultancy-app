@@ -151,7 +151,7 @@ function FormPanelSeparator({
   className,
   ...props
 }: React.ComponentProps<typeof Separator>) {
-  return <Separator className="my-6" {...props} />;
+  return <Separator className={cn("my-6 border-line", className)} {...props} />;
 }
 
 /* ------------------------------------------------------------------ */
