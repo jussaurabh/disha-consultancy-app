@@ -148,6 +148,102 @@ describe("Stepper — vertical", () => {
   })
 })
 
+describe("Stepper — horizontal", () => {
+  it("renders ol with data-orientation=horizontal and row layout", () => {
+    const { container } = render(<Stepper steps={STEPS} current={2} orientation="horizontal" />)
+    const ol = container.querySelector('[data-slot="stepper"]') as HTMLElement
+    expect(ol).not.toBeNull()
+    expect(ol.dataset.orientation).toBe("horizontal")
+    expect(ol.className).toContain("flex-row")
+  })
+
+  it("renders exactly steps.length - 1 connectors (2px segments, not spine)", () => {
+    const { container } = render(<Stepper steps={STEPS} current={2} orientation="horizontal" />)
+    const connectors = container.querySelectorAll('[data-slot="stepper-connector"]')
+    expect(connectors).toHaveLength(5)
+    connectors.forEach((conn) => {
+      expect(conn.className).toContain("h-[2px]")
+      expect(conn.className).toContain("rounded-full")
+    })
+  })
+
+  it("segments after completed steps have bg-accent; after current/upcoming have bg-line", () => {
+    const { container } = render(<Stepper steps={STEPS} current={2} orientation="horizontal" />)
+    const connectors = container.querySelectorAll('[data-slot="stepper-connector"]')
+    // Between items 0-1 (completed) and 1-2 (completed) => bg-accent
+    expect((connectors[0] as HTMLElement).className).toContain("bg-accent")
+    expect((connectors[1] as HTMLElement).className).toContain("bg-accent")
+    // Between items 2-3 (current), 3-4 (upcoming), 4-5 (upcoming) => bg-line
+    expect((connectors[2] as HTMLElement).className).toContain("bg-line")
+    expect((connectors[3] as HTMLElement).className).toContain("bg-line")
+    expect((connectors[4] as HTMLElement).className).toContain("bg-line")
+  })
+
+  it("labels sit below circles; current item shows title, subtitle, Current badge; current title text-accent", () => {
+    const { container } = render(<Stepper steps={STEPS} current={2} orientation="horizontal" />)
+    const items = container.querySelectorAll('[data-slot="stepper-item"]')
+    const currentItem = items[2] as HTMLElement
+    // Title
+    const title = currentItem.querySelector("span.text-\\[13px\\]")
+    expect(title).not.toBeNull()
+    expect(title?.className).toContain("text-accent")
+    expect(title?.textContent).toBe("Bank")
+    // Subtitle
+    const subtitle = currentItem.querySelector("span.text-\\[11px\\]")
+    expect(subtitle).not.toBeNull()
+    expect(subtitle?.textContent).toBe("Salary disbursement · 4 fields")
+    // Current badge
+    expect(currentItem.textContent).toContain("Current")
+    // Other items have text-ink titles
+    const otherTitle = items[0].querySelector("span.text-\\[13px\\]") as HTMLElement
+    expect(otherTitle.className).toContain("text-ink")
+  })
+
+  it("long title: label column has min-w-0 and item has w-[118px]", () => {
+    const longTitle = "A".repeat(200)
+    const { container } = render(
+      <Stepper steps={[{ title: longTitle, subtitle: "Sub" }]} current={0} orientation="horizontal" />
+    )
+    const item = container.querySelector('[data-slot="stepper-item"]') as HTMLElement
+    expect(item.className).toContain("w-[118px]")
+    expect(item.className).toContain("min-w-0")
+  })
+
+  it("single step + horizontal: no connectors", () => {
+    const { container } = render(<Stepper steps={[{ title: "Only" }]} current={0} orientation="horizontal" />)
+    expect(container.querySelector('[data-slot="stepper-connector"]')).toBeNull()
+  })
+
+  it("error circle carries same state classes as vertical (bg-danger)", () => {
+    const stepsWithError: StepperStep[] = STEPS.map((s, i) =>
+      i === 2 ? { ...s, state: "error" as const } : s
+    )
+    const { container } = render(<Stepper steps={stepsWithError} current={2} orientation="horizontal" />)
+    const items = container.querySelectorAll('[data-slot="stepper-item"]')
+    const errorItem = items[2] as HTMLElement
+    const indicator = errorItem.querySelector('[data-slot="stepper-indicator"]') as HTMLElement
+    expect(indicator.className).toContain("bg-danger")
+    expect(indicator.className).toContain("ring-[3px]")
+    expect(indicator.className).toContain("ring-danger/16")
+    expect(indicator.className).toContain("dark:ring-danger/28")
+  })
+
+  it("rendered HTML contains no hex color tokens", () => {
+    const { container } = render(<Stepper steps={STEPS} current={2} orientation="horizontal" />)
+    const html = container.innerHTML
+    expect(html).not.toMatch(/#[0-9a-f]{3}\b/i)
+    expect(html).not.toMatch(/#[0-9a-f]{6}\b/i)
+  })
+
+  it("onStepSelect: clicking item 3 calls spy with 2", () => {
+    const spy = vi.fn()
+    const { container } = render(<Stepper steps={STEPS} current={0} orientation="horizontal" onStepSelect={spy} />)
+    const items = container.querySelectorAll('[data-slot="stepper-item"]')
+    fireEvent.click(items[2])
+    expect(spy).toHaveBeenCalledWith(2)
+  })
+})
+
 describe("resolveStepState", () => {
   it("index < current => completed", () => {
     expect(resolveStepState({ title: "A" }, 0, 2)).toBe("completed")

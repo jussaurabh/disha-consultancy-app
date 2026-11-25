@@ -208,6 +208,28 @@ export const HorizontalDefault: Story = {
   ),
 }
 
+export const HorizontalAllCompleted: Story = {
+  render: () => (
+    <div className="min-h-screen w-full bg-background px-8 py-10 md:px-16">
+      <div className="mx-auto flex max-w-[1180px] flex-col">
+        <div className="flex items-center gap-2">
+          <Caption>Component library</Caption>
+          <span className="font-body text-[10px] text-muted-foreground">·</span>
+          <Caption>DC design system · V1.0</Caption>
+        </div>
+        <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight text-foreground">
+          Stepper — Horizontal All Completed
+        </h2>
+        <Block title="Horizontal">
+          <Row label="All completed (current=6)" note="All segments filled accent">
+            <Stepper steps={STEPS} current={6} orientation="horizontal" />
+          </Row>
+        </Block>
+      </div>
+    </div>
+  ),
+}
+
 export const HorizontalDark: Story = {
   render: () => (
     <div className="dark bg-ground p-8">
