@@ -9,7 +9,7 @@ function StickyActionBarRoot({
     <div
       data-slot="sticky-action-bar"
       className={cn(
-        "sticky bottom-0 z-30 flex min-h-[76px] w-full items-center gap-4 border-t border-border bg-card px-4 md:px-6",
+        "fixed bottom-0 z-30 flex min-h-19 w-full items-center gap-4 border-t border-border bg-card px-4 md:px-6",
         className,
       )}
       {...props}

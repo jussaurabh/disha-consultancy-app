@@ -44,7 +44,10 @@ export function EsiPanel() {
   usePersistStep(STEPS[stepIndex].key, form);
 
   return (
-    <FormPanel {...panelHeaderProps(STEPS[stepIndex], stepIndex)}>
+    <FormPanel
+      {...panelHeaderProps(STEPS[stepIndex], stepIndex)}
+      className="mb-20"
+    >
       <Form {...form}>
         <FormPanel.Section title="REGISTRATION">
           <div className="grid gap-5 md:grid-cols-2">
@@ -120,7 +123,9 @@ export function EsiPanel() {
                   <FormControl>
                     <Input placeholder="21000" {...field} />
                   </FormControl>
-                  <FormDescription>Statutory wage ceiling for ESI coverage.</FormDescription>
+                  <FormDescription>
+                    Statutory wage ceiling for ESI coverage.
+                  </FormDescription>
                 </FormItem>
               )}
             />
@@ -168,7 +173,10 @@ export function EsiPanel() {
                     className="flex flex-wrap gap-3"
                   >
                     <RadioOption value="gross" label="Gross" />
-                    <RadioOption value="all_components" label="All components" />
+                    <RadioOption
+                      value="all_components"
+                      label="All components"
+                    />
                   </RadioGroup>
                 </FormControl>
                 <FormDescription>

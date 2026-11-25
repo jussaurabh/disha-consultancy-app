@@ -72,7 +72,8 @@ function ToggleCard({
 }: {
   label: string;
   description: string;
-  name: "pt_as_per_employee_state" | "professional_tax" | "it_auto" | "esi_on_ot";
+  name:
+    "pt_as_per_employee_state" | "professional_tax" | "it_auto" | "esi_on_ot";
   control: ReturnType<typeof useForm<PayrollValues>>["control"];
 }) {
   return (
@@ -105,7 +106,10 @@ export function PayrollPanel() {
   usePersistStep(STEPS[stepIndex].key, form);
 
   return (
-    <FormPanel {...panelHeaderProps(STEPS[stepIndex], stepIndex)}>
+    <FormPanel
+      {...panelHeaderProps(STEPS[stepIndex], stepIndex)}
+      className="mb-20"
+    >
       <Form {...form}>
         <FormPanel.Section title="TAX & REGISTRATION">
           <div className="grid gap-5 md:grid-cols-3">
@@ -326,7 +330,9 @@ export function PayrollPanel() {
                   <FormControl>
                     <Input placeholder="2" {...field} />
                   </FormControl>
-                  <FormDescription>Multiplier applied to the OT wage base.</FormDescription>
+                  <FormDescription>
+                    Multiplier applied to the OT wage base.
+                  </FormDescription>
                 </FormItem>
               )}
             />

@@ -60,7 +60,10 @@ export function PfPanel() {
   usePersistStep(STEPS[stepIndex].key, form);
 
   return (
-    <FormPanel {...panelHeaderProps(STEPS[stepIndex], stepIndex)}>
+    <FormPanel
+      {...panelHeaderProps(STEPS[stepIndex], stepIndex)}
+      className="mb-20"
+    >
       <Form {...form}>
         <FormPanel.Section title="REGISTRATION">
           <div className="grid gap-5 md:grid-cols-2">
@@ -148,7 +151,9 @@ export function PfPanel() {
                   <FormControl>
                     <Input placeholder="15000" {...field} />
                   </FormControl>
-                  <FormDescription>Statutory wage ceiling for PF.</FormDescription>
+                  <FormDescription>
+                    Statutory wage ceiling for PF.
+                  </FormDescription>
                 </FormItem>
               )}
             />
@@ -200,7 +205,8 @@ export function PfPanel() {
                   </RadioGroup>
                 </FormControl>
                 <FormDescription>
-                  Statutory PF is computed on basic wages, capped at the PF limit.
+                  Statutory PF is computed on basic wages, capped at the PF
+                  limit.
                 </FormDescription>
               </FormItem>
             )}
