@@ -1,5 +1,5 @@
 import type { ReactNode } from "react"
-import type { Meta, StoryObj } from "@storybook/react-vite"
+import type { Meta } from "@storybook/react-vite"
 import { useForm, Controller } from "react-hook-form"
 import { Clock } from "lucide-react"
 import { FormPanel } from "./form-panel"
@@ -28,7 +28,6 @@ const meta = {
 } satisfies Meta<typeof FormPanel>
 
 export default meta
-type Story = StoryObj<typeof meta>
 
 function Caption({ children }: { children: ReactNode }) {
   return (
@@ -344,7 +343,7 @@ function Screen({ children }: { children: ReactNode }) {
 /* Exports                                                          */
 /* ---------------------------------------------------------------- */
 
-export const Light: Story = {
+export const Light = {
   render: () => (
     <Screen>
       <div className="flex items-center gap-2">
@@ -382,9 +381,9 @@ export const Light: Story = {
   ),
 }
 
-export const ContactStory: Story = { render: () => <Contact /> }
-export const BankWithNoteStory: Story = { render: () => <BankWithNote /> }
-export const HorizontalLayoutStory: Story = { render: () => <HorizontalLayout /> }
-export const MixedLayoutStory: Story = { render: () => <MixedLayout /> }
-export const ReactHookFormStory: Story = { render: () => <ReactHookFormDemo /> }
-export const MinimalStory: Story = { render: () => <Minimal /> }
+export const ContactStory = { render: () => <Contact /> }
+export const BankWithNoteStory = { render: () => <BankWithNote /> }
+export const HorizontalLayoutStory = { render: () => <HorizontalLayout /> }
+export const MixedLayoutStory = { render: () => <MixedLayout /> }
+export const ReactHookFormStory = { render: () => <ReactHookFormDemo /> }
+export const MinimalStory = { render: () => <Minimal /> }

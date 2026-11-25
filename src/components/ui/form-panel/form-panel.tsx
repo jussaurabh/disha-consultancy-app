@@ -42,6 +42,8 @@ interface FormPanelFieldRowProps extends React.ComponentProps<"div"> {
   children: React.ReactNode;
 }
 
+type FormPanelSeparatorProps = React.ComponentProps<typeof Separator>;
+
 /* ------------------------------------------------------------------ */
 /* FormPanelField – forwardRef for react-hook-form                    */
 /* ------------------------------------------------------------------ */
@@ -73,6 +75,17 @@ const FormPanelField = React.forwardRef<HTMLInputElement, FormPanelFieldProps>(
 );
 
 FormPanelField.displayName = "FormPanelField";
+
+/* ------------------------------------------------------------------ */
+/* Compound component type                                            */
+/* ------------------------------------------------------------------ */
+
+interface FormPanelFieldCompoundComponent
+  extends React.ForwardRefExoticComponent<
+    React.PropsWithoutRef<FormPanelFieldProps> & React.RefAttributes<HTMLInputElement>
+  > {
+  Row: typeof FormPanelFieldRow;
+}
 
 /* ------------------------------------------------------------------ */
 /* FormPanelFieldRow – explicit row wrapper                           */
@@ -193,7 +206,7 @@ export function FormPanel({
 
 FormPanel.Section = FormPanelSection;
 FormPanel.Separator = FormPanelSeparator;
-FormPanel.Field = FormPanelField;
+FormPanel.Field = FormPanelField as FormPanelFieldCompoundComponent;
 FormPanel.Field.Row = FormPanelFieldRow;
 
 export { FormPanelSection, FormPanelSeparator, FormPanelField, FormPanelFieldRow };
