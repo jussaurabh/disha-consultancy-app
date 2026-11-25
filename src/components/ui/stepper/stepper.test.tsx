@@ -3,6 +3,7 @@ import { cleanup, fireEvent, render } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import { Stepper } from "./stepper"
 import { StepperDots } from "./stepper-dots"
+import { StepperProgress } from "./stepper-progress"
 import { resolveStepState, type StepperStep } from "./shared"
 
 afterEach(() => cleanup())
@@ -439,6 +440,86 @@ describe("StepperDots", () => {
     expect(html).not.toMatch(/#[0-9a-f]{3}\b/i)
     expect(html).not.toMatch(/#[0-9a-f]{6}\b/i)
     expect(html).not.toContain("style=")
+  })
+})
+
+describe("StepperProgress", () => {
+  it("root div[data-slot=stepper-progress] with 6 segments, no connectors", () => {
+    const { container } = render(<StepperProgress steps={STEPS} current={2} progress={0.45} />)
+    const root = container.querySelector('[data-slot="stepper-progress"]')
+    expect(root).not.toBeNull()
+    const segments = container.querySelectorAll('[data-slot="stepper-segment"]')
+    expect(segments).toHaveLength(6)
+    expect(container.querySelector('[data-slot="stepper-connector"]')).toBeNull()
+  })
+
+  it("completed segments bg-accent; upcoming bg-line; current bg-accent-soft with fill width 45%", () => {
+    const { container } = render(<StepperProgress steps={STEPS} current={2} progress={0.45} />)
+    const segments = container.querySelectorAll('[data-slot="stepper-segment"]')
+    // Completed segments (0, 1)
+    expect((segments[0] as HTMLElement).className).toContain("bg-accent")
+    expect((segments[1] as HTMLElement).className).toContain("bg-accent")
+    // Current segment (2)
+    expect((segments[2] as HTMLElement).className).toContain("bg-accent-soft")
+    const fill = segments[2].querySelector('[data-slot="stepper-segment-fill"]')
+    expect(fill).not.toBeNull()
+    expect((fill as HTMLElement).style.width).toBe("45%")
+    expect((fill as HTMLElement).className).toContain("bg-accent")
+    // Upcoming segments (3, 4, 5)
+    for (let i = 3; i < 6; i++) {
+      expect((segments[i] as HTMLElement).className).toContain("bg-line")
+    }
+  })
+
+  it("progress clamps: progress=2 => width 100%; omitted => no fill element", () => {
+    const { container: c1 } = render(<StepperProgress steps={STEPS} current={2} progress={2} />)
+    const fill1 = c1.querySelector('[data-slot="stepper-segment-fill"]')
+    expect((fill1 as HTMLElement).style.width).toBe("100%")
+
+    const { container: c2 } = render(<StepperProgress steps={STEPS} current={2} />)
+    const fill2 = c2.querySelector('[data-slot="stepper-segment-fill"]')
+    expect(fill2).toBeNull()
+  })
+
+  it("labels row: 6 labels flex-1 text-[10px] font-bold uppercase; current text-accent", () => {
+    const { container } = render(<StepperProgress steps={STEPS} current={2} progress={0.45} />)
+    const labels = container.querySelectorAll('[data-slot="stepper-progress"] > div:last-child > span')
+    expect(labels).toHaveLength(6)
+    labels.forEach((label, i) => {
+      const cls = (label as HTMLElement).className
+      expect(cls).toContain("flex-1")
+      expect(cls).toContain("text-[10px]")
+      expect(cls).toContain("font-bold")
+      expect(cls).toContain("uppercase")
+      expect(cls).toContain("leading-3")
+      expect(cls).toContain("tracking-[0.08em]")
+      if (i === 2) {
+        expect(cls).toContain("text-accent")
+      } else {
+        expect(cls).toContain("text-muted-foreground")
+      }
+      expect(label.textContent).toBe(STEPS[i].title)
+    })
+  })
+
+  it("segments h-1.5 rounded-full; segments and labels rows share gap-1.5", () => {
+    const { container } = render(<StepperProgress steps={STEPS} current={2} progress={0.45} />)
+    const segments = container.querySelectorAll('[data-slot="stepper-segment"]')
+    const segmentRow = container.querySelector('[data-slot="stepper-progress"] > div:first-child') as HTMLElement
+    const labelsRow = container.querySelector('[data-slot="stepper-progress"] > div:last-child') as HTMLElement
+    segments.forEach((seg) => {
+      expect((seg as HTMLElement).className).toContain("h-1.5")
+      expect((seg as HTMLElement).className).toContain("rounded-full")
+    })
+    expect(segmentRow.className).toContain("gap-1.5")
+    expect(labelsRow.className).toContain("gap-1.5")
+  })
+
+  it("rendered HTML contains no hex", () => {
+    const { container } = render(<StepperProgress steps={STEPS} current={2} progress={0.45} />)
+    const html = container.innerHTML
+    expect(html).not.toMatch(/#[0-9a-f]{3}\b/i)
+    expect(html).not.toMatch(/#[0-9a-f]{6}\b/i)
   })
 })
 
