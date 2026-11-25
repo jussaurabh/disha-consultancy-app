@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Stepper, type StepperStep } from "./stepper"
 import { StepperDots } from "./stepper-dots"
 import { StepperProgress } from "./stepper-progress"
+import { StepperCards } from "./stepper-cards"
 
 const STEPS: StepperStep[] = [
   { title: "Company", subtitle: "Registration basics · 8 fields" },
@@ -348,6 +349,53 @@ export const ProgressDark: Story = {
   render: () => (
     <div className="dark bg-ground p-8">
       <StepperProgress steps={STEPS} current={2} progress={0.45} />
+    </div>
+  ),
+}
+
+export const Cards: Story = {
+  render: () => (
+    <div className="min-h-screen w-full bg-background px-8 py-10 md:px-16">
+      <div className="mx-auto flex max-w-[1180px] flex-col">
+        <div className="flex items-center gap-2">
+          <Caption>Component library</Caption>
+          <span className="font-body text-[10px] text-muted-foreground">·</span>
+          <Caption>DC design system · V1.0</Caption>
+        </div>
+        <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight text-foreground">
+          StepperCards — Step Cards
+        </h2>
+        <p className="mt-2 max-w-xl font-body text-sm leading-6 text-muted-foreground">
+          Step cards for clickable rails in dialogs and settings. Current card is the only tinted one; others stay quiet and enterable.
+        </p>
+        <Block title="Cards">
+          <Row label="Default (current=1)" note="Contact current — mirrors design sheet">
+            <StepperCards steps={STEPS} current={1} />
+          </Row>
+        </Block>
+      </div>
+    </div>
+  ),
+}
+
+export const CardsClickable: Story = {
+  render: () => (
+    <div className="min-h-screen w-full bg-background px-8 py-10 md:px-16">
+      <div className="mx-auto flex max-w-[1180px] flex-col">
+        <Block title="Cards Clickable">
+          <Row label="With onStepSelect" note="Cards render as buttons">
+            <StepperCards steps={STEPS} current={1} onStepSelect={(i) => console.log("select", i)} />
+          </Row>
+        </Block>
+      </div>
+    </div>
+  ),
+}
+
+export const CardsDark: Story = {
+  render: () => (
+    <div className="dark bg-ground p-8">
+      <StepperCards steps={STEPS} current={1} />
     </div>
   ),
 }

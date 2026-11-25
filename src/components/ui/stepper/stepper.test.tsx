@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest"
 import { Stepper } from "./stepper"
 import { StepperDots } from "./stepper-dots"
 import { StepperProgress } from "./stepper-progress"
+import { StepperCards } from "./stepper-cards"
 import { resolveStepState, type StepperStep } from "./shared"
 
 afterEach(() => cleanup())
@@ -520,6 +521,142 @@ describe("StepperProgress", () => {
     const html = container.innerHTML
     expect(html).not.toMatch(/#[0-9a-f]{3}\b/i)
     expect(html).not.toMatch(/#[0-9a-f]{6}\b/i)
+  })
+})
+
+describe("StepperCards", () => {
+  it("root div[data-slot=stepper-cards] with 6 cards each carrying data-state", () => {
+    const { container } = render(<StepperCards steps={STEPS} current={1} />)
+    const root = container.querySelector('[data-slot="stepper-cards"]')
+    expect(root).not.toBeNull()
+    const cards = container.querySelectorAll('[data-slot="stepper-card"]')
+    expect(cards).toHaveLength(6)
+    cards.forEach((card) => {
+      expect(card.dataset.state).toBeDefined()
+    })
+  })
+
+  it("current card bg-accent-soft border-accent; others border-line no bg", () => {
+    const { container } = render(<StepperCards steps={STEPS} current={1} />)
+    const cards = container.querySelectorAll('[data-slot="stepper-card"]')
+    const currentCard = cards[1] as HTMLElement
+    expect(currentCard.className).toContain("bg-accent-soft")
+    expect(currentCard.className).toContain("border-accent")
+    // Other cards should have border-line but no bg-accent-soft
+    const otherCard = cards[0] as HTMLElement
+    expect(otherCard.className).toContain("border-line")
+    expect(otherCard.className).not.toContain("bg-accent-soft")
+  })
+
+  it("circles size-6: completed/current bg-accent; completed shows check size-3; current shows number; upcoming border border-line bg-surface", () => {
+    const { container } = render(<StepperCards steps={STEPS} current={1} />)
+    const cards = container.querySelectorAll('[data-slot="stepper-card"]')
+    // Completed card (0)
+    const completedIndicator = cards[0].querySelector('[data-slot="stepper-indicator"]') as HTMLElement
+    expect(completedIndicator.className).toContain("size-6")
+    expect(completedIndicator.className).toContain("bg-accent")
+    expect(completedIndicator.querySelector('[data-slot="stepper-check"]')).not.toBeNull()
+    // Current card (1)
+    const currentIndicator = cards[1].querySelector('[data-slot="stepper-indicator"]') as HTMLElement
+    expect(currentIndicator.className).toContain("size-6")
+    expect(currentIndicator.className).toContain("bg-accent")
+    expect(currentIndicator.textContent).toBe("2")
+    // Upcoming card (2)
+    const upcomingIndicator = cards[2].querySelector('[data-slot="stepper-indicator"]') as HTMLElement
+    expect(upcomingIndicator.className).toContain("size-6")
+    expect(upcomingIndicator.className).toContain("border-line")
+    expect(upcomingIndicator.className).toContain("bg-surface")
+  })
+
+  it("card text: title text-[13px] font-semibold leading-4; current text-ink, others text-muted-foreground; subtitle text-[11px] leading-[14px] text-muted-foreground", () => {
+    const { container } = render(<StepperCards steps={STEPS} current={1} />)
+    const cards = container.querySelectorAll('[data-slot="stepper-card"]')
+    // Current card title
+    const currentTitle = cards[1].querySelector('span.text-\\[13px\\]') as HTMLElement
+    expect(currentTitle.className).toContain("text-[13px]")
+    expect(currentTitle.className).toContain("font-semibold")
+    expect(currentTitle.className).toContain("leading-4")
+    expect(currentTitle.className).toContain("text-ink")
+    // Other card title
+    const otherTitle = cards[0].querySelector('span.text-\\[13px\\]') as HTMLElement
+    expect(otherTitle.className).toContain("text-muted-foreground")
+    // Subtitle
+    const subtitle = cards[1].querySelector('span.text-\\[11px\\]') as HTMLElement
+    expect(subtitle.className).toContain("text-[11px]")
+    expect(subtitle.className).toContain("leading-[14px]")
+    expect(subtitle.className).toContain("text-muted-foreground")
+  })
+
+  it("status word on right: Done/Current/Upcoming by state; text-[10px] font-bold uppercase; current text-accent", () => {
+    const { container } = render(<StepperCards steps={STEPS} current={1} />)
+    const statuses = container.querySelectorAll('[data-slot="stepper-card-status"]')
+    expect(statuses).toHaveLength(6)
+    // Completed card status
+    expect(statuses[0].textContent).toBe("Done")
+    expect((statuses[0] as HTMLElement).className).toContain("text-muted-foreground")
+    // Current card status
+    expect(statuses[1].textContent).toBe("Current")
+    expect((statuses[1] as HTMLElement).className).toContain("text-accent")
+    // Upcoming card status
+    expect(statuses[2].textContent).toBe("Upcoming")
+    expect((statuses[2] as HTMLElement).className).toContain("text-muted-foreground")
+    // Check status classes
+    statuses.forEach((status) => {
+      const cls = (status as HTMLElement).className
+      expect(cls).toContain("text-[10px]")
+      expect(cls).toContain("font-bold")
+      expect(cls).toContain("uppercase")
+      expect(cls).toContain("leading-3")
+      expect(cls).toContain("tracking-[0.08em]")
+    })
+  })
+
+  it("with onStepSelect: cards are buttons; clicking card 3 calls spy with 2; without: cards are divs", () => {
+    const spy = vi.fn()
+    const { container: c1 } = render(<StepperCards steps={STEPS} current={1} onStepSelect={spy} />)
+    const cards1 = c1.querySelectorAll('[data-slot="stepper-card"]')
+    expect(cards1[0].tagName).toBe("BUTTON")
+    fireEvent.click(cards1[2])
+    expect(spy).toHaveBeenCalledWith(2)
+
+    const { container: c2 } = render(<StepperCards steps={STEPS} current={1} />)
+    const cards2 = c2.querySelectorAll('[data-slot="stepper-card"]')
+    expect(cards2[0].tagName).toBe("DIV")
+  })
+
+  it("long title: card text wrapper has min-w-0 and flex-1", () => {
+    const longTitle = "A".repeat(200)
+    const { container } = render(<StepperCards steps={[{ title: longTitle, subtitle: "Sub" }]} current={0} />)
+    const cards = container.querySelectorAll('[data-slot="stepper-card"]')
+    const textWrapper = cards[0].querySelector('div.min-w-0.flex-1') as HTMLElement
+    expect(textWrapper).not.toBeNull()
+    expect(textWrapper.className).toContain("min-w-0")
+    expect(textWrapper.className).toContain("flex-1")
+  })
+
+  it("error card: status Failed with text-danger; locked card: status Locked", () => {
+    const stepsWithError: StepperStep[] = STEPS.map((s, i) =>
+      i === 2 ? { ...s, state: "error" as const } : s
+    )
+    const { container: c1 } = render(<StepperCards steps={stepsWithError} current={1} />)
+    const statuses1 = c1.querySelectorAll('[data-slot="stepper-card-status"]')
+    expect(statuses1[2].textContent).toBe("Failed")
+    expect((statuses1[2] as HTMLElement).className).toContain("text-danger")
+
+    const stepsWithLocked: StepperStep[] = STEPS.map((s, i) =>
+      i === 4 ? { ...s, state: "locked" as const } : s
+    )
+    const { container: c2 } = render(<StepperCards steps={stepsWithLocked} current={1} />)
+    const statuses2 = c2.querySelectorAll('[data-slot="stepper-card-status"]')
+    expect(statuses2[4].textContent).toBe("Locked")
+  })
+
+  it("rendered HTML contains no hex and no style=", () => {
+    const { container } = render(<StepperCards steps={STEPS} current={1} />)
+    const html = container.innerHTML
+    expect(html).not.toMatch(/#[0-9a-f]{3}\b/i)
+    expect(html).not.toMatch(/#[0-9a-f]{6}\b/i)
+    expect(html).not.toContain("style=")
   })
 })
 
