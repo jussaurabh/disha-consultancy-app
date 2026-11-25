@@ -1,16 +1,6 @@
 fileignoreconfig:
-- filename: src/pages/organizations/filters-bar.tsx
-  checksum: 602db6c9d64609ad7f49b5cc9c222f17862cd8bbfa5bcb430f06ab9e6d5e373c
-- filename: src/pages/organizations/index.tsx
-  checksum: 23e1f9657c16a75caeecf7ec2c791b6036192cee2180489ff3c678a52abb9c2f
-- filename: src/components/ui/secondary-header.tsx
-  checksum: a8d3fb18e009633f3f258133c38fe88541628a723e35c1f5fe23ba0c1d507ae0
-- filename: src/pages/organizations/detail.tsx
-  checksum: f26ae815b79b501d616e8ba4a568c88a77bd6edf089c84c1f2cbff167ea6c423
-- filename: src/components/ui/tabs/tabs.stories.tsx
-  checksum: 903c2a5e9d4719e6d0eafc794222a74afd90ee3eeada070386f311bb7b4a1e1e
-- filename: src/components/ui/radio-group/radio-group.stories.tsx
-  checksum: ba590ac4bbe0bcf3e68ea23346f3aa931dbb2fedd0c21b93bf24f28b7e6700c1
-- filename: src/components/ui/card/card.stories.tsx
-  checksum: c381f5765736d2b098b12af56e974925bc6bbe6f0c0d1a569a84f1de7731b061
+- filename: src/lib/org-new-draft.ts
+  checksum: 5d4a11acb1b4c7b137e0b3bd8e9b0ec7463104da42c0d71b432f6055c5e2c1dd
+- filename: src/lib/org-new-draft.test.ts
+  checksum: 7517b532243718b8e4dc3c6b98d749c2d804c4cef68e572c5841a20cdb587d20
 version: "1.0"
