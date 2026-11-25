@@ -47,12 +47,12 @@ export function ChangeRoleModal({
   if (!open || !user) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-lg border bg-background p-6 shadow-lg">
-        <h2 className="mb-4 text-lg font-semibold">Change role</h2>
-        <p className="mb-4 text-sm text-muted-foreground">{user.email}</p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55">
+      <div className="min-w-[560px] max-w-[640px] rounded-xl border bg-background p-6 shadow-lg">
+        <h2 className="mb-2 text-[16px] font-semibold font-display">Change role</h2>
+        <p className="mb-6 text-[13px] text-muted-foreground font-body">{user.email}</p>
         <Select value={roleId} onValueChange={setRoleId}>
-          <SelectTrigger className="mb-4">
+          <SelectTrigger className="mb-6">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -64,15 +64,15 @@ export function ChangeRoleModal({
           </SelectContent>
         </Select>
         {mutation.isError && (
-          <p className="mb-2 text-destructive text-sm">
+          <p className="mb-4 text-destructive text-[13px] font-body">
             {(mutation.error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Failed to update role."}
           </p>
         )}
-        <div className="flex justify-end gap-2">
-          <Button type="button" variant="outline" onClick={onClose}>
+        <div className="flex justify-end gap-2 flex-wrap">
+          <Button type="button" variant="outline" size="sm" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={() => mutation.mutate()} disabled={mutation.isPending}>
+          <Button onClick={() => mutation.mutate()} disabled={mutation.isPending} size="sm">
             {mutation.isPending ? "Saving…" : "Save"}
           </Button>
         </div>

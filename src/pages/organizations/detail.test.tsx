@@ -16,7 +16,7 @@ vi.mock("@/providers/use-auth", () => ({
   useAuth: () => ({ user: { email: "admin@dishatest.test" }, hasPermission: authMock.hasPermission }),
 }));
 vi.mock("@/api/orgs", () => ({
-  orgsApi: { getOrg: vi.fn(), updateOrg: vi.fn() },
+  orgsApi: { getOrg: vi.fn(), updateOrg: vi.fn(), deleteOrg: vi.fn() },
 }));
 vi.mock("@/api/users", () => ({
   usersApi: { listUsers: vi.fn() },
@@ -88,6 +88,25 @@ describe("OrganizationDetailPage — context strip", () => {
     await screen.findByTestId("detail-context-strip");
     const title = container.querySelector('[data-slot="secondary-header-title"]')!;
     expect(title.firstElementChild).toHaveTextContent("S");
+  });
+
+  it("opens the More actions menu and deletes the organization after confirm", async () => {
+    const user = userEvent.setup();
+    vi.mocked(orgsApi.deleteOrg).mockResolvedValue({ data: orgFixture } as unknown as AxiosResponse<Organization>);
+    renderDetailPage();
+    await screen.findByTestId("detail-context-strip");
+    await user.click(screen.getByRole("button", { name: "More actions" }));
+    await user.click(await screen.findByRole("menuitem", { name: "Delete organization" }));
+    await user.click(screen.getByRole("button", { name: "Confirm" }));
+    await waitFor(() => expect(orgsApi.deleteOrg).toHaveBeenCalledWith("org-1"));
+    expect(screen.getByTestId("location")).toHaveTextContent("/organizations");
+  });
+
+  it("renders no More actions button without the org:delete permission", async () => {
+    authMock.hasPermission.mockImplementation((code: string) => code !== "org:delete");
+    renderDetailPage();
+    await screen.findByTestId("detail-context-strip");
+    expect(screen.queryByRole("button", { name: "More actions" })).not.toBeInTheDocument();
   });
 });
 

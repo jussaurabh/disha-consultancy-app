@@ -17,7 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { STEPS, panelHeaderProps, type StepKey } from "./new-shared";
+import { STEPS, type StepKey } from "./new-shared";
 import { CompanyPanel, COMPANY_DEFAULTS } from "./company-panel";
 import { ContactPanel, CONTACT_DEFAULTS } from "./contact-panel";
 import { BankPanel, BANK_DEFAULTS } from "./bank-panel";
@@ -99,8 +99,7 @@ export default function NewOrganizationPage() {
             current={current}
           />
           <InfoNote className="mt-3.5">
-            Optional sections can be completed later from the organization
-            page.
+            Optional sections can be completed later from the organization page.
           </InfoNote>
         </div>
 
@@ -165,7 +164,9 @@ export default function NewOrganizationPage() {
             >
               Cancel & navigate away
             </Button>
-            <Button onClick={() => blocker.reset()}>Continue filling the form</Button>
+            <Button onClick={() => blocker.reset()}>
+              Continue filling the form
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

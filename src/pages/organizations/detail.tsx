@@ -1,10 +1,10 @@
 import { useState, type ReactNode } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Building2, Pencil } from "lucide-react";
+import { Building2, Pencil, Ellipsis } from "lucide-react";
 import { toast } from "sonner";
 import { orgsApi, type Organization, type UpdateOrgBody } from "@/api/orgs";
 import {
@@ -47,6 +47,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown";
+import { ConfirmDialog } from "@/components/dialogs/confirm-dialog";
 
 // --- Schemas ---
 
@@ -583,6 +584,22 @@ export default function OrganizationDetailPage() {
   });
   const usersTotal = usersData?.total;
 
+  const navigate = useNavigate();
+  const [deleteOpen, setDeleteOpen] = useState(false);
+
+  const deleteMutation = useMutation({
+    mutationFn: () => orgsApi.deleteOrg(id!).then((r) => r.data),
+    onSuccess: () => {
+      toast.success("Organization deleted");
+      navigate("/organizations");
+    },
+    onError: (error) => {
+      toast.error(
+        (error as ApiError)?.response?.data?.message ?? "Failed to delete organization",
+      );
+    },
+  });
+
   const isNotFound =
     (error as { response?: { status?: number } })?.response?.status === 404;
 
@@ -670,6 +687,25 @@ export default function OrganizationDetailPage() {
             badge={statusBadge}
           />
           <SecondaryHeader.Actions>
+            {canDelete && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    data-slot="detail-more"
+                    aria-label="More actions"
+                    className="flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-ground"
+                  >
+                    <Ellipsis className="size-[15px] text-muted" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem variant="destructive" onClick={() => setDeleteOpen(true)}>
+                    Delete organization
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
             <Button
               size="sm"
               disabled={!canEdit}
@@ -713,6 +749,16 @@ export default function OrganizationDetailPage() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={deleteOpen}
+        title="Delete organization"
+        message={`Delete ${org.company_name}? This permanently removes the organization and its users. This action cannot be undone.`}
+        destructive
+        isLoading={deleteMutation.isPending}
+        onConfirm={() => deleteMutation.mutate()}
+        onCancel={() => setDeleteOpen(false)}
+      />
     </>
   );
 }

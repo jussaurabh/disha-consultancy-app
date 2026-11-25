@@ -9,7 +9,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
 } from "@/components/ui/dropdown";
 import {
   Table,
@@ -30,6 +29,7 @@ import {
   Download,
   Upload,
   Ellipsis,
+  Settings,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -214,7 +214,12 @@ export default function OrganizationsPage() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild>
-                              <Link to={`/organizations/${org._id}`}>View</Link>
+                              <Settings />
+                              <Link
+                                to={`/organizations/${org._id}?tab=settings`}
+                              >
+                                Settings
+                              </Link>
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>

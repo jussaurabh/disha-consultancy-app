@@ -9,7 +9,7 @@ import ResetPasswordPage from "@/pages/reset-password";
 import AcceptInvitePage from "@/pages/invite/accept";
 import DashboardPage from "@/pages/dashboard";
 import OrganizationsPage from "@/pages/organizations/index";
-import NewOrganizationPage from "@/pages/organizations/new";
+import NewOrganizationPage from "@/pages/organizations/new-org/new";
 import OrganizationDetailPage from "@/pages/organizations/detail";
 import UsersPage from "@/pages/users/index";
 import RolesPage from "@/pages/roles/index";
