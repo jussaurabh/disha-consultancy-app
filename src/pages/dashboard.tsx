@@ -1,8 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { KpiBar } from "@/components/ui/kpi-bar";
 import { QuickActions } from "@/components/ui/quick-actions";
-import { DataTable, type DataTableColumn } from "@/components/ui/data-table";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
 import { useAuth } from "@/providers/use-auth";
 import { consultancyApi } from "@/api/consultancy";
 import { orgsApi, type Organization } from "@/api/orgs";
@@ -13,6 +22,7 @@ import {
   addMonths,
   differenceInCalendarDays,
 } from "date-fns";
+import { MoveRight } from "lucide-react";
 
 export interface KpiBarItem {
   label: string;
@@ -56,7 +66,7 @@ export default function DashboardPage() {
     refetchOnWindowFocus: false,
   });
 
-  const { data: orgs } = useQuery({
+  const { data: orgs, isLoading: isOrgLoading } = useQuery({
     queryKey: ["orgs-recent"],
     queryFn: () => orgsApi.listOrgs({ limit: 5 }).then((r) => r.data),
     refetchOnWindowFocus: false,
@@ -76,13 +86,13 @@ export default function DashboardPage() {
     { label: "Roles", value: stats?.data?.roles ?? "—" },
   ];
 
-  // Recent orgs columns
-  const orgColumns: DataTableColumn<Organization>[] = [
+  // Recent orgs columns config
+  const orgColumns = [
     {
       key: "initials",
       header: "Company",
       className: "min-w-0 truncate",
-      cell: (org) => {
+      cell: (org: Organization) => {
         const firstTwoWords = org.company_name.split(" ").slice(0, 2).join(" ");
         const initials = firstTwoWords
           .split(" ")
@@ -103,13 +113,13 @@ export default function DashboardPage() {
       key: "state",
       header: "State",
       className: "w-36 shrink-0",
-      cell: (org) => org.state,
+      cell: (org: Organization) => org.state,
     },
     {
       key: "status",
       header: "Status",
       className: "w-24 shrink-0",
-      cell: (org) => {
+      cell: (org: Organization) => {
         const status = org.status;
         if (status === "active") {
           return (
@@ -136,7 +146,7 @@ export default function DashboardPage() {
       key: "added",
       header: "Added",
       className: "w-24 shrink-0 text-right text-muted",
-      cell: (org) =>
+      cell: (org: Organization) =>
         org.created_at ? format(new Date(org.created_at), "dd MMM") : "-",
     },
   ];
@@ -178,40 +188,88 @@ export default function DashboardPage() {
       <KpiBar items={kpiItems} isLoading={stats.isLoading} />
 
       {/* Content row */}
-      <div data-testid="dashboard-content-row" className="flex gap-8 px-4 md:px-6">
+      <div
+        data-testid="dashboard-content-row"
+        className="flex gap-8 px-4 md:px-6"
+      >
         {/* Recent orgs panel */}
         {hasPermission("org:list") && (
           <div className="flex-1">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-3.5">
               <h2 className="font-display text-lg font-bold tracking-[-0.01em] text-ink">
                 Recently added
               </h2>
-              <Link
-                to="/organizations"
-                className="font-body text-[13px] font-semibold text-accent"
-              >
-                View all →
-              </Link>
+              <Button variant="link" size="sm" asChild className="h-auto gap-1 px-0">
+                <Link to="/organizations">
+                  View all
+                  <MoveRight className="size-3.5" aria-hidden />
+                </Link>
+              </Button>
             </div>
-            <DataTable
-              columns={orgColumns}
-              rows={orgs?.data ?? []}
-              rowKey={(org) => org._id}
-              onRowClick={(org) => navigate(`/organizations/${org._id}`)}
-              emptyState={
-                <div className="py-8 text-center">
-                  <p className="font-body text-sm text-muted">
-                    No organizations yet
-                  </p>
-                  <Link
-                    to="/organizations"
-                    className="font-body text-sm font-semibold text-accent"
-                  >
-                    Add your first organization
-                  </Link>
-                </div>
-              }
-            />
+            {isOrgLoading ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    {orgColumns.map((col) => (
+                      <TableHead key={col.key} className={col.className}>
+                        {col.header}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <TableRow key={i}>
+                      {orgColumns.map((col) => (
+                        <TableCell key={col.key} className={col.className}>
+                          <div className="h-4 w-full animate-pulse bg-muted" />
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : orgs?.data && orgs.data.length === 0 ? (
+              <EmptyState
+                variant="no-data"
+                title="No organizations yet"
+                subTitle="Add your first organization to start running payroll."
+                actions={
+                  <Button size="sm" asChild>
+                    <Link to="/organizations">
+                      Add your first organization
+                    </Link>
+                  </Button>
+                }
+              />
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    {orgColumns.map((col) => (
+                      <TableHead key={col.key} className={col.className}>
+                        {col.header}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {orgs?.data?.map((org) => (
+                    <TableRow
+                      key={org._id}
+                      onClick={() => navigate(`/organizations/${org._id}`)}
+                      className="cursor-pointer hover:bg-accent-soft/40"
+                    >
+                      {orgColumns.map((col) => (
+                        <TableCell key={col.key} className={col.className}>
+                          {col.cell(org)}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </div>
         )}
 

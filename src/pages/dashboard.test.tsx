@@ -67,19 +67,21 @@ describe("DashboardPage", () => {
   it("renders stats and recent organizations", async () => {
     vi.mocked(consultancyApi.getStats).mockResolvedValue({ data: { orgs: 24, users: 132, roles: 6 } } as never)
     vi.mocked(orgsApi.listOrgs).mockResolvedValue({
-      data: [
-        {
-          _id: "1",
-          company_name: "Sri Venkateswara Textiles Pvt Ltd",
-          state: "Karnataka",
-          status: "active",
-          created_at: "2026-11-12T00:00:00Z",
-        },
-      ],
-      total: 1,
-      page: 1,
-      limit: 5,
-      totalPages: 1,
+      data: {
+        data: [
+          {
+            _id: "1",
+            company_name: "Sri Venkateswara Textiles Pvt Ltd",
+            state: "Karnataka",
+            status: "active",
+            created_at: "2026-11-12T00:00:00Z",
+          },
+        ],
+        total: 1,
+        page: 1,
+        limit: 5,
+        totalPages: 1,
+      },
     } as never)
     renderPage()
     await waitFor(() => expect(screen.getByText("24")).toBeInTheDocument())
@@ -91,19 +93,21 @@ describe("DashboardPage", () => {
   it("falls back to a muted dot and the raw value for an unknown status", async () => {
     vi.mocked(consultancyApi.getStats).mockResolvedValue({ data: { orgs: 1, users: 1, roles: 1 } } as never)
     vi.mocked(orgsApi.listOrgs).mockResolvedValue({
-      data: [
-        {
-          _id: "2",
-          company_name: "Brightline Logistics Pvt Ltd",
-          state: "Gujarat",
-          status: "pending",
-          created_at: "2026-10-28T00:00:00Z",
-        },
-      ],
-      total: 1,
-      page: 1,
-      limit: 5,
-      totalPages: 1,
+      data: {
+        data: [
+          {
+            _id: "2",
+            company_name: "Brightline Logistics Pvt Ltd",
+            state: "Gujarat",
+            status: "pending",
+            created_at: "2026-10-28T00:00:00Z",
+          },
+        ],
+        total: 1,
+        page: 1,
+        limit: 5,
+        totalPages: 1,
+      },
     } as never)
     renderPage()
     await waitFor(() => expect(screen.getByText("pending")).toBeInTheDocument())
@@ -112,11 +116,13 @@ describe("DashboardPage", () => {
   it("renders an em dash when stats fail", async () => {
     vi.mocked(consultancyApi.getStats).mockRejectedValue(new Error("boom"))
     vi.mocked(orgsApi.listOrgs).mockResolvedValue({
-      data: [],
-      total: 0,
-      page: 1,
-      limit: 5,
-      totalPages: 0,
+      data: {
+        data: [],
+        total: 0,
+        page: 1,
+        limit: 5,
+        totalPages: 0,
+      },
     } as never)
     renderPage()
     await waitFor(() => expect(screen.getAllByText("—").length).toBe(3))
@@ -136,19 +142,21 @@ describe("DashboardPage", () => {
   it("insets the content row with the shared gutter", async () => {
     vi.mocked(consultancyApi.getStats).mockResolvedValue({ data: { orgs: 24, users: 132, roles: 6 } } as never)
     vi.mocked(orgsApi.listOrgs).mockResolvedValue({
-      data: [
-        {
-          _id: "1",
-          company_name: "Sri Venkateswara Textiles Pvt Ltd",
-          state: "Karnataka",
-          status: "active",
-          created_at: "2026-11-12T00:00:00Z",
-        },
-      ],
-      total: 1,
-      page: 1,
-      limit: 5,
-      totalPages: 1,
+      data: {
+        data: [
+          {
+            _id: "1",
+            company_name: "Sri Venkateswara Textiles Pvt Ltd",
+            state: "Karnataka",
+            status: "active",
+            created_at: "2026-11-12T00:00:00Z",
+          },
+        ],
+        total: 1,
+        page: 1,
+        limit: 5,
+        totalPages: 1,
+      },
     } as never)
     const { container } = renderPage()
     await waitFor(() => expect(screen.getByText("24")).toBeInTheDocument())
