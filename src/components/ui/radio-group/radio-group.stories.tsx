@@ -1,15 +1,19 @@
 import type { ReactNode } from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { RadioGroup, RadioGroupItem } from "./radio-group"
+import { RadioOption } from "./radio-option"
 import { Label } from "@/components/ui/label"
-import { cn } from "@/lib/utils"
 
 /**
  * DC design system — "06 / Radio Group" board (V1.0).
  *
- * Spec: aspect-square size-4 · rounded-full · border-input · checked dots
- * primary (CircleIcon size-2 fill-primary) · focus-visible ring 3px at 50%
- * · disabled 50% opacity · aria-invalid dyes the border destructive.
+ * Single-select dot on a 1.5px line ring — selected dyes the ring accent and
+ * fills an 8px accent dot at the center; focus paints a 3px accent ring at
+ * 30%; disabled keeps the line ring. Four registers through `variant` —
+ * list rows (28px pitch, label 13px ink, checked label goes semibold),
+ * selector cards (accent border + accent-soft fill), pill cards (42px,
+ * pad 18) and the joined divided bar. Three sizes through `size` — dot
+ * 14/16/20, row 24/28/32, pill 36/42/48, label 12/13/14.
  *
  * Rules: single choice only — use a checkbox for multi-select. Always
  * pre-select one option and pair every item with a visible label.
@@ -23,11 +27,26 @@ const meta = {
     docs: {
       description: {
         component:
-          "Single-select choice group on the 4×4 dot shell — the checked dot dyes primary. Use for one choice out of 2–5 visible options; reach for a select when the list is longer.",
+          "Single-select choice group in four registers — list rows, selector cards, " +
+          "pill cards and a joined divided bar — in three sizes. The dot is a 16px " +
+          "circle with a 1.5px line ring; selected dyes the ring accent and fills an " +
+          "8px accent dot. RadioOption pairs the dot with a label, description and " +
+          "helper or error lines.",
       },
     },
   },
   argTypes: {
+    variant: {
+      control: "radio",
+      options: ["list", "card", "pill", "joined"],
+      description:
+        "Register — list rows (default), selector cards, pill cards or the joined divided bar.",
+    },
+    size: {
+      control: "radio",
+      options: ["sm", "default", "lg"],
+      description: "Scale — sm shrinks the dot, row, pill and label; lg grows them.",
+    },
     defaultValue: {
       control: "text",
       description: "Item value selected on first render (uncontrolled).",
@@ -38,7 +57,7 @@ const meta = {
     },
     disabled: {
       control: "boolean",
-      description: "Disables the whole group — items sink to 50% opacity.",
+      description: "Disables the whole group — dots keep the line ring.",
     },
     required: {
       control: "boolean",
@@ -55,6 +74,8 @@ const meta = {
     },
   },
   args: {
+    variant: "list",
+    size: "default",
     defaultValue: "monthly",
     disabled: false,
     required: false,
@@ -122,7 +143,7 @@ function Screen({ children }: { children: ReactNode }) {
   )
 }
 
-/** Labeled item — the pattern every group in the product uses. */
+/** Bare dot + label — used where the option needs item-level aria-invalid. */
 function LabeledItem({
   id,
   value,
@@ -139,9 +160,164 @@ function LabeledItem({
   return (
     <div className="flex items-center gap-2.5">
       <RadioGroupItem value={value} id={id} disabled={disabled} aria-invalid={invalid} />
-      <Label htmlFor={id} className={disabled ? "opacity-50" : undefined}>
+      <Label htmlFor={id} className={invalid ? undefined : "text-ink"}>
         {label}
       </Label>
+    </div>
+  )
+}
+
+/** The four registers — list rows, selector cards, pill cards, joined bar. */
+function Registers() {
+  return (
+    <div className="flex flex-col">
+      <Row label="List · Label only" note="Row 28 · gap-2.5 · dot 16 · ring 1.5px line">
+        <RadioGroup defaultValue="monthly">
+          <RadioOption value="monthly" label="Monthly" />
+          <RadioOption value="quarterly" label="Quarterly" />
+          <RadioOption value="yearly" label="Yearly" />
+        </RadioGroup>
+      </Row>
+      <Row label="List · Descriptions" note="Label 13 ink · description 12 muted · checked label goes semibold">
+        <RadioGroup defaultValue="new">
+          <RadioOption
+            value="new"
+            label="New regime"
+            description="Lower slabs, no exemptions — the default for new employees."
+          />
+          <RadioOption
+            value="old"
+            label="Old regime"
+            description="Higher slabs with HRA, 80C and other exemptions."
+            disabled
+          />
+        </RadioGroup>
+      </Row>
+      <Row
+        label="Selector cards · Plan"
+        note="Pad 16 · selected paints the 1.5px accent border on accent-soft"
+      >
+        <RadioGroup defaultValue="pro" variant="card" className="w-full max-w-2xl sm:grid sm:grid-cols-3 sm:gap-4">
+          <RadioOption
+            value="starter"
+            label="Starter"
+            description="Up to 5 employees · basic payroll · email support."
+          />
+          <RadioOption
+            value="pro"
+            label="Professional"
+            description="Up to 50 employees · advanced payroll · priority support."
+          />
+          <RadioOption
+            value="enterprise"
+            label="Enterprise"
+            description="Unlimited employees · dedicated support · SLA."
+          />
+        </RadioGroup>
+      </Row>
+      <Row label="Selector cards · Tiles" note="2×2 tile cells — py-3.5 px-4 gap-2.5">
+        <RadioGroup defaultValue="upi" variant="card" className="w-fit grid grid-cols-2 gap-3">
+          {["UPI", "Net banking", "Card", "Wallet"].map((method) => (
+            <RadioOption
+              key={method}
+              value={method.toLowerCase().replace(" ", "-")}
+              label={method}
+              className="py-3.5 px-4 gap-2.5"
+            />
+          ))}
+        </RadioGroup>
+      </Row>
+      <Row
+        label="Pill cards · Inline"
+        note="Pill 42 · pad 18 · gap-9 — disabled pill sits on surface-pressed · the joined bar divides its segments"
+      >
+        <State label="Selected">
+          <RadioGroup defaultValue="monthly" variant="pill">
+            <RadioOption value="monthly" label="Monthly" />
+            <RadioOption value="quarterly" label="Quarterly" />
+          </RadioGroup>
+        </State>
+        <State label="Unselected">
+          <RadioGroup variant="pill">
+            <RadioOption value="monthly" label="Monthly" />
+            <RadioOption value="quarterly" label="Quarterly" />
+          </RadioGroup>
+        </State>
+        <State label="Disabled">
+          <RadioGroup variant="pill">
+            <RadioOption value="monthly" label="Monthly" disabled />
+          </RadioGroup>
+        </State>
+        <State label="Joined bar">
+          <RadioGroup defaultValue="monthly" variant="joined">
+            <RadioOption value="monthly" label="Monthly" />
+            <RadioOption value="quarterly" label="Quarterly" />
+            <RadioOption value="weekly" label="Weekly" />
+          </RadioGroup>
+        </State>
+      </Row>
+    </div>
+  )
+}
+
+/** Messages — the group label rides 8px above the options; helper and error are 12px lines. */
+function Messages() {
+  return (
+    <div className="flex flex-col">
+      <Row label="Group label · Helper" note="Label 13 semibold ink · helper 12 muted · 8px above the options">
+        <div className="flex flex-col gap-2">
+          <Label className="text-ink">Pay frequency</Label>
+          <p className="text-xs leading-[14px] text-muted-foreground">
+            How often payroll runs — one choice per organization.
+          </p>
+          <RadioGroup defaultValue="monthly">
+            <RadioOption value="monthly" label="Monthly" />
+            <RadioOption value="quarterly" label="Quarterly" />
+          </RadioGroup>
+        </div>
+      </Row>
+      <Row label="Error" note="Error 12 copper-red under the group · per-option lines ride inside the label">
+        <div className="flex flex-col gap-2">
+          <RadioGroup defaultValue="monthly">
+            <RadioOption
+              value="monthly"
+              label="Monthly"
+              description="Payslips on the last working day."
+              hint="12 cycles a year."
+            />
+            <RadioOption value="quarterly" label="Quarterly" error="Pick one before running payroll." />
+          </RadioGroup>
+          <p className="text-xs leading-[14px] text-danger">Choose a pay frequency to continue.</p>
+        </div>
+      </Row>
+    </div>
+  )
+}
+
+/** Sizes — the dot, row, pill and label scale together. */
+function Sizes() {
+  return (
+    <div className="flex flex-col">
+      <Row label="Sizes" note="sm — dot 14 · row 24 · label 12 · default — dot 16 · row 28 · label 13 · lg — dot 20 · row 32 · label 14">
+        <State label="sm">
+          <RadioGroup defaultValue="monthly" size="sm">
+            <RadioOption value="monthly" label="Monthly" />
+            <RadioOption value="quarterly" label="Quarterly" />
+          </RadioGroup>
+        </State>
+        <State label="default">
+          <RadioGroup defaultValue="monthly">
+            <RadioOption value="monthly" label="Monthly" />
+            <RadioOption value="quarterly" label="Quarterly" />
+          </RadioGroup>
+        </State>
+        <State label="lg">
+          <RadioGroup defaultValue="monthly" size="lg">
+            <RadioOption value="monthly" label="Monthly" />
+            <RadioOption value="quarterly" label="Quarterly" />
+          </RadioGroup>
+        </State>
+      </Row>
     </div>
   )
 }
@@ -151,17 +327,17 @@ function Orientations() {
   return (
     <div className="flex flex-col">
       <Row label="Vertical" note="Default · grid gap-3">
-        <RadioGroup defaultValue="monthly" className="gap-3">
-          <LabeledItem id="o-monthly" value="monthly" label="Monthly" />
-          <LabeledItem id="o-quarterly" value="quarterly" label="Quarterly" />
-          <LabeledItem id="o-yearly" value="yearly" label="Yearly" />
+        <RadioGroup defaultValue="monthly">
+          <RadioOption value="monthly" label="Monthly" />
+          <RadioOption value="quarterly" label="Quarterly" />
+          <RadioOption value="yearly" label="Yearly" />
         </RadioGroup>
       </Row>
       <Row label="Horizontal" note="Flex row · same gap rhythm">
         <RadioGroup defaultValue="monthly" className="flex flex-row gap-6">
-          <LabeledItem id="oh-monthly" value="monthly" label="Monthly" />
-          <LabeledItem id="oh-quarterly" value="quarterly" label="Quarterly" />
-          <LabeledItem id="oh-yearly" value="yearly" label="Yearly" />
+          <RadioOption value="monthly" label="Monthly" />
+          <RadioOption value="quarterly" label="Quarterly" />
+          <RadioOption value="yearly" label="Yearly" />
         </RadioGroup>
       </Row>
     </div>
@@ -175,194 +351,37 @@ function States() {
       <Row label="Default" note="One option pre-selected">
         <State label="Monthly selected">
           <RadioGroup defaultValue="monthly">
-            <LabeledItem id="s-monthly" value="monthly" label="Monthly" />
-            <LabeledItem id="s-quarterly" value="quarterly" label="Quarterly" />
+            <RadioOption value="monthly" label="Monthly" />
+            <RadioOption value="quarterly" label="Quarterly" />
           </RadioGroup>
         </State>
       </Row>
-      <Row label="Disabled item" note="One option unavailable · 50% opacity">
+      <Row label="Disabled item" note="Dot keeps the line ring · label sinks to muted 60">
         <RadioGroup defaultValue="monthly">
-          <LabeledItem id="sd-monthly" value="monthly" label="Monthly" />
-          <LabeledItem id="sd-quarterly" value="quarterly" label="Quarterly" disabled />
+          <RadioOption value="monthly" label="Monthly" />
+          <RadioOption value="quarterly" label="Quarterly" disabled />
         </RadioGroup>
       </Row>
-      <Row label="Disabled group" note="Whole group locked">
-        <State label="All items sink to 50%">
+      <Row label="Disabled group" note="Whole group locked — every dot stays on the line ring">
+        <State label="All options sink to muted">
           <RadioGroup defaultValue="monthly" disabled>
-            <LabeledItem id="sg-monthly" value="monthly" label="Monthly" />
-            <LabeledItem id="sg-quarterly" value="quarterly" label="Quarterly" />
+            <RadioOption value="monthly" label="Monthly" disabled />
+            <RadioOption value="quarterly" label="Quarterly" disabled />
           </RadioGroup>
         </State>
       </Row>
-      <Row label="Invalid" note="aria-invalid dyes the border destructive">
+      <Row label="Invalid" note="aria-invalid dyes the dot ring danger">
         <State label="Selection required">
           <div className="flex flex-col gap-2">
             <RadioGroup>
               <LabeledItem id="si-regime" value="new" label="New regime" invalid />
               <LabeledItem id="si-regime-old" value="old" label="Old regime" invalid />
             </RadioGroup>
-            <p className="font-body text-xs leading-4 text-destructive">
+            <p className="text-xs leading-[14px] text-danger">
               Choose a tax regime to continue.
             </p>
           </div>
         </State>
-      </Row>
-    </div>
-  )
-}
-
-/** Labels with helper descriptions under each choice. */
-function WithDescriptions() {
-  return (
-    <div className="flex flex-col">
-      <Row label="With descriptions" note="Label 13/600 · helper 12 muted">
-        <RadioGroup defaultValue="new">
-          <div className="flex items-start gap-2.5">
-            <RadioGroupItem value="new" id="d-new" className="mt-0.5" />
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="d-new">New regime</Label>
-              <span className="font-body text-xs leading-4 text-muted-foreground">
-                Lower slabs, no exemptions — the default for new employees.
-              </span>
-            </div>
-          </div>
-          <div className="flex items-start gap-2.5">
-            <RadioGroupItem value="old" id="d-old" className="mt-0.5" />
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="d-old">Old regime</Label>
-              <span className="font-body text-xs leading-4 text-muted-foreground">
-                Higher slabs with HRA, 80C and other exemptions.
-              </span>
-            </div>
-          </div>
-        </RadioGroup>
-      </Row>
-    </div>
-  )
-}
-
-/** Payroll settings — the real-world shape the group ships for. */
-function PayrollExample() {
-  return (
-    <div className="flex flex-col">
-      <Row label="Pay frequency" note="Required choice · one primary selection">
-        <div className="w-96 rounded-xl border border-border bg-card p-5">
-          <Label required className="mb-4 block">
-            Pay frequency
-          </Label>
-          <RadioGroup defaultValue="monthly" name="pay-frequency">
-            <LabeledItem id="f-monthly" value="monthly" label="Monthly — 12 cycles a year" />
-            <LabeledItem id="f-semi-monthly" value="semi-monthly" label="Semi-monthly — 24 cycles a year" />
-            <LabeledItem id="f-weekly" value="weekly" label="Weekly — 52 cycles a year" />
-          </RadioGroup>
-        </div>
-      </Row>
-    </div>
-  )
-}
-
-/** Option cards — radio items as selectable cards (Paper 225-2 / 229-2 pattern). */
-function OptionCards() {
-  return (
-    <div className="flex flex-col">
-      <Row label="Plan selection" note="Card-style radios · checked = primary border + accent bg · hover lifts">
-        <RadioGroup defaultValue="pro" className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {[
-            {
-              value: "starter",
-              title: "Starter",
-              price: "₹0",
-              period: "/month",
-              features: ["Up to 5 employees", "Basic payroll", "Email support"],
-              popular: false,
-            },
-            {
-              value: "pro",
-              title: "Professional",
-              price: "₹2,999",
-              period: "/month",
-              features: ["Up to 50 employees", "Advanced payroll", "Priority support", "Compliance reports"],
-              popular: true,
-            },
-            {
-              value: "enterprise",
-              title: "Enterprise",
-              price: "₹9,999",
-              period: "/month",
-              features: ["Unlimited employees", "Full suite", "Dedicated support", "Custom integrations", "SLA"],
-              popular: false,
-            },
-          ].map((plan) => (
-            <div key={plan.value} className="relative">
-              <RadioGroupItem value={plan.value} id={`plan-${plan.value}`} className="sr-only" />
-              <label
-                htmlFor={`plan-${plan.value}`}
-                className={cn(
-                  "relative flex h-full flex-col cursor-pointer rounded-xl border-2 bg-card transition-all duration-150",
-                  "hover:shadow-lg hover:-translate-y-0.5",
-                  "data-[state=checked]:border-primary data-[state=checked]:bg-accent-soft",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                )}
-              >
-                {plan.popular && (
-                  <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
-                    Most popular
-                  </span>
-                )}
-                <div className="p-5 flex flex-col flex-1">
-                  <div className="flex items-baseline justify-between gap-2 mb-3">
-                    <h3 className="font-heading text-lg font-semibold text-foreground">{plan.title}</h3>
-                    <div className="flex items-baseline gap-1">
-                      <span className="font-display text-3xl font-semibold text-foreground">{plan.price}</span>
-                      <span className="text-muted-foreground">{plan.period}</span>
-                    </div>
-                  </div>
-                  <ul className="flex-1 space-y-2 mb-4">
-                    {plan.features.map((feature, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <span className="mt-0.5 size-1.5 rounded-full bg-primary shrink-0" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="flex items-center justify-center">
-                    <RadioGroupItem value={plan.value} id={`plan-${plan.value}-radio`} className="mt-0.5" />
-                    <span className="sr-only">Select {plan.title} plan</span>
-                  </div>
-                </div>
-              </label>
-            </div>
-          ))}
-        </RadioGroup>
-      </Row>
-
-      <Row label="Payment method" note="Horizontal cards · icon + label · compact">
-        <RadioGroup defaultValue="upi" className="flex flex-wrap gap-4">
-          {[
-            { value: "upi", label: "UPI", icon: "📱" },
-            { value: "netbanking", label: "Net Banking", icon: "🏦" },
-            { value: "card", label: "Card", icon: "💳" },
-            { value: "wallet", label: "Wallet", icon: "👛" },
-          ].map((method) => (
-            <div key={method.value} className="relative">
-              <RadioGroupItem value={method.value} id={`pay-${method.value}`} className="sr-only" />
-              <label
-                htmlFor={`pay-${method.value}`}
-                className={cn(
-                  "relative flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 bg-card px-4 py-3 transition-all duration-150",
-                  "hover:shadow-md hover:border-line-strong",
-                  "data-[state=checked]:border-primary data-[state=checked]:bg-accent-soft data-[state=checked]:text-foreground",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                )}
-              >
-                <span className="text-2xl" aria-hidden>{method.icon}</span>
-                <span className="font-medium text-sm">{method.label}</span>
-                <RadioGroupItem value={method.value} id={`pay-${method.value}-radio`} className="sr-only" />
-                <span className="sr-only">Select {method.label}</span>
-              </label>
-            </div>
-          ))}
-        </RadioGroup>
       </Row>
     </div>
   )
@@ -381,26 +400,27 @@ function Board() {
           Radio Group
         </h2>
         <p className="mt-2 max-w-xl font-body text-sm leading-6 text-muted-foreground">
-          One choice out of a few. Aspect-square 4 dot · primary dot when checked
-          · focus ring 3px · disabled 50% · invalid border dyes destructive.
+          One choice out of a few. A 16px dot on a 1.5px line ring — selected dyes
+          the ring accent and fills an 8px accent dot. Four registers and three
+          sizes share the same anatomy.
         </p>
+        <Block title="Registers">
+          <Registers />
+        </Block>
+        <Block title="Messages">
+          <Messages />
+        </Block>
+        <Block title="Sizes">
+          <Sizes />
+        </Block>
         <Block title="Orientation">
           <Orientations />
         </Block>
         <Block title="States">
           <States />
         </Block>
-        <Block title="With descriptions">
-          <WithDescriptions />
-        </Block>
-        <Block title="Real world">
-          <PayrollExample />
-        </Block>
-        <Block title="Option cards (Paper 225-2 / 229-2)">
-          <OptionCards />
-        </Block>
         <p className="mt-12 border-t border-border pt-6 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-          Single choice only · Always pre-select one option · Every item gets a label
+          DOT 16 · RING 1.5PX ACCENT · ROW 28-40 · PILL 42 · PAD 18 · HELPER 12 MUTED · ERROR 12 COPPER-RED
         </p>
       </div>
     </div>
@@ -425,18 +445,50 @@ export const Dark: Story = {
 export const Playground: Story = {
   render: (args) => (
     <div className="flex min-h-52 items-center justify-center bg-background p-10">
-      <RadioGroup {...args} className="flex flex-row gap-6">
-        <LabeledItem id="pg-monthly" value="monthly" label="Monthly" />
-        <LabeledItem id="pg-quarterly" value="quarterly" label="Quarterly" />
-        <LabeledItem id="pg-yearly" value="yearly" label="Yearly" />
+      <RadioGroup {...args} className={args.variant === "joined" ? undefined : "max-w-md"}>
+        <RadioOption value="monthly" label="Monthly" description="12 cycles a year." />
+        <RadioOption value="quarterly" label="Quarterly" description="4 cycles a year." />
+        <RadioOption value="yearly" label="Yearly" description="1 cycle a year." />
       </RadioGroup>
     </div>
   ),
   args: {
+    variant: "list",
+    size: "default",
     defaultValue: "monthly",
     disabled: false,
     required: false,
   },
+}
+
+export const OnlyRegisters: Story = {
+  render: () => (
+    <Screen>
+      <Block title="Registers">
+        <Registers />
+      </Block>
+    </Screen>
+  ),
+}
+
+export const OnlyMessages: Story = {
+  render: () => (
+    <Screen>
+      <Block title="Messages">
+        <Messages />
+      </Block>
+    </Screen>
+  ),
+}
+
+export const OnlySizes: Story = {
+  render: () => (
+    <Screen>
+      <Block title="Sizes">
+        <Sizes />
+      </Block>
+    </Screen>
+  ),
 }
 
 export const OnlyOrientations: Story = {
@@ -454,36 +506,6 @@ export const OnlyStates: Story = {
     <Screen>
       <Block title="States">
         <States />
-      </Block>
-    </Screen>
-  ),
-}
-
-export const OnlyDescriptions: Story = {
-  render: () => (
-    <Screen>
-      <Block title="With descriptions">
-        <WithDescriptions />
-      </Block>
-    </Screen>
-  ),
-}
-
-export const OnlyRealWorld: Story = {
-  render: () => (
-    <Screen>
-      <Block title="Real world">
-        <PayrollExample />
-      </Block>
-    </Screen>
-  ),
-}
-
-export const OnlyOptionCards: Story = {
-  render: () => (
-    <Screen>
-      <Block title="Option cards (Paper 225-2 / 229-2)">
-        <OptionCards />
       </Block>
     </Screen>
   ),

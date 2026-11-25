@@ -9,4 +9,6 @@ fileignoreconfig:
   checksum: b732f868ae8a060363d774ee8d1f2ea46b3d7b7fc17df8f62460497452db03eb
 - filename: src/components/ui/tabs/tabs.stories.tsx
   checksum: 903c2a5e9d4719e6d0eafc794222a74afd90ee3eeada070386f311bb7b4a1e1e
+- filename: src/components/ui/radio-group/radio-group.stories.tsx
+  checksum: ba590ac4bbe0bcf3e68ea23346f3aa931dbb2fedd0c21b93bf24f28b7e6700c1
 version: "1.0"
