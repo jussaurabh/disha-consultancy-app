@@ -3,4 +3,8 @@ fileignoreconfig:
   checksum: 5d4a11acb1b4c7b137e0b3bd8e9b0ec7463104da42c0d71b432f6055c5e2c1dd
 - filename: src/lib/org-new-draft.test.ts
   checksum: 7517b532243718b8e4dc3c6b98d749c2d804c4cef68e572c5841a20cdb587d20
+- filename: src/pages/organizations/new-shared.tsx
+  checksum: c690e6753dd455f5b95d423dea003d2bd3d1d77c915ea98f44ac79c86776d6a4
+- filename: src/pages/organizations/company-panel.tsx
+  checksum: e4bc375b8ce8406ed5eb022800fb8371af651addd569db28d541ecf66e55baef
 version: "1.0"
