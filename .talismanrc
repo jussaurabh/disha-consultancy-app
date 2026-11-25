@@ -9,4 +9,6 @@ fileignoreconfig:
   checksum: e4bc375b8ce8406ed5eb022800fb8371af651addd569db28d541ecf66e55baef
 - filename: src/pages/organizations/contact-panel.tsx
   checksum: 93d18bb673b806cc19d0a7ec931727f991da6b0924992e8dca34efa021c67495
+- filename: src/pages/organizations/bank-panel.tsx
+  checksum: 6aa9b1071039e0f42b66b6ac72ecaab157b496337745098c1a5c36af0c414e5f
 version: "1.0"
