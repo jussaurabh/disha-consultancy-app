@@ -2,6 +2,7 @@
 import { cleanup, fireEvent, render } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import { Stepper } from "./stepper"
+import { StepperDots } from "./stepper-dots"
 import { resolveStepState, type StepperStep } from "./shared"
 
 afterEach(() => cleanup())
@@ -328,6 +329,116 @@ describe("Stepper — compact", () => {
     const html = container.innerHTML
     expect(html).not.toMatch(/#[0-9a-f]{3}\b/i)
     expect(html).not.toMatch(/#[0-9a-f]{6}\b/i)
+  })
+})
+
+describe("StepperDots", () => {
+  it("root div[data-slot=stepper-dots] contains dot row and caption when provided", () => {
+    const { container } = render(
+      <StepperDots
+        steps={STEPS}
+        current={2}
+        caption={<>Step 3 of 6 · <span>Bank details</span></>}
+      />
+    )
+    const root = container.querySelector('[data-slot="stepper-dots"]')
+    expect(root).not.toBeNull()
+    expect(root?.querySelector('[data-slot="stepper-dot"]')).not.toBeNull()
+    expect(root?.textContent).toContain("Step 3 of 6")
+    expect(root?.textContent).toContain("Bank details")
+  })
+
+  it("exactly 6 dots and 5 connectors", () => {
+    const { container } = render(<StepperDots steps={STEPS} current={2} />)
+    const dots = container.querySelectorAll('[data-slot="stepper-dot"]')
+    const connectors = container.querySelectorAll('[data-slot="stepper-connector"]')
+    expect(dots).toHaveLength(6)
+    expect(connectors).toHaveLength(5)
+  })
+
+  it("dot states: completed/upcoming size-2.5; current size-3 with ring-accent-soft", () => {
+    const { container } = render(<StepperDots steps={STEPS} current={2} />)
+    const dots = container.querySelectorAll('[data-slot="stepper-dot"]')
+    // Completed dots (0, 1)
+    expect((dots[0] as HTMLElement).className).toContain("size-2.5")
+    expect((dots[0] as HTMLElement).className).toContain("bg-accent")
+    expect((dots[1] as HTMLElement).className).toContain("size-2.5")
+    expect((dots[1] as HTMLElement).className).toContain("bg-accent")
+    // Current dot (2)
+    expect((dots[2] as HTMLElement).className).toContain("size-3")
+    expect((dots[2] as HTMLElement).className).toContain("bg-accent")
+    expect((dots[2] as HTMLElement).className).toContain("ring-[3px]")
+    expect((dots[2] as HTMLElement).className).toContain("ring-accent-soft")
+    // Upcoming dots (3, 4, 5)
+    for (let i = 3; i < 6; i++) {
+      expect((dots[i] as HTMLElement).className).toContain("size-2.5")
+      expect((dots[i] as HTMLElement).className).toContain("border-line")
+      expect((dots[i] as HTMLElement).className).toContain("bg-surface")
+    }
+  })
+
+  it("connectors after completed steps have bg-accent; rest bg-line; all h-[2px] rounded-full", () => {
+    const { container } = render(<StepperDots steps={STEPS} current={2} />)
+    const connectors = container.querySelectorAll('[data-slot="stepper-connector"]')
+    // After completed steps (0-1, 1-2) => bg-accent
+    expect((connectors[0] as HTMLElement).className).toContain("bg-accent")
+    expect((connectors[1] as HTMLElement).className).toContain("bg-accent")
+    // After current/upcoming (2-3, 3-4, 4-5) => bg-line
+    for (let i = 2; i < 5; i++) {
+      expect((connectors[i] as HTMLElement).className).toContain("bg-line")
+    }
+    connectors.forEach((conn) => {
+      expect((conn as HTMLElement).className).toContain("h-[2px]")
+      expect((conn as HTMLElement).className).toContain("rounded-full")
+    })
+  })
+
+  it("without caption: no caption node", () => {
+    const { container } = render(<StepperDots steps={STEPS} current={2} />)
+    // The caption is a p with text-xs leading-4 text-muted-foreground
+    const captions = container.querySelectorAll('p.text-xs.leading-4.text-muted-foreground')
+    expect(captions.length).toBe(0)
+  })
+
+  it("current=6: all dots bg-accent, no halo", () => {
+    const { container } = render(<StepperDots steps={STEPS} current={6} />)
+    const dots = container.querySelectorAll('[data-slot="stepper-dot"]')
+    dots.forEach((dot) => {
+      expect((dot as HTMLElement).className).toContain("bg-accent")
+      expect((dot as HTMLElement).className).not.toContain("ring-accent-soft")
+    })
+  })
+
+  it("error dot: bg-danger with ring", () => {
+    const stepsWithError: StepperStep[] = STEPS.map((s, i) =>
+      i === 2 ? { ...s, state: "error" as const } : s
+    )
+    const { container } = render(<StepperDots steps={stepsWithError} current={2} />)
+    const dots = container.querySelectorAll('[data-slot="stepper-dot"]')
+    const errorDot = dots[2] as HTMLElement
+    expect(errorDot.className).toContain("bg-danger")
+    expect(errorDot.className).toContain("ring-[3px]")
+    expect(errorDot.className).toContain("ring-danger/16")
+    expect(errorDot.className).toContain("dark:ring-danger/28")
+  })
+
+  it("locked dot: border-dashed opacity-55", () => {
+    const stepsWithLocked: StepperStep[] = STEPS.map((s, i) =>
+      i === 4 ? { ...s, state: "locked" as const } : s
+    )
+    const { container } = render(<StepperDots steps={stepsWithLocked} current={2} />)
+    const dots = container.querySelectorAll('[data-slot="stepper-dot"]')
+    const lockedDot = dots[4] as HTMLElement
+    expect(lockedDot.className).toContain("border-dashed")
+    expect(lockedDot.className).toContain("opacity-55")
+  })
+
+  it("rendered HTML contains no hex and no style=", () => {
+    const { container } = render(<StepperDots steps={STEPS} current={2} />)
+    const html = container.innerHTML
+    expect(html).not.toMatch(/#[0-9a-f]{3}\b/i)
+    expect(html).not.toMatch(/#[0-9a-f]{6}\b/i)
+    expect(html).not.toContain("style=")
   })
 })
 

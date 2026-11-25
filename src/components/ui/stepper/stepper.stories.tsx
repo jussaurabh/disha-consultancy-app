@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Stepper, type StepperStep } from "./stepper"
+import { StepperDots } from "./stepper-dots"
 
 const STEPS: StepperStep[] = [
   { title: "Company", subtitle: "Registration basics · 8 fields" },
@@ -272,6 +273,47 @@ export const CompactDark: Story = {
   render: () => (
     <div className="dark bg-ground p-8">
       <Stepper steps={STEPS} current={2} size="compact" />
+    </div>
+  ),
+}
+
+export const Dots: Story = {
+  render: () => (
+    <div className="min-h-screen w-full bg-background px-8 py-10 md:px-16">
+      <div className="mx-auto flex max-w-[1180px] flex-col">
+        <div className="flex items-center gap-2">
+          <Caption>Component library</Caption>
+          <span className="font-body text-[10px] text-muted-foreground">·</span>
+          <Caption>DC design system · V1.0</Caption>
+        </div>
+        <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight text-foreground">
+          StepperDots — Compact Dots
+        </h2>
+        <p className="mt-2 max-w-xl font-body text-sm leading-6 text-muted-foreground">
+          Compact dots for dialog headers and narrow forms. No per-step chrome; current step name sits beneath the rail.
+        </p>
+        <Block title="Dots">
+          <Row label="Default (current=2)" note="Step 3 of 6 · Bank details">
+            <StepperDots
+              steps={STEPS}
+              current={2}
+              caption={<>Step 3 of 6 · <span className="font-semibold text-ink">Bank details</span></>}
+            />
+          </Row>
+        </Block>
+      </div>
+    </div>
+  ),
+}
+
+export const DotsDark: Story = {
+  render: () => (
+    <div className="dark bg-ground p-8">
+      <StepperDots
+        steps={STEPS}
+        current={2}
+        caption={<>Step 3 of 6 · <span className="font-semibold text-ink">Bank details</span></>}
+      />
     </div>
   ),
 }
