@@ -1,8 +1,8 @@
 import type { ReactNode } from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import { useForm, Controller } from "react-hook-form"
 import { Clock } from "lucide-react"
 import { FormPanel } from "./form-panel"
-import { Input } from "@/components/ui/input"
 import { InfoNote } from "@/components/ui/info-note"
 
 const meta = {
@@ -14,7 +14,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Wizard-step form wrapper with header (eyebrow, title, description, meta), body (children), and optional bottom note slot. Matches DC design nodes 117-1 and 1A0-1.",
+          "Wizard-step form wrapper with composable Section, Separator, Field, and Field.Row components. Supports vertical/horizontal layouts and react-hook-form via asChild.",
       },
     },
   },
@@ -71,22 +71,9 @@ function Row({ label, note, children }: { label: string; note?: string; children
   )
 }
 
-function Label({ children }: { children: ReactNode }) {
-  return (
-    <p className="text-[11px] font-semibold uppercase leading-[14px] tracking-[0.1em] text-muted-foreground">
-      {children}
-    </p>
-  )
-}
-
-function InputRow({ label, placeholder, ...props }: React.ComponentProps<typeof Input> & { label: string }) {
-  return (
-    <div className="flex flex-col gap-1.5 w-full md:w-[360px]">
-      <span className="font-body text-xs leading-4 text-muted-foreground">{label}</span>
-      <Input placeholder={placeholder} {...props} />
-    </div>
-  )
-}
+/* ---------------------------------------------------------------- */
+/* Story 1: Contact – vertical sections with Field.Row              */
+/* ---------------------------------------------------------------- */
 
 function Contact() {
   return (
@@ -96,27 +83,33 @@ function Contact() {
       description="Business contact details and registered address."
       meta={<><Clock aria-hidden /> Takes ~2 minutes</>}
     >
-      <div className="flex flex-col gap-6">
-        <Label>COMMUNICATION</Label>
-        <div className="flex flex-wrap gap-4">
-          <InputRow label="Email" placeholder="name@company.com" type="email" />
-          <InputRow label="Phone number" placeholder="+91 98765 43210" type="tel" />
-        </div>
-        <hr className="border-line" />
-        <Label>REGISTERED LOCATION</Label>
-        <div className="flex flex-wrap gap-4">
-          <InputRow label="Address" placeholder="123 Business Park, Tower A" />
-          <InputRow label="Branch / Location" placeholder="Mumbai Head Office" />
-        </div>
-        <div className="flex flex-wrap gap-4">
-          <InputRow label="City" placeholder="Mumbai" />
-          <InputRow label="District" placeholder="Mumbai Suburban" />
-          <InputRow label="Pincode" placeholder="400001" />
-        </div>
-      </div>
+      <FormPanel.Section title="COMMUNICATION">
+        <FormPanel.Field.Row>
+          <FormPanel.Field label="Email" placeholder="name@company.com" type="email" />
+          <FormPanel.Field label="Phone number" placeholder="+91 98765 43210" type="tel" />
+        </FormPanel.Field.Row>
+      </FormPanel.Section>
+
+      <FormPanel.Separator />
+
+      <FormPanel.Section title="REGISTERED LOCATION">
+        <FormPanel.Field.Row>
+          <FormPanel.Field label="Address" placeholder="123 Business Park, Tower A" />
+          <FormPanel.Field label="Branch / Location" placeholder="Mumbai Head Office" />
+        </FormPanel.Field.Row>
+        <FormPanel.Field.Row>
+          <FormPanel.Field label="City" placeholder="Mumbai" />
+          <FormPanel.Field label="District" placeholder="Mumbai Suburban" />
+          <FormPanel.Field label="Pincode" placeholder="400001" />
+        </FormPanel.Field.Row>
+      </FormPanel.Section>
     </FormPanel>
   )
 }
+
+/* ---------------------------------------------------------------- */
+/* Story 2: Bank with note – vertical sections                      */
+/* ---------------------------------------------------------------- */
 
 function BankWithNote() {
   return (
@@ -131,22 +124,201 @@ function BankWithNote() {
         </InfoNote>
       }
     >
-      <div className="flex flex-col gap-6">
-        <Label>PRIMARY ACCOUNT</Label>
-        <div className="flex flex-wrap gap-4">
-          <InputRow label="Bank name" placeholder="HDFC Bank" />
-          <InputRow label="IFSC code" placeholder="HDFC0001234" />
-          <InputRow label="Account number" placeholder="50100123456789" />
-        </div>
-        <hr className="border-line" />
-        <Label>BRANCH</Label>
-        <div className="flex flex-wrap gap-4">
-          <InputRow label="Bank address" placeholder="HDFC Bank, Fort Branch, Mumbai" />
-        </div>
+      <FormPanel.Section title="PRIMARY ACCOUNT">
+        <FormPanel.Field.Row>
+          <FormPanel.Field label="Bank name" placeholder="HDFC Bank" />
+          <FormPanel.Field label="IFSC code" placeholder="HDFC0001234" />
+          <FormPanel.Field label="Account number" placeholder="50100123456789" />
+        </FormPanel.Field.Row>
+      </FormPanel.Section>
+
+      <FormPanel.Separator />
+
+      <FormPanel.Section title="BRANCH">
+        <FormPanel.Field.Row>
+          <FormPanel.Field label="Bank address" placeholder="HDFC Bank, Fort Branch, Mumbai" />
+        </FormPanel.Field.Row>
+      </FormPanel.Section>
+    </FormPanel>
+  )
+}
+
+/* ---------------------------------------------------------------- */
+/* Story 3: Horizontal layout – 3 fields side by side               */
+/* ---------------------------------------------------------------- */
+
+function HorizontalLayout() {
+  return (
+    <FormPanel
+      eyebrow="Step 1 of 3 — Details"
+      title="Company Information"
+      description="Enter your company details below."
+    >
+      <FormPanel.Section title="BASIC INFO" layout="horizontal">
+        <FormPanel.Field label="Company name" placeholder="Acme Corp" />
+        <FormPanel.Field label="Registration no." placeholder="U12345MH2020PTC123456" />
+        <FormPanel.Field label="GSTIN" placeholder="27AAACA1234A1Z5" />
+      </FormPanel.Section>
+
+      <FormPanel.Separator />
+
+      <FormPanel.Section title="ADDRESS" layout="horizontal">
+        <FormPanel.Field label="City" placeholder="Mumbai" />
+        <FormPanel.Field label="State" placeholder="Maharashtra" />
+        <FormPanel.Field label="Pincode" placeholder="400001" />
+      </FormPanel.Section>
+    </FormPanel>
+  )
+}
+
+/* ---------------------------------------------------------------- */
+/* Story 4: Mixed vertical + horizontal                             */
+/* ---------------------------------------------------------------- */
+
+function MixedLayout() {
+  return (
+    <FormPanel
+      title="Mixed Layout Demo"
+      description="Vertical sections with horizontal field groups."
+    >
+      <FormPanel.Section title="VERTICAL SECTION">
+        <FormPanel.Field label="Full width field" placeholder="Spans full width" />
+      </FormPanel.Section>
+
+      <FormPanel.Separator />
+
+      <FormPanel.Section title="HORIZONTAL GROUP" layout="horizontal">
+        <FormPanel.Field label="Field A" placeholder="Value A" />
+        <FormPanel.Field label="Field B" placeholder="Value B" />
+      </FormPanel.Section>
+
+      <FormPanel.Separator />
+
+      <FormPanel.Section title="ANOTHER VERTICAL" layout="vertical">
+        <FormPanel.Field.Row>
+          <FormPanel.Field label="Row Field 1" placeholder="Value 1" />
+          <FormPanel.Field label="Row Field 2" placeholder="Value 2" />
+        </FormPanel.Field.Row>
+        <FormPanel.Field label="Solo field" placeholder="Full width again" />
+      </FormPanel.Section>
+    </FormPanel>
+  )
+}
+
+/* ---------------------------------------------------------------- */
+/* Story 5: react-hook-form integration                             */
+/* ---------------------------------------------------------------- */
+
+interface ContactForm {
+  email: string
+  phone: string
+  address: string
+  city: string
+}
+
+function ReactHookFormDemo() {
+  const { control, handleSubmit, formState: { errors } } = useForm<ContactForm>()
+
+  const onSubmit = (data: ContactForm) => {
+    console.log("Submitted:", data)
+    alert(JSON.stringify(data, null, 2))
+  }
+
+  return (
+    <FormPanel
+      eyebrow="Step 2 of 6 — Contact"
+      title="Contact & address (RHF)"
+      description="Connected to react-hook-form via asChild."
+      meta={<><Clock aria-hidden /> Takes ~2 minutes</>}
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <FormPanel.Section title="COMMUNICATION">
+        <FormPanel.Field.Row>
+          <Controller
+            name="email"
+            control={control}
+            rules={{ required: "Email is required", pattern: { value: /^[^@]+@[^@]+\.[^@]+$/, message: "Invalid email" } }}
+            render={({ field }) => (
+              <FormPanel.Field
+                label="Email"
+                placeholder="name@company.com"
+                type="email"
+                aria-invalid={!!errors.email}
+                {...field}
+              />
+            )}
+          />
+          <Controller
+            name="phone"
+            control={control}
+            rules={{ required: "Phone is required" }}
+            render={({ field }) => (
+              <FormPanel.Field
+                label="Phone number"
+                placeholder="+91 98765 43210"
+                type="tel"
+                aria-invalid={!!errors.phone}
+                {...field}
+              />
+            )}
+          />
+        </FormPanel.Field.Row>
+      </FormPanel.Section>
+
+      <FormPanel.Separator />
+
+      <FormPanel.Section title="REGISTERED LOCATION">
+        <FormPanel.Field.Row>
+          <Controller
+            name="address"
+            control={control}
+            rules={{ required: "Address is required" }}
+            render={({ field }) => (
+              <FormPanel.Field
+                label="Address"
+                placeholder="123 Business Park, Tower A"
+                aria-invalid={!!errors.address}
+                {...field}
+              />
+            )}
+          />
+          <Controller
+            name="city"
+            control={control}
+            rules={{ required: "City is required" }}
+            render={({ field }) => (
+              <FormPanel.Field
+                label="City"
+                placeholder="Mumbai"
+                aria-invalid={!!errors.city}
+                {...field}
+              />
+            )}
+          />
+        </FormPanel.Field.Row>
+      </FormPanel.Section>
+
+      <div className="mt-4 flex gap-3">
+        <button
+          type="submit"
+          className="rounded-lg bg-accent px-4 py-2 font-body text-sm font-semibold text-primary-foreground hover:bg-accent/90"
+        >
+          Submit
+        </button>
+        <button
+          type="button"
+          className="rounded-lg border border-line px-4 py-2 font-body text-sm font-semibold text-muted-foreground hover:bg-ground"
+        >
+          Cancel
+        </button>
       </div>
     </FormPanel>
   )
 }
+
+/* ---------------------------------------------------------------- */
+/* Story 6: Minimal                                                 */
+/* ---------------------------------------------------------------- */
 
 function Minimal() {
   return (
@@ -156,6 +328,10 @@ function Minimal() {
   )
 }
 
+/* ---------------------------------------------------------------- */
+/* Screen wrapper                                                   */
+/* ---------------------------------------------------------------- */
+
 function Screen({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen w-full bg-background px-8 py-10 md:px-16">
@@ -163,6 +339,10 @@ function Screen({ children }: { children: ReactNode }) {
     </div>
   )
 }
+
+/* ---------------------------------------------------------------- */
+/* Exports                                                          */
+/* ---------------------------------------------------------------- */
 
 export const Light: Story = {
   render: () => (
@@ -176,14 +356,23 @@ export const Light: Story = {
         FormPanel
       </h2>
       <p className="mt-2 max-w-xl font-body text-sm leading-6 text-muted-foreground">
-        Wizard-step form wrapper with header (eyebrow, title, description, meta), body (children), and optional bottom note slot.
+        Wizard-step form wrapper with composable Section, Separator, Field, and Field.Row. Supports vertical/horizontal layouts and react-hook-form via asChild.
       </p>
       <Block title="Variants">
-        <Row label="Contact" note="Design 117-1 — full header with eyebrow, title, description, meta">
+        <Row label="Contact" note="Vertical sections with Field.Row groups">
           <Contact />
         </Row>
-        <Row label="Bank with note" note="Design 1A0-1 — includes InfoNote at bottom">
+        <Row label="Bank with note" note="Vertical sections + InfoNote at bottom">
           <BankWithNote />
+        </Row>
+        <Row label="Horizontal layout" note="layout=horizontal makes fields side-by-side">
+          <HorizontalLayout />
+        </Row>
+        <Row label="Mixed layout" note="Vertical + horizontal sections combined">
+          <MixedLayout />
+        </Row>
+        <Row label="react-hook-form" note="asChild + Controller for full RHF integration">
+          <ReactHookFormDemo />
         </Row>
         <Row label="Minimal" note="Title only">
           <Minimal />
@@ -193,14 +382,9 @@ export const Light: Story = {
   ),
 }
 
-export const ContactStory: Story = {
-  render: () => <Contact />,
-}
-
-export const BankWithNoteStory: Story = {
-  render: () => <BankWithNote />,
-}
-
-export const MinimalStory: Story = {
-  render: () => <Minimal />,
-}
+export const ContactStory: Story = { render: () => <Contact /> }
+export const BankWithNoteStory: Story = { render: () => <BankWithNote /> }
+export const HorizontalLayoutStory: Story = { render: () => <HorizontalLayout /> }
+export const MixedLayoutStory: Story = { render: () => <MixedLayout /> }
+export const ReactHookFormStory: Story = { render: () => <ReactHookFormDemo /> }
+export const MinimalStory: Story = { render: () => <Minimal /> }
