@@ -95,7 +95,7 @@ describe("OrganizationsPage", () => {
     expect(screen.getByText("No employees to show yet.")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Search employees…")).toBeInTheDocument();
     expect(
-      screen.getByRole("tab", { name: /employees/i }).querySelector('[data-slot="tab-switcher-badge"]'),
+      screen.getByRole("tab", { name: /employees/i }).querySelector('[data-slot="tabs-count"]'),
     ).toBeNull();
   });
 

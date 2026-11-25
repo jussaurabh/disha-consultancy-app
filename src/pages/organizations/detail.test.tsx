@@ -106,7 +106,7 @@ describe("OrganizationDetailPage — tabs", () => {
     }
     const usersTab = screen.getByRole("tab", { name: /users/i });
     expect(usersTab).toBeInTheDocument();
-    await waitFor(() => expect(usersTab.querySelector('[data-slot="tab-switcher-badge"]')).toHaveTextContent("12"));
+    await waitFor(() => expect(usersTab.querySelector('[data-slot="tabs-count"]')).toHaveTextContent("12"));
   });
 
   it("clicking a tab writes ?tab= and renders blank content", async () => {

@@ -21,7 +21,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { SecondaryHeader } from "@/components/ui/secondary-header";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { TabSwitcher } from "@/components/ui/tab-switcher";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // --- Schemas ---
 
@@ -545,16 +545,19 @@ export default function OrganizationDetailPage() {
         </SecondaryHeader>
 
         {/* Section tabs */}
-        <TabSwitcher
-          className="bg-surface"
-          value={tab}
-          onValueChange={handleTabChange}
-          items={visibleSections.map((section) => ({
-            value: section.id,
-            label: section.label,
-            ...(section.id === "users" && usersTotal !== undefined ? { count: usersTotal } : {}),
-          }))}
-        />
+        <Tabs value={tab} onValueChange={handleTabChange} className="bg-surface">
+          <TabsList variant="line">
+            {visibleSections.map((section) => (
+              <TabsTrigger
+                key={section.id}
+                value={section.id}
+                count={section.id === "users" ? usersTotal : undefined}
+              >
+                {section.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
 
         {tab === "company" && (
           <div className="flex items-start gap-8 px-4 pt-8 pb-14 md:px-6">

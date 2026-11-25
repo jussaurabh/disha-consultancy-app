@@ -20,7 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { UiVariation } from "@/components/ui/ui-variation";
-import { TabSwitcher } from "@/components/ui/tab-switcher";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FiltersBar } from "./filters-bar";
 import { Plus, Loader2, MoreVertical } from "lucide-react";
 
@@ -90,15 +90,14 @@ export default function OrganizationsPage() {
   return (
     <div className="pb-4 md:pb-6">
       <UiVariation {...uiVariationProps} />
-      <TabSwitcher
-        className="mt-9"
-        value={tab}
-        onValueChange={handleTabChange}
-        items={[
-          { value: "organizations", label: "All organizations", count: showCounts ? total : undefined },
-          { value: "employees", label: "Employees" },
-        ]}
-      />
+      <Tabs value={tab} onValueChange={handleTabChange} className="mt-9">
+        <TabsList variant="line" className="px-4 md:px-6">
+          <TabsTrigger value="organizations" count={showCounts ? total : undefined}>
+            All organizations
+          </TabsTrigger>
+          <TabsTrigger value="employees">Employees</TabsTrigger>
+        </TabsList>
+      </Tabs>
       <FiltersBar key={filtersBarKey} tab={tab} className="mt-6" />
       {isOrganizationsTab ? (
         <Card className="mx-4 mt-6 md:mx-6">
