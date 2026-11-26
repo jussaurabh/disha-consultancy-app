@@ -5,7 +5,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { passwordResetApi } from "@/api/auth";
-import { AuthShell } from "@/components/auth/auth-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -32,8 +31,8 @@ export default function ForgotPasswordPage() {
 
   if (submitted) {
     return (
-      <AuthShell>
-        <div className="space-y-6">
+      <div className="min-h-dvh bg-zinc-50 light flex items-center justify-center px-6 py-8 md:px-8 md:py-10 lg:min-h-dvh">
+        <div className="w-full max-w-[400px] space-y-6">
           <div className="inline-flex size-12 items-center justify-center rounded-full bg-zinc-100">
             <Mail className="size-5 text-zinc-600" />
           </div>
@@ -57,13 +56,13 @@ export default function ForgotPasswordPage() {
             Back to login
           </Link>
         </div>
-      </AuthShell>
+      </div>
     );
   }
 
   return (
-    <AuthShell>
-      <div className="space-y-8">
+    <div className="min-h-dvh bg-zinc-50 light flex items-center justify-center px-6 py-8 md:px-8 md:py-10 lg:min-h-dvh">
+      <div className="w-full max-w-[400px] space-y-8">
         <Link
           to="/login"
           className="inline-flex min-h-11 items-center gap-1 text-sm text-muted-foreground hover:text-foreground focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EE3338] focus-visible:ring-offset-2"
@@ -121,6 +120,6 @@ export default function ForgotPasswordPage() {
           </form>
         </Form>
       </div>
-    </AuthShell>
+    </div>
   );
 }

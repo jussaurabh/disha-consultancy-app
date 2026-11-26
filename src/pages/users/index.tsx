@@ -13,13 +13,38 @@ import { useAuth } from "@/providers/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ChangeRoleModal } from "@/components/dialogs/change-role-modal";
-import { ConfirmDialog } from "@/components/dialogs/confirm-dialog";
-import { ArchiveConfirmDialog } from "@/components/dialogs/archive-confirm-dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const inviteSchema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -28,7 +53,15 @@ const inviteSchema = z.object({
 
 type InviteValues = z.infer<typeof inviteSchema>;
 
-function InviteModal({ open, onClose, onSuccess }: { open: boolean; onClose: () => void; onSuccess: () => void }) {
+function InviteModal({
+  open,
+  onClose,
+  onSuccess,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
   const { user } = useAuth();
   const form = useForm<InviteValues>({
     resolver: zodResolver(inviteSchema),
@@ -39,13 +72,19 @@ function InviteModal({ open, onClose, onSuccess }: { open: boolean; onClose: () 
     queryKey: ["roles"],
     queryFn: () =>
       rolesApi
-        .listRoles({ scope: user!.scope, scope_id: user!.scope_id ?? undefined })
+        .listRoles({
+          scope: user!.scope,
+          scope_id: user!.scope_id ?? undefined,
+        })
         .then((r) => r.data),
     enabled: open,
   });
 
   const mutation = useMutation({
-    mutationFn: (values: InviteValues) => invitesApi.createInvite({ ...values, invite_type: "consultancy_user" }).then((r) => r.data),
+    mutationFn: (values: InviteValues) =>
+      invitesApi
+        .createInvite({ ...values, invite_type: "consultancy_user" })
+        .then((r) => r.data),
     onSuccess: () => {
       onSuccess();
       form.reset();
@@ -53,7 +92,9 @@ function InviteModal({ open, onClose, onSuccess }: { open: boolean; onClose: () 
       toast.success("Invite sent");
     },
     onError: (error) => {
-      const msg = (error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Failed to send invite";
+      const msg =
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message ?? "Failed to send invite";
       toast.error(msg);
     },
   });
@@ -65,7 +106,10 @@ function InviteModal({ open, onClose, onSuccess }: { open: boolean; onClose: () 
       <div className="w-full max-w-md rounded-lg border bg-background p-6 shadow-lg">
         <h2 className="mb-4 text-lg font-semibold">Invite user</h2>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit((v) => mutation.mutate(v))} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit((v) => mutation.mutate(v))}
+            className="space-y-4"
+          >
             <FormField
               control={form.control}
               name="email"
@@ -73,7 +117,11 @@ function InviteModal({ open, onClose, onSuccess }: { open: boolean; onClose: () 
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="user@example.com" {...field} />
+                    <Input
+                      type="email"
+                      placeholder="user@example.com"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -108,7 +156,11 @@ function InviteModal({ open, onClose, onSuccess }: { open: boolean; onClose: () 
             />
             {mutation.isError && (
               <p className="text-destructive text-sm">
-                {(mutation.error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Failed to send invite."}
+                {(
+                  mutation.error as {
+                    response?: { data?: { message?: string } };
+                  }
+                )?.response?.data?.message ?? "Failed to send invite."}
               </p>
             )}
             <div className="flex justify-end gap-2">
@@ -130,16 +182,21 @@ export default function UsersPage() {
   const { hasPermission, user: currentUser } = useAuth();
   const queryClient = useQueryClient();
   const [inviteOpen, setInviteOpen] = useState(false);
-  const [changeRoleUser, setChangeRoleUser] = useState<ConsultancyUser | null>(null);
+  const [changeRoleUser, setChangeRoleUser] = useState<ConsultancyUser | null>(
+    null,
+  );
   const [archiveUser, setArchiveUser] = useState<ConsultancyUser | null>(null);
   const [deleteUser, setDeleteUser] = useState<ConsultancyUser | null>(null);
   const [cancelInvite, setCancelInvite] = useState<Invite | null>(null);
   const [resendInvite, setResendInvite] = useState<Invite | null>(null);
-  const [inviteStatusFilter, setInviteStatusFilter] = useState<"all" | "pending" | "accepted" | "cancelled">("all");
+  const [inviteStatusFilter, setInviteStatusFilter] = useState<
+    "all" | "pending" | "accepted" | "cancelled"
+  >("all");
 
   const { data: usersResponse, isLoading: usersLoading } = useQuery({
     queryKey: ["users"],
-    queryFn: () => usersApi.listUsers({ page: 1, limit: 100 }).then((r) => r.data),
+    queryFn: () =>
+      usersApi.listUsers({ page: 1, limit: 100 }).then((r) => r.data),
   });
   const { data: invites, isLoading: invitesLoading } = useQuery({
     queryKey: ["invites"],
@@ -157,7 +214,9 @@ export default function UsersPage() {
       setDeleteUser(null);
     },
     onError: (error) => {
-      const msg = (error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Failed to delete user";
+      const msg =
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message ?? "Failed to delete user";
       toast.error(msg);
     },
   });
@@ -170,7 +229,9 @@ export default function UsersPage() {
       setArchiveUser(null);
     },
     onError: (error) => {
-      const msg = (error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Failed to archive user";
+      const msg =
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message ?? "Failed to archive user";
       toast.error(msg);
     },
   });
@@ -182,7 +243,9 @@ export default function UsersPage() {
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
     onError: (error) => {
-      const msg = (error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Failed to unarchive user";
+      const msg =
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message ?? "Failed to unarchive user";
       toast.error(msg);
     },
   });
@@ -195,7 +258,9 @@ export default function UsersPage() {
       setCancelInvite(null);
     },
     onError: (error) => {
-      const msg = (error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Failed to cancel invite";
+      const msg =
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message ?? "Failed to cancel invite";
       toast.error(msg);
     },
   });
@@ -208,21 +273,30 @@ export default function UsersPage() {
       setResendInvite(null);
     },
     onError: (error) => {
-      const msg = (error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Failed to resend invite";
+      const msg =
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message ?? "Failed to resend invite";
       toast.error(msg);
     },
   });
 
-  const currentUserId = (currentUser as { _id?: string; id?: string })?.id ?? (currentUser as { _id?: string })?._id;
+  const currentUserId =
+    (currentUser as { _id?: string; id?: string })?.id ??
+    (currentUser as { _id?: string })?._id;
 
-  const filteredInvites = inviteStatusFilter === "all" ? inviteList : inviteList.filter((inv) => inv.status === inviteStatusFilter);
+  const filteredInvites =
+    inviteStatusFilter === "all"
+      ? inviteList
+      : inviteList.filter((inv) => inv.status === inviteStatusFilter);
 
   return (
     <div className="space-y-6 pb-4 md:pb-6">
       <div className="flex items-center justify-between p-4 md:p-6">
         <div>
           <h1 className="text-2xl font-semibold">User management</h1>
-          <p className="text-muted-foreground text-sm">Active users and invites.</p>
+          <p className="text-muted-foreground text-sm">
+            Active users and invites.
+          </p>
         </div>
         {hasPermission("consultancy_user:invite") && (
           <Button onClick={() => setInviteOpen(true)}>
@@ -247,7 +321,9 @@ export default function UsersPage() {
             </div>
           )}
           {!usersLoading && userList.length === 0 && (
-            <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">No users yet.</p>
+            <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
+              No users yet.
+            </p>
           )}
           {!usersLoading && userList.length > 0 && (
             <div className="rounded-lg border">
@@ -256,52 +332,85 @@ export default function UsersPage() {
                   <tr className="border-b bg-muted/50">
                     <th className="px-4 py-3 text-left font-medium">Email</th>
                     <th className="px-4 py-3 text-left font-medium">Role</th>
-                    <th className="px-4 py-3 text-left font-medium">Member since</th>
-                    <th className="px-4 py-3 text-right font-medium">Actions</th>
+                    <th className="px-4 py-3 text-left font-medium">
+                      Member since
+                    </th>
+                    <th className="px-4 py-3 text-right font-medium">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {userList.map((u) => {
                     const isSelf = u._id === currentUserId;
                     return (
-                      <tr key={u._id} className={`border-b last:border-b-0 hover:bg-muted/30 ${u.is_archived ? "opacity-50" : ""}`}>
-                        <td className={`px-4 py-3 font-medium ${u.is_archived ? "line-through" : ""}`}>{u.email}</td>
-                        <td className="px-4 py-3 text-muted-foreground">
-                          {u.role_ids?.map((r) => (typeof r === "string" ? r : r.name)).join(", ") ?? "—"}
+                      <tr
+                        key={u._id}
+                        className={`border-b last:border-b-0 hover:bg-muted/30 ${u.is_archived ? "opacity-50" : ""}`}
+                      >
+                        <td
+                          className={`px-4 py-3 font-medium ${u.is_archived ? "line-through" : ""}`}
+                        >
+                          {u.email}
                         </td>
-                        <td className="px-4 py-3 text-muted-foreground">{u.created_at ? new Date(u.created_at).toLocaleDateString() : "—"}</td>
+                        <td className="px-4 py-3 text-muted-foreground">
+                          {u.role_ids
+                            ?.map((r) => (typeof r === "string" ? r : r.name))
+                            .join(", ") ?? "—"}
+                        </td>
+                        <td className="px-4 py-3 text-muted-foreground">
+                          {u.created_at
+                            ? new Date(u.created_at).toLocaleDateString()
+                            : "—"}
+                        </td>
                         <td className="px-4 py-3 text-right">
-                          {!isSelf && (hasPermission("consultancy_user:edit") || hasPermission("consultancy_user:delete") || hasPermission("consultancy_user:archive")) && (
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="sm">
-                                  <MoreHorizontal className="size-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                {hasPermission("consultancy_user:edit") && (
-                                  <DropdownMenuItem onClick={() => setChangeRoleUser(u)}>
-                                    Change role
-                                  </DropdownMenuItem>
-                                )}
-                                {hasPermission("consultancy_user:archive") && !u.is_archived && (
-                                  <DropdownMenuItem onClick={() => setArchiveUser(u)}>
-                                    Archive
-                                  </DropdownMenuItem>
-                                )}
-                                {hasPermission("consultancy_user:archive") && u.is_archived && (
-                                  <DropdownMenuItem onClick={() => unarchiveUserMutation.mutate(u._id)}>
-                                    Unarchive
-                                  </DropdownMenuItem>
-                                )}
-                                {hasPermission("consultancy_user:delete") && (
-                                  <DropdownMenuItem variant="destructive" onClick={() => setDeleteUser(u)}>
-                                    Delete
-                                  </DropdownMenuItem>
-                                )}
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          )}
+                          {!isSelf &&
+                            (hasPermission("consultancy_user:edit") ||
+                              hasPermission("consultancy_user:delete") ||
+                              hasPermission("consultancy_user:archive")) && (
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="outline" size="sm">
+                                    <MoreHorizontal className="size-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  {hasPermission("consultancy_user:edit") && (
+                                    <DropdownMenuItem
+                                      onClick={() => setChangeRoleUser(u)}
+                                    >
+                                      Change role
+                                    </DropdownMenuItem>
+                                  )}
+                                  {hasPermission("consultancy_user:archive") &&
+                                    !u.is_archived && (
+                                      <DropdownMenuItem
+                                        onClick={() => setArchiveUser(u)}
+                                      >
+                                        Archive
+                                      </DropdownMenuItem>
+                                    )}
+                                  {hasPermission("consultancy_user:archive") &&
+                                    u.is_archived && (
+                                      <DropdownMenuItem
+                                        onClick={() =>
+                                          unarchiveUserMutation.mutate(u._id)
+                                        }
+                                      >
+                                        Unarchive
+                                      </DropdownMenuItem>
+                                    )}
+                                  {hasPermission("consultancy_user:delete") && (
+                                    <DropdownMenuItem
+                                      variant="destructive"
+                                      onClick={() => setDeleteUser(u)}
+                                    >
+                                      Delete
+                                    </DropdownMenuItem>
+                                  )}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            )}
                         </td>
                       </tr>
                     );
@@ -314,7 +423,12 @@ export default function UsersPage() {
 
         <TabsContent value="invites" className="mt-4">
           <div className="space-y-4">
-            <Tabs value={inviteStatusFilter} onValueChange={(v) => setInviteStatusFilter(v as typeof inviteStatusFilter)}>
+            <Tabs
+              value={inviteStatusFilter}
+              onValueChange={(v) =>
+                setInviteStatusFilter(v as typeof inviteStatusFilter)
+              }
+            >
               <TabsList>
                 <TabsTrigger value="all">All</TabsTrigger>
                 <TabsTrigger value="pending">Pending</TabsTrigger>
@@ -332,7 +446,9 @@ export default function UsersPage() {
                 )}
                 {!invitesLoading && filteredInvites.length === 0 && (
                   <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
-                    {inviteStatusFilter === "all" ? "No invites." : `No ${inviteStatusFilter} invites.`}
+                    {inviteStatusFilter === "all"
+                      ? "No invites."
+                      : `No ${inviteStatusFilter} invites.`}
                   </p>
                 )}
                 {!invitesLoading && filteredInvites.length > 0 && (
@@ -340,46 +456,77 @@ export default function UsersPage() {
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b bg-muted/50">
-                          <th className="px-4 py-3 text-left font-medium">Email</th>
-                          <th className="px-4 py-3 text-left font-medium">Role</th>
-                          <th className="px-4 py-3 text-left font-medium">Status</th>
-                          <th className="px-4 py-3 text-left font-medium">Invited by</th>
-                          <th className="px-4 py-3 text-left font-medium">Expires at</th>
-                          <th className="px-4 py-3 text-right font-medium">Actions</th>
+                          <th className="px-4 py-3 text-left font-medium">
+                            Email
+                          </th>
+                          <th className="px-4 py-3 text-left font-medium">
+                            Role
+                          </th>
+                          <th className="px-4 py-3 text-left font-medium">
+                            Status
+                          </th>
+                          <th className="px-4 py-3 text-left font-medium">
+                            Invited by
+                          </th>
+                          <th className="px-4 py-3 text-left font-medium">
+                            Expires at
+                          </th>
+                          <th className="px-4 py-3 text-right font-medium">
+                            Actions
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
                         {filteredInvites.map((inv) => {
                           const status = inv.status ?? "pending";
-                          const hasActions = status === "pending" && hasPermission("invite:cancel");
-                          const hasResend = status === "cancelled" && hasPermission("consultancy_user:invite");
+                          const hasActions =
+                            status === "pending" &&
+                            hasPermission("invite:cancel");
+                          const hasResend =
+                            status === "cancelled" &&
+                            hasPermission("consultancy_user:invite");
                           const showActionsDropdown = hasActions || hasResend;
 
                           return (
-                            <tr key={inv._id} className="border-b last:border-b-0 hover:bg-muted/30">
-                              <td className="px-4 py-3 font-medium">{inv.email}</td>
-                              <td className="px-4 py-3 text-muted-foreground">{inv.role_id?.name ?? "—"}</td>
+                            <tr
+                              key={inv._id}
+                              className="border-b last:border-b-0 hover:bg-muted/30"
+                            >
+                              <td className="px-4 py-3 font-medium">
+                                {inv.email}
+                              </td>
+                              <td className="px-4 py-3 text-muted-foreground">
+                                {inv.role_id?.name ?? "—"}
+                              </td>
                               <td className="px-4 py-3">
                                 <span
                                   className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
                                     status === "pending"
                                       ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
                                       : status === "accepted"
-                                      ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
-                                      : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"
+                                        ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
+                                        : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"
                                   }`}
                                 >
-                                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                                  {status.charAt(0).toUpperCase() +
+                                    status.slice(1)}
                                 </span>
                               </td>
-                              <td className="px-4 py-3 text-muted-foreground">{inv.invited_by?.email ?? "—"}</td>
                               <td className="px-4 py-3 text-muted-foreground">
-                                {inv.expires_at && inv.status === "pending" && new Date(inv.expires_at) < new Date() ? (
+                                {inv.invited_by?.email ?? "—"}
+                              </td>
+                              <td className="px-4 py-3 text-muted-foreground">
+                                {inv.expires_at &&
+                                inv.status === "pending" &&
+                                new Date(inv.expires_at) < new Date() ? (
                                   <span className="inline-flex rounded-full px-2 py-0.5 text-xs font-medium bg-red-100 text-red-700">
                                     Expired
                                   </span>
                                 ) : inv.expires_at ? (
-                                  format(new Date(inv.expires_at), "dd MMM yyyy, hh:mm a")
+                                  format(
+                                    new Date(inv.expires_at),
+                                    "dd MMM yyyy, hh:mm a",
+                                  )
                                 ) : (
                                   "—"
                                 )}
@@ -394,13 +541,18 @@ export default function UsersPage() {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                       {hasActions && (
-                                        <DropdownMenuItem variant="destructive" onClick={() => setCancelInvite(inv)}>
+                                        <DropdownMenuItem
+                                          variant="destructive"
+                                          onClick={() => setCancelInvite(inv)}
+                                        >
                                           <X className="size-4" />
                                           Cancel invite
                                         </DropdownMenuItem>
                                       )}
                                       {hasResend && (
-                                        <DropdownMenuItem onClick={() => setResendInvite(inv)}>
+                                        <DropdownMenuItem
+                                          onClick={() => setResendInvite(inv)}
+                                        >
                                           <RotateCcw className="size-4" />
                                           Resend invite
                                         </DropdownMenuItem>
@@ -408,7 +560,9 @@ export default function UsersPage() {
                                     </DropdownMenuContent>
                                   </DropdownMenu>
                                 ) : (
-                                  <span className="text-muted-foreground">—</span>
+                                  <span className="text-muted-foreground">
+                                    —
+                                  </span>
                                 )}
                               </td>
                             </tr>
@@ -427,7 +581,9 @@ export default function UsersPage() {
       <InviteModal
         open={inviteOpen}
         onClose={() => setInviteOpen(false)}
-        onSuccess={() => queryClient.invalidateQueries({ queryKey: ["invites"] })}
+        onSuccess={() =>
+          queryClient.invalidateQueries({ queryKey: ["invites"] })
+        }
       />
 
       <ChangeRoleModal
@@ -435,44 +591,125 @@ export default function UsersPage() {
         open={!!changeRoleUser}
         onClose={() => setChangeRoleUser(null)}
         onSuccess={() => queryClient.invalidateQueries({ queryKey: ["users"] })}
-        onUpdateRole={(userId, roleId) => usersApi.updateUserRole(userId, roleId).then(() => undefined)}
+        onUpdateRole={(userId, roleId) =>
+          usersApi.updateUserRole(userId, roleId).then(() => undefined)
+        }
       />
 
-      <ArchiveConfirmDialog
+      <Dialog
         open={!!archiveUser}
-        email={archiveUser?.email ?? ""}
-        isArchiving={archiveUserMutation.isPending}
-        onConfirm={() => archiveUser && archiveUserMutation.mutate(archiveUser._id)}
-        onCancel={() => setArchiveUser(null)}
-      />
+        onOpenChange={(open) => {
+          if (!open) setArchiveUser(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Archive user</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to archive {archiveUser?.email ?? "this user"}? They will lose
+              access to the consultancy.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="secondary">Cancel</Button>
+            </DialogClose>
+            <Button
+              variant="destructive"
+              disabled={archiveUserMutation.isPending}
+              onClick={() => archiveUser && archiveUserMutation.mutate(archiveUser._id)}
+            >
+              {archiveUserMutation.isPending ? "Archiving…" : "Archive"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      <ConfirmDialog
+      <Dialog
         open={!!deleteUser}
-        title="Delete user"
-        message={deleteUser ? `This will remove ${deleteUser.email}'s access. They will not be able to login.` : ""}
-        onConfirm={() => deleteUser && deleteMutation.mutate(deleteUser._id)}
-        onCancel={() => setDeleteUser(null)}
-        isLoading={deleteMutation.isPending}
-        destructive
-      />
+        onOpenChange={(open) => {
+          if (!open) setDeleteUser(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete user</DialogTitle>
+            <DialogDescription>
+              {deleteUser
+                ? `This will remove ${deleteUser.email}'s access. They will not be able to login.`
+                : ""}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="secondary">Cancel</Button>
+            </DialogClose>
+            <Button
+              variant="destructive"
+              disabled={deleteMutation.isPending}
+              onClick={() => deleteUser && deleteMutation.mutate(deleteUser._id)}
+            >
+              {deleteMutation.isPending ? "Deleting…" : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      <ConfirmDialog
+      <Dialog
         open={!!cancelInvite}
-        title="Cancel invite"
-        message={cancelInvite ? `Cancel the invite sent to ${cancelInvite.email}?` : ""}
-        onConfirm={() => cancelInvite && cancelInviteMutation.mutate(cancelInvite._id)}
-        onCancel={() => setCancelInvite(null)}
-        isLoading={cancelInviteMutation.isPending}
-      />
+        onOpenChange={(open) => {
+          if (!open) setCancelInvite(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel invite</DialogTitle>
+            <DialogDescription>
+              {cancelInvite ? `Cancel the invite sent to ${cancelInvite.email}?` : ""}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="secondary">Cancel</Button>
+            </DialogClose>
+            <Button
+              disabled={cancelInviteMutation.isPending}
+              onClick={() => cancelInvite && cancelInviteMutation.mutate(cancelInvite._id)}
+            >
+              {cancelInviteMutation.isPending ? "Cancelling…" : "Cancel invite"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      <ConfirmDialog
+      <Dialog
         open={!!resendInvite}
-        title="Resend invite"
-        message={resendInvite ? `Resend the invite to ${resendInvite.email}? They will receive a new email with the invite link.` : ""}
-        onConfirm={() => resendInvite && resendInviteMutation.mutate(resendInvite)}
-        onCancel={() => setResendInvite(null)}
-        isLoading={resendInviteMutation.isPending}
-      />
+        onOpenChange={(open) => {
+          if (!open) setResendInvite(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Resend invite</DialogTitle>
+            <DialogDescription>
+              {resendInvite
+                ? `Resend the invite to ${resendInvite.email}? They will receive a new email with the invite link.`
+                : ""}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="secondary">Cancel</Button>
+            </DialogClose>
+            <Button
+              disabled={resendInviteMutation.isPending}
+              onClick={() => resendInvite && resendInviteMutation.mutate(resendInvite)}
+            >
+              {resendInviteMutation.isPending ? "Resending…" : "Resend invite"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

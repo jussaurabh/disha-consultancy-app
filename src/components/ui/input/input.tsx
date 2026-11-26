@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -30,4 +31,38 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   );
 }
 
-export { Input };
+/**
+ * Password field with a show/hide toggle icon.
+ * Renders Input on the 42px shell with an Eye/EyeOff affix on the right.
+ * Toggles type between "password" and "text" on click.
+ */
+function PasswordInput({
+  className,
+  ...props
+}: React.ComponentProps<typeof Input>) {
+  const [show, setShow] = React.useState(false);
+
+  return (
+    <div className="relative w-full">
+      <Input
+        className={cn("pr-10", className)}
+        type={show ? "text" : "password"}
+        {...props}
+      />
+      <button
+        type="button"
+        onClick={() => setShow((prev) => !prev)}
+        className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors"
+        aria-label={show ? "Hide password" : "Show password"}
+      >
+        {show ? (
+          <EyeOff className="size-4" />
+        ) : (
+          <Eye className="size-4" />
+        )}
+      </button>
+    </div>
+  );
+}
+
+export { Input, PasswordInput };

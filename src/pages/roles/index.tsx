@@ -12,15 +12,37 @@ import { useAuth } from "@/providers/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown";
 import { Badge } from "@/components/ui/badge";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ConfirmDialog } from "@/components/dialogs/confirm-dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const roleSchema = z.object({
   name: z.string().min(1, "Role name is required"),
-  permission_codes: z.array(z.string()).min(1, "Select at least one permission"),
+  permission_codes: z
+    .array(z.string())
+    .min(1, "Select at least one permission"),
 });
 
 type RoleFormValues = z.infer<typeof roleSchema>;
@@ -64,13 +86,15 @@ function RoleForm({
     mutationFn: (values: RoleFormValues) => {
       // Build map: code -> ID from the permissions list
       const permissionIdMap = Object.fromEntries(
-        (permissions || []).map((p) => [p.code, p._id])
+        (permissions || []).map((p) => [p.code, p._id]),
       );
 
       // Map selected codes to IDs before sending
       const payload = {
         name: values.name,
-        permission_ids: values.permission_codes.map((code) => permissionIdMap[code]),
+        permission_ids: values.permission_codes.map(
+          (code) => permissionIdMap[code],
+        ),
       };
 
       return rolesApi.createRole(payload).then((r) => r.data);
@@ -82,7 +106,9 @@ function RoleForm({
       toast.success("Role created");
     },
     onError: (error) => {
-      const msg = (error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Failed to create role";
+      const msg =
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message ?? "Failed to create role";
       toast.error(msg);
     },
   });
@@ -93,13 +119,15 @@ function RoleForm({
 
       // Build map: code -> ID from the permissions list
       const permissionIdMap = Object.fromEntries(
-        (permissions || []).map((p) => [p.code, p._id])
+        (permissions || []).map((p) => [p.code, p._id]),
       );
 
       // Map selected codes to IDs before sending
       const payload = {
         name: values.name,
-        permission_ids: values.permission_codes.map((code) => permissionIdMap[code]),
+        permission_ids: values.permission_codes.map(
+          (code) => permissionIdMap[code],
+        ),
       };
 
       return rolesApi.updateRole(role._id, payload).then((r) => r.data);
@@ -111,7 +139,9 @@ function RoleForm({
       toast.success("Role updated");
     },
     onError: (error) => {
-      const msg = (error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Failed to update role";
+      const msg =
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message ?? "Failed to update role";
       toast.error(msg);
     },
   });
@@ -124,7 +154,9 @@ function RoleForm({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-lg border bg-background p-6 shadow-lg">
-        <h2 className="mb-4 text-lg font-semibold">{role ? "Edit role" : "Create role"}</h2>
+        <h2 className="mb-4 text-lg font-semibold">
+          {role ? "Edit role" : "Create role"}
+        </h2>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit((v) => {
@@ -154,7 +186,9 @@ function RoleForm({
               <FormLabel className="mb-3 block">Permissions</FormLabel>
               {Object.entries(grouped).map(([category, perms]) => (
                 <div key={category} className="mb-4">
-                  <h4 className="mb-2 text-sm font-medium text-muted-foreground">{category}</h4>
+                  <h4 className="mb-2 text-sm font-medium text-muted-foreground">
+                    {category}
+                  </h4>
                   <div className="space-y-2">
                     {perms.map((perm) => (
                       <FormField
@@ -171,7 +205,9 @@ function RoleForm({
                                   if (checked) {
                                     field.onChange([...codes, perm.code]);
                                   } else {
-                                    field.onChange(codes.filter((c) => c !== perm.code));
+                                    field.onChange(
+                                      codes.filter((c) => c !== perm.code),
+                                    );
                                   }
                                 }}
                               />
@@ -180,7 +216,11 @@ function RoleForm({
                               <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer">
                                 {perm.name}
                               </label>
-                              {perm.description && <p className="text-xs text-muted-foreground">{perm.description}</p>}
+                              {perm.description && (
+                                <p className="text-xs text-muted-foreground">
+                                  {perm.description}
+                                </p>
+                              )}
                             </div>
                           </FormItem>
                         )}
@@ -193,8 +233,16 @@ function RoleForm({
 
             {(createMutation.isError || updateMutation.isError) && (
               <p className="text-destructive text-sm">
-                {(createMutation.error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-                  (updateMutation.error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+                {(
+                  createMutation.error as {
+                    response?: { data?: { message?: string } };
+                  }
+                )?.response?.data?.message ||
+                  (
+                    updateMutation.error as {
+                      response?: { data?: { message?: string } };
+                    }
+                  )?.response?.data?.message ||
                   "Failed to save role"}
               </p>
             )}
@@ -226,7 +274,10 @@ export default function RolesPage() {
     queryKey: ["roles"],
     queryFn: () =>
       rolesApi
-        .listRoles({ scope: user!.scope, scope_id: user!.scope_id ?? undefined })
+        .listRoles({
+          scope: user!.scope,
+          scope_id: user!.scope_id ?? undefined,
+        })
         .then((r) => r.data),
   });
 
@@ -239,7 +290,9 @@ export default function RolesPage() {
       toast.success("Role deleted");
     },
     onError: (error) => {
-      const msg = (error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Failed to delete role";
+      const msg =
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message ?? "Failed to delete role";
       toast.error(msg);
     },
   });
@@ -311,7 +364,9 @@ export default function RolesPage() {
                 <th className="text-left py-2 px-4 font-medium">Name</th>
                 <th className="text-left py-2 px-4 font-medium">Permissions</th>
                 <th className="text-left py-2 px-4 font-medium">Created</th>
-                {(canEdit || canDelete) && <th className="text-right py-2 px-4 font-medium">Actions</th>}
+                {(canEdit || canDelete) && (
+                  <th className="text-right py-2 px-4 font-medium">Actions</th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -320,11 +375,14 @@ export default function RolesPage() {
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-2">
                       {role.name}
-                      {role.is_system && <Badge variant="secondary">System</Badge>}
+                      {role.is_system && (
+                        <Badge variant="secondary">System</Badge>
+                      )}
                     </div>
                   </td>
                   <td className="py-3 px-4 text-muted-foreground">
-                    {role.permissions.length} permission{role.permissions.length !== 1 ? "s" : ""}
+                    {role.permissions.length} permission
+                    {role.permissions.length !== 1 ? "s" : ""}
                   </td>
                   <td className="py-3 px-4 text-muted-foreground">
                     {format(new Date(role.created_at), "MMM d, yyyy")}
@@ -340,13 +398,18 @@ export default function RolesPage() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             {canEdit && (
-                              <DropdownMenuItem onClick={() => openEditForm(role)}>
+                              <DropdownMenuItem
+                                onClick={() => openEditForm(role)}
+                              >
                                 <Pencil className="mr-2 h-4 w-4" />
                                 Edit
                               </DropdownMenuItem>
                             )}
                             {canDelete && (
-                              <DropdownMenuItem onClick={() => openDeleteConfirm(role)} className="text-destructive">
+                              <DropdownMenuItem
+                                onClick={() => openDeleteConfirm(role)}
+                                className="text-destructive"
+                              >
                                 <Trash2 className="mr-2 h-4 w-4" />
                                 Delete
                               </DropdownMenuItem>
@@ -375,22 +438,38 @@ export default function RolesPage() {
         }}
       />
 
-      <ConfirmDialog
+      <Dialog
         open={deleteConfirmOpen}
-        title="Delete role"
-        message={
-          roleToDelete
-            ? `Are you sure you want to delete "${roleToDelete.name}"? This action cannot be undone.`
-            : "Are you sure?"
-        }
-        onConfirm={handleDeleteConfirm}
-        onCancel={() => {
-          setDeleteConfirmOpen(false);
-          setRoleToDelete(null);
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeleteConfirmOpen(false);
+            setRoleToDelete(null);
+          }
         }}
-        isLoading={deleteMutation.isPending}
-        destructive
-      />
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete role</DialogTitle>
+            <DialogDescription>
+              {roleToDelete
+                ? `Are you sure you want to delete "${roleToDelete.name}"? This action cannot be undone.`
+                : "Are you sure?"}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="secondary">Cancel</Button>
+            </DialogClose>
+            <Button
+              variant="destructive"
+              disabled={deleteMutation.isPending}
+              onClick={handleDeleteConfirm}
+            >
+              {deleteMutation.isPending ? "Deleting…" : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

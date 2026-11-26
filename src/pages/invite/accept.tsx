@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { inviteAuthApi } from "@/api/auth";
 import { useAuth } from "@/providers/use-auth";
-import { AuthShell } from "@/components/auth/auth-shell";
 import { PasswordStrengthIndicator } from "@/components/auth/password-strength-indicator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -112,8 +111,8 @@ export default function AcceptInvitePage() {
 
   if (verifyState.status === "invalid") {
     return (
-      <AuthShell>
-        <div className="space-y-6">
+      <div className="min-h-dvh bg-zinc-50 light flex items-center justify-center px-6 py-8 md:px-8 md:py-10 lg:min-h-dvh">
+        <div className="w-full max-w-[400px] space-y-6">
           <div className="inline-flex size-12 items-center justify-center rounded-full bg-red-50">
             <AlertCircle className="size-5 text-red-600" />
           </div>
@@ -125,15 +124,15 @@ export default function AcceptInvitePage() {
 
           <p className="text-sm text-muted-foreground">Contact your administrator for a new invite.</p>
         </div>
-      </AuthShell>
+      </div>
     );
   }
 
   const { email, role } = verifyState;
 
   return (
-    <AuthShell>
-      <div className="space-y-8">
+    <div className="min-h-dvh bg-zinc-50 light flex items-center justify-center px-6 py-8 md:px-8 md:py-10 lg:min-h-dvh">
+      <div className="w-full max-w-[400px] space-y-8">
         <header className="space-y-2">
           <h1 className="text-2xl font-semibold text-zinc-950">Welcome to Disha</h1>
           <p className="text-sm text-muted-foreground">
@@ -239,6 +238,6 @@ export default function AcceptInvitePage() {
           </form>
         </Form>
       </div>
-    </AuthShell>
+    </div>
   );
 }

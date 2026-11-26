@@ -13,19 +13,52 @@ import { useAuth } from "@/providers/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArchiveConfirmDialog } from "@/components/dialogs/archive-confirm-dialog";
-import { ConfirmDialog } from "@/components/dialogs/confirm-dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 type InviteStatusFilter = "all" | "pending" | "accepted" | "cancelled";
 
 type ApiError = { response?: { data?: { message?: string } } };
 
 const inviteSchema = z.object({
-  email: z.string().email("Enter a valid email"),
+  email: z.email("Enter a valid email"),
   role_id: z.string().min(1, "Select a role"),
 });
 
@@ -71,18 +104,28 @@ function OrgInviteModal({
       toast.success("Invite sent");
     },
     onError: (error) => {
-      toast.error((error as ApiError)?.response?.data?.message ?? "Failed to send invite");
+      toast.error(
+        (error as ApiError)?.response?.data?.message ?? "Failed to send invite",
+      );
     },
   });
 
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-lg border bg-background p-6 shadow-lg">
-        <h2 className="mb-4 text-lg font-semibold">Invite user</h2>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) onClose();
+      }}
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Invite user</DialogTitle>
+        </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit((v) => mutation.mutate(v))} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit((v) => mutation.mutate(v))}
+            className="space-y-4"
+          >
             <FormField
               control={form.control}
               name="email"
@@ -90,7 +133,11 @@ function OrgInviteModal({
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="user@example.com" {...field} />
+                    <Input
+                      type="email"
+                      placeholder="user@example.com"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -123,18 +170,20 @@ function OrgInviteModal({
                 </FormItem>
               )}
             />
-            <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
-              </Button>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="secondary" type="button">
+                  Cancel
+                </Button>
+              </DialogClose>
               <Button type="submit" disabled={mutation.isPending}>
                 {mutation.isPending ? "Sending…" : "Send invite"}
               </Button>
-            </div>
+            </DialogFooter>
           </form>
         </Form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -145,19 +194,26 @@ export default function OrgUsersSection({ orgId }: { orgId: string }) {
   const [archiveUser, setArchiveUser] = useState<ConsultancyUser | null>(null);
   const [cancelInvite, setCancelInvite] = useState<Invite | null>(null);
   const [resendInvite, setResendInvite] = useState<Invite | null>(null);
-  const [inviteStatusFilter, setInviteStatusFilter] = useState<InviteStatusFilter>("all");
+  const [inviteStatusFilter, setInviteStatusFilter] =
+    useState<InviteStatusFilter>("all");
 
   const canInvite = hasPermission("org_user:invite");
   const canListInvites = hasPermission("org_user:list_invites");
 
   const { data: usersResponse, isLoading: usersLoading } = useQuery({
     queryKey: ["org-users", orgId],
-    queryFn: () => usersApi.listUsers({ page: 1, limit: 100, org_id: orgId }).then((r) => r.data),
+    queryFn: () =>
+      usersApi
+        .listUsers({ page: 1, limit: 100, org_id: orgId })
+        .then((r) => r.data),
   });
 
   const { data: invites, isLoading: invitesLoading } = useQuery({
     queryKey: ["org-invites", orgId],
-    queryFn: () => invitesApi.listInvites({ invite_type: "org_user", scope_id: orgId }).then((r) => r.data),
+    queryFn: () =>
+      invitesApi
+        .listInvites({ invite_type: "org_user", scope_id: orgId })
+        .then((r) => r.data),
     enabled: canListInvites,
   });
 
@@ -172,7 +228,10 @@ export default function OrgUsersSection({ orgId }: { orgId: string }) {
       setArchiveUser(null);
     },
     onError: (error) => {
-      toast.error((error as ApiError)?.response?.data?.message ?? "Failed to archive user");
+      toast.error(
+        (error as ApiError)?.response?.data?.message ??
+          "Failed to archive user",
+      );
     },
   });
 
@@ -183,7 +242,10 @@ export default function OrgUsersSection({ orgId }: { orgId: string }) {
       queryClient.invalidateQueries({ queryKey: ["org-users", orgId] });
     },
     onError: (error) => {
-      toast.error((error as ApiError)?.response?.data?.message ?? "Failed to unarchive user");
+      toast.error(
+        (error as ApiError)?.response?.data?.message ??
+          "Failed to unarchive user",
+      );
     },
   });
 
@@ -195,7 +257,10 @@ export default function OrgUsersSection({ orgId }: { orgId: string }) {
       setCancelInvite(null);
     },
     onError: (error) => {
-      toast.error((error as ApiError)?.response?.data?.message ?? "Failed to cancel invite");
+      toast.error(
+        (error as ApiError)?.response?.data?.message ??
+          "Failed to cancel invite",
+      );
     },
   });
 
@@ -207,22 +272,30 @@ export default function OrgUsersSection({ orgId }: { orgId: string }) {
       setResendInvite(null);
     },
     onError: (error) => {
-      toast.error((error as ApiError)?.response?.data?.message ?? "Failed to resend invite");
+      toast.error(
+        (error as ApiError)?.response?.data?.message ??
+          "Failed to resend invite",
+      );
     },
   });
 
   const currentUserId =
-    (currentUser as { _id?: string; id?: string })?.id ?? (currentUser as { _id?: string })?._id;
+    (currentUser as { _id?: string; id?: string })?.id ??
+    (currentUser as { _id?: string })?._id;
 
   const filteredInvites =
-    inviteStatusFilter === "all" ? inviteList : inviteList.filter((inv) => inv.status === inviteStatusFilter);
+    inviteStatusFilter === "all"
+      ? inviteList
+      : inviteList.filter((inv) => inv.status === inviteStatusFilter);
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold">Users</h2>
-          <p className="text-sm text-muted-foreground">Members and pending invites for this organization.</p>
+          <p className="text-sm text-muted-foreground">
+            Members and pending invites for this organization.
+          </p>
         </div>
         {canInvite && (
           <Button onClick={() => setInviteOpen(true)}>
@@ -247,41 +320,53 @@ export default function OrgUsersSection({ orgId }: { orgId: string }) {
             </div>
           )}
           {!usersLoading && userList.length === 0 && (
-            <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">No users yet.</p>
+            <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
+              No users yet.
+            </p>
           )}
           {!usersLoading && userList.length > 0 && (
             <div className="rounded-lg border">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b bg-muted/50">
-                    <th className="px-4 py-3 text-left font-medium">Email</th>
-                    <th className="px-4 py-3 text-left font-medium">Role</th>
-                    <th className="px-4 py-3 text-left font-medium">Member since</th>
-                    <th className="px-4 py-3 text-right font-medium">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Member since</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {userList.map((u) => {
                     const isSelf = u._id === currentUserId;
                     const roleNames = (u.role_ids ?? [])
                       .map((r) => (typeof r === "string" ? null : r.name))
                       .filter((name): name is string => Boolean(name));
                     const canShowActions =
-                      !isSelf && (hasPermission("org_user:archive") || hasPermission("org_user:unarchive"));
+                      !isSelf &&
+                      (hasPermission("org_user:archive") ||
+                        hasPermission("org_user:unarchive"));
 
                     return (
-                      <tr
+                      <TableRow
                         key={u._id}
-                        className={`border-b last:border-b-0 hover:bg-muted/30 ${u.is_archived ? "opacity-50" : ""}`}
+                        className={`hover:bg-muted/30 ${
+                          u.is_archived ? "opacity-50" : ""
+                        }`}
                       >
-                        <td className={`px-4 py-3 font-medium ${u.is_archived ? "line-through" : ""}`}>{u.email}</td>
-                        <td className="px-4 py-3 text-muted-foreground">
+                        <TableCell
+                          className={`font-medium ${u.is_archived ? "line-through" : ""}`}
+                        >
+                          {u.email}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
                           {roleNames.length > 0 ? roleNames.join(", ") : "—"}
-                        </td>
-                        <td className="px-4 py-3 text-muted-foreground">
-                          {u.created_at ? format(new Date(u.created_at), "MMM d, yyyy") : "—"}
-                        </td>
-                        <td className="px-4 py-3 text-right">
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {u.created_at
+                            ? format(new Date(u.created_at), "MMM d, yyyy")
+                            : "—"}
+                        </TableCell>
+                        <TableCell className="text-right">
                           {canShowActions && (
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -290,23 +375,33 @@ export default function OrgUsersSection({ orgId }: { orgId: string }) {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                {hasPermission("org_user:archive") && !u.is_archived && (
-                                  <DropdownMenuItem onClick={() => setArchiveUser(u)}>Archive</DropdownMenuItem>
-                                )}
-                                {hasPermission("org_user:unarchive") && u.is_archived && (
-                                  <DropdownMenuItem onClick={() => unarchiveUserMutation.mutate(u._id)}>
-                                    Unarchive
-                                  </DropdownMenuItem>
-                                )}
+                                {hasPermission("org_user:archive") &&
+                                  !u.is_archived && (
+                                    <DropdownMenuItem
+                                      onClick={() => setArchiveUser(u)}
+                                    >
+                                      Archive
+                                    </DropdownMenuItem>
+                                  )}
+                                {hasPermission("org_user:unarchive") &&
+                                  u.is_archived && (
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        unarchiveUserMutation.mutate(u._id)
+                                      }
+                                    >
+                                      Unarchive
+                                    </DropdownMenuItem>
+                                  )}
                               </DropdownMenuContent>
                             </DropdownMenu>
                           )}
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     );
                   })}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
           )}
         </TabsContent>
@@ -320,7 +415,9 @@ export default function OrgUsersSection({ orgId }: { orgId: string }) {
           {canListInvites && (
             <Tabs
               value={inviteStatusFilter}
-              onValueChange={(v) => setInviteStatusFilter(v as InviteStatusFilter)}
+              onValueChange={(v) =>
+                setInviteStatusFilter(v as InviteStatusFilter)
+              }
             >
               <TabsList>
                 <TabsTrigger value="all">All</TabsTrigger>
@@ -339,58 +436,76 @@ export default function OrgUsersSection({ orgId }: { orgId: string }) {
                 )}
                 {!invitesLoading && filteredInvites.length === 0 && (
                   <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
-                    {inviteStatusFilter === "all" ? "No invites." : `No ${inviteStatusFilter} invites.`}
+                    {inviteStatusFilter === "all"
+                      ? "No invites."
+                      : `No ${inviteStatusFilter} invites.`}
                   </p>
                 )}
                 {!invitesLoading && filteredInvites.length > 0 && (
                   <div className="rounded-lg border">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b bg-muted/50">
-                          <th className="px-4 py-3 text-left font-medium">Email</th>
-                          <th className="px-4 py-3 text-left font-medium">Role</th>
-                          <th className="px-4 py-3 text-left font-medium">Status</th>
-                          <th className="px-4 py-3 text-left font-medium">Invited by</th>
-                          <th className="px-4 py-3 text-left font-medium">Expires at</th>
-                          <th className="px-4 py-3 text-right font-medium">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Role</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Invited by</TableHead>
+                          <TableHead>Expires at</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
                         {filteredInvites.map((inv) => {
                           const status = inv.status ?? "pending";
-                          const hasCancel = status === "pending" && hasPermission("org_user:cancel_invite");
-                          const hasResend = status === "cancelled" && hasPermission("org_user:resend_invite");
+                          const hasCancel =
+                            status === "pending" &&
+                            hasPermission("org_user:cancel_invite");
+                          const hasResend =
+                            status === "cancelled" &&
+                            hasPermission("org_user:resend_invite");
 
                           return (
-                            <tr key={inv._id} className="border-b last:border-b-0 hover:bg-muted/30">
-                              <td className="px-4 py-3 font-medium">{inv.email}</td>
-                              <td className="px-4 py-3 text-muted-foreground">{inv.role_id?.name ?? "—"}</td>
-                              <td className="px-4 py-3">
+                            <TableRow key={inv._id}>
+                              <TableCell className="font-medium">
+                                {inv.email}
+                              </TableCell>
+                              <TableCell className="text-muted-foreground">
+                                {inv.role_id?.name ?? "—"}
+                              </TableCell>
+                              <TableCell>
                                 <span
                                   className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
                                     status === "pending"
                                       ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
                                       : status === "accepted"
-                                      ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
-                                      : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"
+                                        ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
+                                        : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"
                                   }`}
                                 >
-                                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                                  {status.charAt(0).toUpperCase() +
+                                    status.slice(1)}
                                 </span>
-                              </td>
-                              <td className="px-4 py-3 text-muted-foreground">{inv.invited_by?.email ?? "—"}</td>
-                              <td className="px-4 py-3 text-muted-foreground">
-                                {inv.expires_at && status === "pending" && new Date(inv.expires_at) < new Date() ? (
+                              </TableCell>
+                              <TableCell className="text-muted-foreground">
+                                {inv.invited_by?.email ?? "—"}
+                              </TableCell>
+                              <TableCell className="text-muted-foreground">
+                                {inv.expires_at &&
+                                status === "pending" &&
+                                new Date(inv.expires_at) < new Date() ? (
                                   <span className="inline-flex rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
                                     Expired
                                   </span>
                                 ) : inv.expires_at ? (
-                                  format(new Date(inv.expires_at), "dd MMM yyyy, hh:mm a")
+                                  format(
+                                    new Date(inv.expires_at),
+                                    "dd MMM yyyy, hh:mm a",
+                                  )
                                 ) : (
                                   "—"
                                 )}
-                              </td>
-                              <td className="px-4 py-3 text-right">
+                              </TableCell>
+                              <TableCell className="text-right">
                                 {hasCancel || hasResend ? (
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
@@ -400,13 +515,18 @@ export default function OrgUsersSection({ orgId }: { orgId: string }) {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                       {hasCancel && (
-                                        <DropdownMenuItem variant="destructive" onClick={() => setCancelInvite(inv)}>
+                                        <DropdownMenuItem
+                                          variant="destructive"
+                                          onClick={() => setCancelInvite(inv)}
+                                        >
                                           <X className="size-4" />
                                           Cancel invite
                                         </DropdownMenuItem>
                                       )}
                                       {hasResend && (
-                                        <DropdownMenuItem onClick={() => setResendInvite(inv)}>
+                                        <DropdownMenuItem
+                                          onClick={() => setResendInvite(inv)}
+                                        >
                                           <RotateCcw className="size-4" />
                                           Resend invite
                                         </DropdownMenuItem>
@@ -414,14 +534,16 @@ export default function OrgUsersSection({ orgId }: { orgId: string }) {
                                     </DropdownMenuContent>
                                   </DropdownMenu>
                                 ) : (
-                                  <span className="text-muted-foreground">—</span>
+                                  <span className="text-muted-foreground">
+                                    —
+                                  </span>
                                 )}
-                              </td>
-                            </tr>
+                              </TableCell>
+                            </TableRow>
                           );
                         })}
-                      </tbody>
-                    </table>
+                      </TableBody>
+                    </Table>
                   </div>
                 )}
               </div>
@@ -434,38 +556,104 @@ export default function OrgUsersSection({ orgId }: { orgId: string }) {
         open={inviteOpen}
         orgId={orgId}
         onClose={() => setInviteOpen(false)}
-        onSuccess={() => queryClient.invalidateQueries({ queryKey: ["org-invites", orgId] })}
-      />
-
-      <ArchiveConfirmDialog
-        open={!!archiveUser}
-        email={archiveUser?.email ?? ""}
-        isArchiving={archiveUserMutation.isPending}
-        onConfirm={() => archiveUser && archiveUserMutation.mutate(archiveUser._id)}
-        onCancel={() => setArchiveUser(null)}
-      />
-
-      <ConfirmDialog
-        open={!!cancelInvite}
-        title="Cancel invite"
-        message={cancelInvite ? `Cancel the invite sent to ${cancelInvite.email}?` : ""}
-        onConfirm={() => cancelInvite && cancelInviteMutation.mutate(cancelInvite._id)}
-        onCancel={() => setCancelInvite(null)}
-        isLoading={cancelInviteMutation.isPending}
-      />
-
-      <ConfirmDialog
-        open={!!resendInvite}
-        title="Resend invite"
-        message={
-          resendInvite
-            ? `Resend the invite to ${resendInvite.email}? They will receive a new email with the invite link.`
-            : ""
+        onSuccess={() =>
+          queryClient.invalidateQueries({ queryKey: ["org-invites", orgId] })
         }
-        onConfirm={() => resendInvite && resendInviteMutation.mutate(resendInvite)}
-        onCancel={() => setResendInvite(null)}
-        isLoading={resendInviteMutation.isPending}
       />
+
+      <Dialog
+        open={!!archiveUser}
+        onOpenChange={(open) => {
+          if (!open) setArchiveUser(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Archive user</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to archive{" "}
+              {archiveUser?.email ?? "this user"}? They will lose access to the
+              organization.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="secondary">Cancel</Button>
+            </DialogClose>
+            <Button
+              variant="destructive"
+              disabled={archiveUserMutation.isPending}
+              onClick={() =>
+                archiveUser && archiveUserMutation.mutate(archiveUser._id)
+              }
+            >
+              {archiveUserMutation.isPending ? "Archiving…" : "Archive"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={!!cancelInvite}
+        onOpenChange={(open) => {
+          if (!open) setCancelInvite(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel invite</DialogTitle>
+            <DialogDescription>
+              {cancelInvite
+                ? `Cancel the invite sent to ${cancelInvite.email}?`
+                : ""}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="secondary">Cancel</Button>
+            </DialogClose>
+            <Button
+              disabled={cancelInviteMutation.isPending}
+              onClick={() =>
+                cancelInvite && cancelInviteMutation.mutate(cancelInvite._id)
+              }
+            >
+              {cancelInviteMutation.isPending ? "Cancelling…" : "Cancel invite"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={!!resendInvite}
+        onOpenChange={(open) => {
+          if (!open) setResendInvite(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Resend invite</DialogTitle>
+            <DialogDescription>
+              {resendInvite
+                ? `Resend the invite to ${resendInvite.email}? They will receive a new email with the invite link.`
+                : ""}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="secondary">Cancel</Button>
+            </DialogClose>
+            <Button
+              disabled={resendInviteMutation.isPending}
+              onClick={() =>
+                resendInvite && resendInviteMutation.mutate(resendInvite)
+              }
+            >
+              {resendInviteMutation.isPending ? "Resending…" : "Resend invite"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

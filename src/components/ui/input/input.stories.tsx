@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Input } from "./input";
+import { Input, PasswordInput } from "./input";
 import { Label } from "@/components/ui/label";
 import { Search, Calendar } from "lucide-react";
 
@@ -135,6 +135,23 @@ export const TrailingIcon: Story = {
     <div className="relative w-80">
       <Input className="pr-10" defaultValue="01 Apr 2019" />
       <Calendar className="pointer-events-none absolute right-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+    </div>
+  ),
+};
+
+/** Password field with show/hide toggle icon. */
+export const PasswordToggle: Story = {
+  render: () => (
+    <div className="w-80 space-y-2">
+      <Label htmlFor="input-password">Password</Label>
+      <PasswordInput
+        id="input-password"
+        placeholder="••••••••"
+        aria-describedby="input-password-helper"
+      />
+      <p id="input-password-helper" className="text-xs leading-4 text-muted-foreground">
+        At least 8 characters.
+      </p>
     </div>
   ),
 };

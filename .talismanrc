@@ -23,4 +23,16 @@ fileignoreconfig:
   checksum: df22ce7b93b54682119f187a39ba18712af4daa7526dd0e4e62e64f1997672fe
 - filename: src/pages/login.tsx
   checksum: 17497c93f94373e96e6402e6e3b5982f74c225e87a555a64364037e44b6d2231
+- filename: src/pages/forgot-password.tsx
+  checksum: be27c81204dd07de8e5dca1470dbbce1e55f7d021da88cd5d0ebe80bc231a558
+- filename: src/pages/reset-password.tsx
+  checksum: c57f72dab5cab109871c120cc901cec0100cbe667e066a7eb5db85ef6412f657
+- filename: src/components/ui/input/input.stories.tsx
+  checksum: 9f5c90ac3d47730443ad96c34dfb14eab33437dafe6b3aafc7163af48eb03f3e
+- filename: src/components/ui/input/input.tsx
+  checksum: ec54543bbb283b6b92a6361cf7a3984344e3ec0057330cf211ac80eeb0919526
+- filename: src/pages/organizations/detail/users-section.tsx
+  checksum: 1f05626ce6d3b267acb4700c1d3272e67c58cd4e452e098d70de0841646dd03a
+- filename: src/pages/users/index.tsx
+  checksum: 3c33dc32156cebf1a53942a26b043bdbca5d547b16e3f56b43dfcc33829db3fc
 version: "1.0"

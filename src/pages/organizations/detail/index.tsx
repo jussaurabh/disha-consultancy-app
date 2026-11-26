@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { Link, useParams, useSearchParams, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useParams,
+  useSearchParams,
+  useNavigate,
+} from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Building2, Pencil, Ellipsis } from "lucide-react";
 import { toast } from "sonner";
@@ -16,7 +21,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown";
-import { ConfirmDialog } from "@/components/dialogs/confirm-dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { CompanyDetailsSection } from "./company-section";
 import { ContactSection } from "./contact-section";
 import { BankSection } from "./bank-section";
@@ -72,8 +85,8 @@ export default function OrganizationDetailPage() {
     },
     onError: (error) => {
       toast.error(
-        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ??
-          "Failed to delete organization",
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message ?? "Failed to delete organization",
       );
     },
   });
@@ -178,7 +191,10 @@ export default function OrganizationDetailPage() {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem variant="destructive" onClick={() => setDeleteOpen(true)}>
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onClick={() => setDeleteOpen(true)}
+                  >
                     Delete organization
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -283,7 +299,11 @@ export default function OrganizationDetailPage() {
         )}
         {tab === "settings" && (
           <div className="px-4 pt-8 pb-14 md:px-6">
-            <SettingsSection org={org} canDelete={canDelete} onDelete={() => setDeleteOpen(true)} />
+            <SettingsSection
+              org={org}
+              canDelete={canDelete}
+              onDelete={() => setDeleteOpen(true)}
+            />
           </div>
         )}
         {tab === "users" && (
@@ -293,15 +313,34 @@ export default function OrganizationDetailPage() {
         )}
       </div>
 
-      <ConfirmDialog
+      <Dialog
         open={deleteOpen}
-        title="Delete organization"
-        message={`Delete ${org.company_name}? This permanently removes the organization and its users. This action cannot be undone.`}
-        destructive
-        isLoading={deleteMutation.isPending}
-        onConfirm={() => deleteMutation.mutate()}
-        onCancel={() => setDeleteOpen(false)}
-      />
+        onOpenChange={(open) => {
+          if (!open) setDeleteOpen(false);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete organization</DialogTitle>
+            <DialogDescription>
+              Delete {org.company_name}? This permanently removes the organization and its users.
+              This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="secondary">Cancel</Button>
+            </DialogClose>
+            <Button
+              variant="destructive"
+              disabled={deleteMutation.isPending}
+              onClick={() => deleteMutation.mutate()}
+            >
+              {deleteMutation.isPending ? "Deleting…" : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
