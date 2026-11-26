@@ -23,6 +23,7 @@ import { BankSection } from "./bank-section";
 import { PayrollSection } from "./payroll-section";
 import { PfSection } from "./pf-section";
 import { EsiSection } from "./esi-section";
+import { SettingsSection } from "./settings-section";
 import { StatsRail } from "./detail-shared";
 import { SECTIONS, type SectionId } from "./sections";
 
@@ -277,6 +278,11 @@ export default function OrganizationDetailPage() {
               onEditOpen={() => setIsEditing(true)}
               onEditClose={() => setIsEditing(false)}
             />
+          </div>
+        )}
+        {tab === "settings" && (
+          <div className="px-4 pt-8 pb-14 md:px-6">
+            <SettingsSection org={org} canDelete={canDelete} onDelete={() => setDeleteOpen(true)} />
           </div>
         )}
       </div>
