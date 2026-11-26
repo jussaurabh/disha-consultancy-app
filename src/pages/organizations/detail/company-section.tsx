@@ -1,17 +1,13 @@
-import { useState, type ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { orgsApi, type Organization, type UpdateOrgBody } from "@/api/orgs";
+import { type Organization } from "@/api/orgs";
 import {
   COMPANY_VIEW_OPTIONS,
   EST_TYPE_OPTIONS,
   RULE_TYPE_OPTIONS,
   STATES_OPTIONS,
 } from "@/lib/org-options";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Form,
@@ -28,10 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  DetailSection,
-  DetailSectionAction,
-} from "@/components/ui/detail-section";
+import { DetailSection } from "@/components/ui/detail-section";
 import { Badge } from "@/components/ui/badge";
 import { DetailRow, DetailRowValue, SectionBandActions } from "./detail-shared";
 import { useOrgSectionMutation } from "./use-org-section-mutation";

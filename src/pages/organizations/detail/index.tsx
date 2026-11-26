@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link, useParams, useSearchParams, useNavigate } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Building2, Pencil, Ellipsis } from "lucide-react";
 import { toast } from "sonner";
-import { orgsApi, type Organization, type UpdateOrgBody } from "@/api/orgs";
+import { orgsApi } from "@/api/orgs";
 import { usersApi } from "@/api/users";
 import { useAuth } from "@/providers/use-auth";
 import { Button } from "@/components/ui/button";
