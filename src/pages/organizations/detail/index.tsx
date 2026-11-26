@@ -24,6 +24,7 @@ import { PayrollSection } from "./payroll-section";
 import { PfSection } from "./pf-section";
 import { EsiSection } from "./esi-section";
 import { SettingsSection } from "./settings-section";
+import OrgUsersSection from "./users-section";
 import { StatsRail } from "./detail-shared";
 import { SECTIONS, type SectionId } from "./sections";
 
@@ -283,6 +284,11 @@ export default function OrganizationDetailPage() {
         {tab === "settings" && (
           <div className="px-4 pt-8 pb-14 md:px-6">
             <SettingsSection org={org} canDelete={canDelete} onDelete={() => setDeleteOpen(true)} />
+          </div>
+        )}
+        {tab === "users" && (
+          <div className="px-4 pt-8 pb-14 md:px-6">
+            <OrgUsersSection orgId={org._id} />
           </div>
         )}
       </div>

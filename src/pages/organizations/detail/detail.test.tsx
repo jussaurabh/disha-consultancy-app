@@ -165,6 +165,14 @@ describe("OrganizationDetailPage — tabs", () => {
     expect(screen.queryByRole("tab", { name: /users/i })).not.toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /settings/i })).toBeInTheDocument();
   });
+
+  it("renders the users management section on the Users tab", async () => {
+    const user = userEvent.setup();
+    renderDetailPage();
+    await screen.findByRole("tab", { name: /company/i });
+    await user.click(screen.getByRole("tab", { name: /users/i }));
+    expect(await screen.findByRole("button", { name: /invite user/i })).toBeInTheDocument();
+  });
 });
 
 describe("OrganizationDetailPage — company details", () => {
