@@ -21,6 +21,7 @@ import { CompanyDetailsSection } from "./company-section";
 import { ContactSection } from "./contact-section";
 import { BankSection } from "./bank-section";
 import { PayrollSection } from "./payroll-section";
+import { PfSection } from "./pf-section";
 import { StatsRail } from "./detail-shared";
 import { SECTIONS, type SectionId } from "./sections";
 
@@ -247,6 +248,17 @@ export default function OrganizationDetailPage() {
         {tab === "payroll" && (
           <div className="px-4 pt-8 pb-14 md:px-6">
             <PayrollSection
+              org={org}
+              canEdit={canEdit}
+              isEditing={isEditing}
+              onEditOpen={() => setIsEditing(true)}
+              onEditClose={() => setIsEditing(false)}
+            />
+          </div>
+        )}
+        {tab === "pf" && (
+          <div className="px-4 pt-8 pb-14 md:px-6">
+            <PfSection
               org={org}
               canEdit={canEdit}
               isEditing={isEditing}
