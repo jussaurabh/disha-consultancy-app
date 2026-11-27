@@ -177,38 +177,6 @@ export default function OrganizationDetailPage() {
             name={org.company_name}
             badge={statusBadge}
           />
-          <SecondaryHeader.Actions>
-            {canDelete && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    type="button"
-                    data-slot="detail-more"
-                    aria-label="More actions"
-                    className="flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-ground"
-                  >
-                    <Ellipsis className="size-[15px] text-muted" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    variant="destructive"
-                    onClick={() => setDeleteOpen(true)}
-                  >
-                    Delete organization
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-            <Button
-              size="sm"
-              disabled={!canEdit}
-              onClick={() => setIsEditing(true)}
-            >
-              <Pencil />
-              Edit organization
-            </Button>
-          </SecondaryHeader.Actions>
         </SecondaryHeader>
 
         {/* Section tabs */}
@@ -323,8 +291,8 @@ export default function OrganizationDetailPage() {
           <DialogHeader>
             <DialogTitle>Delete organization</DialogTitle>
             <DialogDescription>
-              Delete {org.company_name}? This permanently removes the organization and its users.
-              This action cannot be undone.
+              Delete {org.company_name}? This permanently removes the
+              organization and its users. This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

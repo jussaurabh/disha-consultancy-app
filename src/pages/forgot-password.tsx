@@ -7,11 +7,18 @@ import { useMutation } from "@tanstack/react-query";
 import { passwordResetApi } from "@/api/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { ArrowLeft, Loader2, Mail } from "lucide-react";
 
 const schema = z.object({
-  email: z.string().email("Please enter a valid email"),
+  email: z.email("Please enter a valid email"),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -25,7 +32,8 @@ export default function ForgotPasswordPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: ({ email }: FormValues) => passwordResetApi.forgotPassword(email),
+    mutationFn: ({ email }: FormValues) =>
+      passwordResetApi.forgotPassword(email),
     onSuccess: () => setSubmitted(true),
   });
 
@@ -38,9 +46,12 @@ export default function ForgotPasswordPage() {
           </div>
 
           <header className="space-y-2">
-            <h1 className="text-2xl font-semibold text-zinc-950">Check your email</h1>
+            <h1 className="text-2xl font-semibold text-zinc-950">
+              Check your email
+            </h1>
             <p className="text-sm text-muted-foreground">
-              If that email exists in our system, a password reset link has been sent.
+              If that email exists in our system, a password reset link has been
+              sent.
             </p>
           </header>
 
@@ -72,7 +83,9 @@ export default function ForgotPasswordPage() {
         </Link>
 
         <header className="space-y-2">
-          <h1 className="text-2xl font-semibold text-zinc-950">Forgot your password?</h1>
+          <h1 className="text-2xl font-semibold text-zinc-950">
+            Forgot your password?
+          </h1>
           <p className="text-sm text-muted-foreground">
             No worries. Enter your email and we&apos;ll send you a reset link.
           </p>
@@ -104,7 +117,11 @@ export default function ForgotPasswordPage() {
             />
 
             {mutation.isError && (
-              <p role="alert" aria-live="polite" className="text-[13px] text-destructive">
+              <p
+                role="alert"
+                aria-live="polite"
+                className="text-[13px] text-destructive"
+              >
                 Something went wrong. Please try again.
               </p>
             )}
@@ -114,7 +131,9 @@ export default function ForgotPasswordPage() {
               className="h-10 w-full bg-[#EE3338] text-white hover:bg-[#D42D31]"
               disabled={mutation.isPending}
             >
-              {mutation.isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
+              {mutation.isPending && (
+                <Loader2 className="mr-2 size-4 animate-spin" />
+              )}
               {mutation.isPending ? "Sending reset link..." : "Send reset link"}
             </Button>
           </form>

@@ -16,7 +16,7 @@ import { useOrgSectionMutation } from "./use-org-section-mutation";
 import { SECTION_COPY } from "./sections";
 
 const contactSchema = z.object({
-  email: z.string().email("Invalid email").optional(),
+  email: z.email("Invalid email").optional(),
   phone_no: z.string().optional(),
   address: z.string().optional(),
   branch_location: z.string().optional(),
@@ -184,25 +184,39 @@ export function ContactSection({
           ) : (
             <div>
               <DetailRow label="Email">
-                <DetailRowValue muted={!org.email}>{org.email ?? "—"}</DetailRowValue>
+                <DetailRowValue muted={!org.email}>
+                  {org.email ?? "—"}
+                </DetailRowValue>
               </DetailRow>
               <DetailRow label="Phone number">
-                <DetailRowValue muted={!org.phone_no}>{org.phone_no ?? "—"}</DetailRowValue>
+                <DetailRowValue muted={!org.phone_no}>
+                  {org.phone_no ?? "—"}
+                </DetailRowValue>
               </DetailRow>
               <DetailRow label="Address">
-                <DetailRowValue muted={!org.address}>{org.address ?? "—"}</DetailRowValue>
+                <DetailRowValue muted={!org.address}>
+                  {org.address ?? "—"}
+                </DetailRowValue>
               </DetailRow>
               <DetailRow label="Branch / Location">
-                <DetailRowValue muted={!org.branch_location}>{org.branch_location ?? "—"}</DetailRowValue>
+                <DetailRowValue muted={!org.branch_location}>
+                  {org.branch_location ?? "—"}
+                </DetailRowValue>
               </DetailRow>
               <DetailRow label="City">
-                <DetailRowValue muted={!org.city}>{org.city ?? "—"}</DetailRowValue>
+                <DetailRowValue muted={!org.city}>
+                  {org.city ?? "—"}
+                </DetailRowValue>
               </DetailRow>
               <DetailRow label="District">
-                <DetailRowValue muted={!org.district}>{org.district ?? "—"}</DetailRowValue>
+                <DetailRowValue muted={!org.district}>
+                  {org.district ?? "—"}
+                </DetailRowValue>
               </DetailRow>
               <DetailRow label="Pincode">
-                <DetailRowValue muted={!org.pincode}>{org.pincode ?? "—"}</DetailRowValue>
+                <DetailRowValue muted={!org.pincode}>
+                  {org.pincode ?? "—"}
+                </DetailRowValue>
               </DetailRow>
             </div>
           )}

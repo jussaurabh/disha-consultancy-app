@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Checkbox } from "./checkbox"
+import { CheckboxBox } from "./checkbox-box"
 import { Label } from "@/components/ui/label"
 import {
   Card,
@@ -357,4 +358,133 @@ export const OnlySelection: Story = {
       </Block>
     </Screen>
   ),
+}
+
+/** Boxed checkbox — clickable box with embedded checkbox, for permission pickers. */
+function BoxedStatesFn() {
+  return (
+    <div className="flex flex-col">
+      <Row label="Boxed · unchecked" note="White bg · line border · empty checkbox">
+        <State label="Default">
+          <CheckboxBox aria-label="Archive org employee" />
+        </State>
+        <State label="Disabled">
+          <CheckboxBox disabled aria-label="Locked" />
+        </State>
+      </Row>
+      <Row label="Boxed · checked" note="Accent-soft bg · accent border · white check on accent">
+        <State label="Checked">
+          <CheckboxBox checked aria-label="Archive org employee" />
+        </State>
+        <State label="Disabled · checked">
+          <CheckboxBox disabled checked aria-label="Locked" />
+        </State>
+      </Row>
+    </div>
+  )
+}
+
+/** Boxed checkbox with labels — used in permission pickers. */
+function BoxedWithLabelFn() {
+  return (
+    <div className="flex flex-col">
+      <Row label="Boxed with label" note="Click anywhere on the box to toggle">
+        <div className="flex flex-wrap gap-3">
+          <CheckboxBox checked aria-label="Archive org employee">
+            Archive org employee
+          </CheckboxBox>
+          <CheckboxBox aria-label="Create org employee">
+            Create org employee
+          </CheckboxBox>
+          <CheckboxBox aria-label="Delete org employee">
+            Delete org employee
+          </CheckboxBox>
+          <CheckboxBox aria-label="List org employees">
+            List org employees
+          </CheckboxBox>
+          <CheckboxBox aria-label="View org employee">
+            View org employee
+          </CheckboxBox>
+          <CheckboxBox aria-label="Update org employee">
+            Update org employee
+          </CheckboxBox>
+        </div>
+      </Row>
+      <Row label="Boxed in group" note="Org user group · 5/11 selected (indeterminate header)">
+        <div className="flex flex-wrap gap-3">
+          <CheckboxBox checked aria-label="Archive org user">
+            Archive org user
+          </CheckboxBox>
+          <CheckboxBox checked aria-label="Assign org user role">
+            Assign org user role
+          </CheckboxBox>
+          <CheckboxBox checked aria-label="Cancel org user invite">
+            Cancel org user invite
+          </CheckboxBox>
+          <CheckboxBox checked aria-label="Delete org user">
+            Delete org user
+          </CheckboxBox>
+          <CheckboxBox checked aria-label="Invite org user">
+            Invite org user
+          </CheckboxBox>
+          <CheckboxBox aria-label="List org users">
+            List org users
+          </CheckboxBox>
+          <CheckboxBox aria-label="List org user invites">
+            List org user invites
+          </CheckboxBox>
+          <CheckboxBox aria-label="View org user">
+            View org user
+          </CheckboxBox>
+          <CheckboxBox aria-label="Resend org user invite">
+            Resend org user invite
+          </CheckboxBox>
+          <CheckboxBox aria-label="Unarchive org user">
+            Unarchive org user
+          </CheckboxBox>
+          <CheckboxBox aria-label="Update org user">
+            Update org user
+          </CheckboxBox>
+        </div>
+      </Row>
+    </div>
+  )
+}
+
+export const BoxedStates: Story = {
+  render: () => (
+    <Screen>
+      <Block title="Boxed checkbox states">
+        <BoxedStatesFn />
+      </Block>
+    </Screen>
+  ),
+}
+
+export const BoxedWithLabel: Story = {
+  render: () => (
+    <Screen>
+      <Block title="Boxed checkbox with labels">
+        <BoxedWithLabelFn />
+      </Block>
+    </Screen>
+  ),
+}
+
+export const BoxedPlayground: Story = {
+  render: (args) => (
+    <div className="flex min-h-52 items-center justify-center bg-background p-10">
+      <CheckboxBox
+        id="playground-boxed"
+        checked={args.checked === true}
+        disabled={args.disabled}
+      >
+        Enable feature
+      </CheckboxBox>
+    </div>
+  ),
+  args: {
+    checked: false,
+    disabled: false,
+  },
 }

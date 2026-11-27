@@ -442,109 +442,105 @@ export default function OrgUsersSection({ orgId }: { orgId: string }) {
                   </p>
                 )}
                 {!invitesLoading && filteredInvites.length > 0 && (
-                  <div className="rounded-lg border">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Email</TableHead>
-                          <TableHead>Role</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Invited by</TableHead>
-                          <TableHead>Expires at</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {filteredInvites.map((inv) => {
-                          const status = inv.status ?? "pending";
-                          const hasCancel =
-                            status === "pending" &&
-                            hasPermission("org_user:cancel_invite");
-                          const hasResend =
-                            status === "cancelled" &&
-                            hasPermission("org_user:resend_invite");
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Role</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Invited by</TableHead>
+                        <TableHead>Expires at</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredInvites.map((inv) => {
+                        const status = inv.status ?? "pending";
+                        const hasCancel =
+                          status === "pending" &&
+                          hasPermission("org_user:cancel_invite");
+                        const hasResend =
+                          status === "cancelled" &&
+                          hasPermission("org_user:resend_invite");
 
-                          return (
-                            <TableRow key={inv._id}>
-                              <TableCell className="font-medium">
-                                {inv.email}
-                              </TableCell>
-                              <TableCell className="text-muted-foreground">
-                                {inv.role_id?.name ?? "—"}
-                              </TableCell>
-                              <TableCell>
-                                <span
-                                  className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                                    status === "pending"
-                                      ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
-                                      : status === "accepted"
-                                        ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
-                                        : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"
-                                  }`}
-                                >
-                                  {status.charAt(0).toUpperCase() +
-                                    status.slice(1)}
+                        return (
+                          <TableRow key={inv._id}>
+                            <TableCell className="font-medium">
+                              {inv.email}
+                            </TableCell>
+                            <TableCell className="text-muted-foreground">
+                              {inv.role_id?.name ?? "—"}
+                            </TableCell>
+                            <TableCell>
+                              <span
+                                className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
+                                  status === "pending"
+                                    ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
+                                    : status === "accepted"
+                                      ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
+                                      : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"
+                                }`}
+                              >
+                                {status.charAt(0).toUpperCase() +
+                                  status.slice(1)}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-muted-foreground">
+                              {inv.invited_by?.email ?? "—"}
+                            </TableCell>
+                            <TableCell className="text-muted-foreground">
+                              {inv.expires_at &&
+                              status === "pending" &&
+                              new Date(inv.expires_at) < new Date() ? (
+                                <span className="inline-flex rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
+                                  Expired
                                 </span>
-                              </TableCell>
-                              <TableCell className="text-muted-foreground">
-                                {inv.invited_by?.email ?? "—"}
-                              </TableCell>
-                              <TableCell className="text-muted-foreground">
-                                {inv.expires_at &&
-                                status === "pending" &&
-                                new Date(inv.expires_at) < new Date() ? (
-                                  <span className="inline-flex rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
-                                    Expired
-                                  </span>
-                                ) : inv.expires_at ? (
-                                  format(
-                                    new Date(inv.expires_at),
-                                    "dd MMM yyyy, hh:mm a",
-                                  )
-                                ) : (
-                                  "—"
-                                )}
-                              </TableCell>
-                              <TableCell className="text-right">
-                                {hasCancel || hasResend ? (
-                                  <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                      <Button variant="outline" size="sm">
-                                        <MoreHorizontal className="size-4" />
-                                      </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                      {hasCancel && (
-                                        <DropdownMenuItem
-                                          variant="destructive"
-                                          onClick={() => setCancelInvite(inv)}
-                                        >
-                                          <X className="size-4" />
-                                          Cancel invite
-                                        </DropdownMenuItem>
-                                      )}
-                                      {hasResend && (
-                                        <DropdownMenuItem
-                                          onClick={() => setResendInvite(inv)}
-                                        >
-                                          <RotateCcw className="size-4" />
-                                          Resend invite
-                                        </DropdownMenuItem>
-                                      )}
-                                    </DropdownMenuContent>
-                                  </DropdownMenu>
-                                ) : (
-                                  <span className="text-muted-foreground">
-                                    —
-                                  </span>
-                                )}
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })}
-                      </TableBody>
-                    </Table>
-                  </div>
+                              ) : inv.expires_at ? (
+                                format(
+                                  new Date(inv.expires_at),
+                                  "dd MMM yyyy, hh:mm a",
+                                )
+                              ) : (
+                                "—"
+                              )}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {hasCancel || hasResend ? (
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" size="sm">
+                                      <MoreHorizontal className="size-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    {hasCancel && (
+                                      <DropdownMenuItem
+                                        variant="destructive"
+                                        onClick={() => setCancelInvite(inv)}
+                                      >
+                                        <X className="size-4" />
+                                        Cancel invite
+                                      </DropdownMenuItem>
+                                    )}
+                                    {hasResend && (
+                                      <DropdownMenuItem
+                                        onClick={() => setResendInvite(inv)}
+                                      >
+                                        <RotateCcw className="size-4" />
+                                        Resend invite
+                                      </DropdownMenuItem>
+                                    )}
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              ) : (
+                                <span className="text-muted-foreground">—</span>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
                 )}
               </div>
             </Tabs>

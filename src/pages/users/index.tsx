@@ -35,7 +35,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ChangeRoleModal } from "@/components/dialogs/change-role-modal";
 import {
   Dialog,
   DialogClose,
@@ -45,13 +44,104 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const inviteSchema = z.object({
-  email: z.string().email("Enter a valid email"),
+  email: z.email("Enter a valid email"),
   role_id: z.string().min(1, "Select a role"),
 });
 
 type InviteValues = z.infer<typeof inviteSchema>;
+
+function ChangeRoleDialogContent({
+  user,
+  onClose,
+  onSuccess,
+}: {
+  user: ConsultancyUser | null;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const { user: currentUser } = useAuth();
+  const [roleId, setRoleId] = useState(() => {
+    const first = user?.role_ids?.[0];
+    return typeof first === "string" ? first : (first?._id ?? "");
+  });
+
+  const { data: roles } = useQuery({
+    queryKey: ["roles"],
+    queryFn: () =>
+      rolesApi
+        .listRoles({
+          scope: currentUser!.scope,
+          scope_id: currentUser!.scope_id ?? undefined,
+        })
+        .then((r) => r.data),
+    enabled: !!user,
+  });
+
+  const mutation = useMutation({
+    mutationFn: () =>
+      user
+        ? usersApi.updateUserRole(user._id, roleId).then(() => undefined)
+        : Promise.reject(new Error("No user")),
+    onSuccess: () => {
+      onSuccess();
+      onClose();
+    },
+    onError: (error) => {
+      const msg =
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message ?? "Failed to update role";
+      toast.error(msg);
+    },
+  });
+
+  if (!user) return null;
+
+  return (
+    <div className="space-y-4">
+      <Select value={roleId} onValueChange={setRoleId}>
+        <SelectTrigger>
+          <SelectValue placeholder="Select role…" />
+        </SelectTrigger>
+        <SelectContent>
+          {(roles ?? []).map((r) => (
+            <SelectItem key={r._id} value={r._id}>
+              {r.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {mutation.isError && (
+        <p className="text-destructive text-sm">
+          {(
+            mutation.error as {
+              response?: { data?: { message?: string } };
+            }
+          )?.response?.data?.message ?? "Failed to update role."}
+        </p>
+      )}
+      <DialogFooter>
+        <DialogClose asChild>
+          <Button variant="secondary" onClick={onClose}>
+            Cancel
+          </Button>
+        </DialogClose>
+        <Button onClick={() => mutation.mutate()} disabled={mutation.isPending}>
+          {mutation.isPending ? "Saving…" : "Save"}
+        </Button>
+      </DialogFooter>
+    </div>
+  );
+}
 
 function InviteModal({
   open,
@@ -99,12 +189,17 @@ function InviteModal({
     },
   });
 
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-lg border bg-background p-6 shadow-lg">
-        <h2 className="mb-4 text-lg font-semibold">Invite user</h2>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) onClose();
+      }}
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Invite user</DialogTitle>
+        </DialogHeader>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit((v) => mutation.mutate(v))}
@@ -163,18 +258,20 @@ function InviteModal({
                 )?.response?.data?.message ?? "Failed to send invite."}
               </p>
             )}
-            <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
-              </Button>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="secondary" type="button">
+                  Cancel
+                </Button>
+              </DialogClose>
               <Button type="submit" disabled={mutation.isPending}>
                 {mutation.isPending ? "Sending…" : "Send invite"}
               </Button>
-            </div>
+            </DialogFooter>
           </form>
         </Form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -326,98 +423,100 @@ export default function UsersPage() {
             </p>
           )}
           {!usersLoading && userList.length > 0 && (
-            <div className="rounded-lg border">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b bg-muted/50">
-                    <th className="px-4 py-3 text-left font-medium">Email</th>
-                    <th className="px-4 py-3 text-left font-medium">Role</th>
-                    <th className="px-4 py-3 text-left font-medium">
-                      Member since
-                    </th>
-                    <th className="px-4 py-3 text-right font-medium">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {userList.map((u) => {
-                    const isSelf = u._id === currentUserId;
-                    return (
-                      <tr
-                        key={u._id}
-                        className={`border-b last:border-b-0 hover:bg-muted/30 ${u.is_archived ? "opacity-50" : ""}`}
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="px-4 py-3 text-left font-medium">
+                    Email
+                  </TableHead>
+                  <TableHead className="px-4 py-3 text-left font-medium">
+                    Role
+                  </TableHead>
+                  <TableHead className="px-4 py-3 text-left font-medium">
+                    Member since
+                  </TableHead>
+                  <TableHead className="px-4 py-3 text-right font-medium">
+                    Actions
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {userList.map((u) => {
+                  const isSelf = u._id === currentUserId;
+                  return (
+                    <TableRow
+                      key={u._id}
+                      className={` ${u.is_archived ? "opacity-50" : ""}`}
+                    >
+                      <TableCell
+                        className={`px-4 py-3 font-medium ${u.is_archived ? "line-through" : ""}`}
                       >
-                        <td
-                          className={`px-4 py-3 font-medium ${u.is_archived ? "line-through" : ""}`}
-                        >
-                          {u.email}
-                        </td>
-                        <td className="px-4 py-3 text-muted-foreground">
-                          {u.role_ids
-                            ?.map((r) => (typeof r === "string" ? r : r.name))
-                            .join(", ") ?? "—"}
-                        </td>
-                        <td className="px-4 py-3 text-muted-foreground">
-                          {u.created_at
-                            ? new Date(u.created_at).toLocaleDateString()
-                            : "—"}
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          {!isSelf &&
-                            (hasPermission("consultancy_user:edit") ||
-                              hasPermission("consultancy_user:delete") ||
-                              hasPermission("consultancy_user:archive")) && (
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="outline" size="sm">
-                                    <MoreHorizontal className="size-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  {hasPermission("consultancy_user:edit") && (
+                        {u.email}
+                      </TableCell>
+                      <TableCell className="px-4 py-3 text-muted-foreground">
+                        {u.role_ids
+                          ?.map((r) => (typeof r === "string" ? r : r.name))
+                          .join(", ") ?? "—"}
+                      </TableCell>
+                      <TableCell className="px-4 py-3 text-muted-foreground">
+                        {u.created_at
+                          ? new Date(u.created_at).toLocaleDateString()
+                          : "—"}
+                      </TableCell>
+                      <TableCell className="px-4 py-3 text-right">
+                        {!isSelf &&
+                          (hasPermission("consultancy_user:edit") ||
+                            hasPermission("consultancy_user:delete") ||
+                            hasPermission("consultancy_user:archive")) && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="sm">
+                                  <MoreHorizontal className="size-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                {hasPermission("consultancy_user:edit") && (
+                                  <DropdownMenuItem
+                                    onClick={() => setChangeRoleUser(u)}
+                                  >
+                                    Change role
+                                  </DropdownMenuItem>
+                                )}
+                                {hasPermission("consultancy_user:archive") &&
+                                  !u.is_archived && (
                                     <DropdownMenuItem
-                                      onClick={() => setChangeRoleUser(u)}
+                                      onClick={() => setArchiveUser(u)}
                                     >
-                                      Change role
+                                      Archive
                                     </DropdownMenuItem>
                                   )}
-                                  {hasPermission("consultancy_user:archive") &&
-                                    !u.is_archived && (
-                                      <DropdownMenuItem
-                                        onClick={() => setArchiveUser(u)}
-                                      >
-                                        Archive
-                                      </DropdownMenuItem>
-                                    )}
-                                  {hasPermission("consultancy_user:archive") &&
-                                    u.is_archived && (
-                                      <DropdownMenuItem
-                                        onClick={() =>
-                                          unarchiveUserMutation.mutate(u._id)
-                                        }
-                                      >
-                                        Unarchive
-                                      </DropdownMenuItem>
-                                    )}
-                                  {hasPermission("consultancy_user:delete") && (
+                                {hasPermission("consultancy_user:archive") &&
+                                  u.is_archived && (
                                     <DropdownMenuItem
-                                      variant="destructive"
-                                      onClick={() => setDeleteUser(u)}
+                                      onClick={() =>
+                                        unarchiveUserMutation.mutate(u._id)
+                                      }
                                     >
-                                      Delete
+                                      Unarchive
                                     </DropdownMenuItem>
                                   )}
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                                {hasPermission("consultancy_user:delete") && (
+                                  <DropdownMenuItem
+                                    variant="destructive"
+                                    onClick={() => setDeleteUser(u)}
+                                  >
+                                    Delete
+                                  </DropdownMenuItem>
+                                )}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
           )}
         </TabsContent>
 
@@ -452,125 +551,117 @@ export default function UsersPage() {
                   </p>
                 )}
                 {!invitesLoading && filteredInvites.length > 0 && (
-                  <div className="rounded-lg border">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b bg-muted/50">
-                          <th className="px-4 py-3 text-left font-medium">
-                            Email
-                          </th>
-                          <th className="px-4 py-3 text-left font-medium">
-                            Role
-                          </th>
-                          <th className="px-4 py-3 text-left font-medium">
-                            Status
-                          </th>
-                          <th className="px-4 py-3 text-left font-medium">
-                            Invited by
-                          </th>
-                          <th className="px-4 py-3 text-left font-medium">
-                            Expires at
-                          </th>
-                          <th className="px-4 py-3 text-right font-medium">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredInvites.map((inv) => {
-                          const status = inv.status ?? "pending";
-                          const hasActions =
-                            status === "pending" &&
-                            hasPermission("invite:cancel");
-                          const hasResend =
-                            status === "cancelled" &&
-                            hasPermission("consultancy_user:invite");
-                          const showActionsDropdown = hasActions || hasResend;
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-b">
+                        <TableHead className="px-4 py-3 text-left font-medium">
+                          Email
+                        </TableHead>
+                        <TableHead className="px-4 py-3 text-left font-medium">
+                          Role
+                        </TableHead>
+                        <TableHead className="px-4 py-3 text-left font-medium">
+                          Status
+                        </TableHead>
+                        <TableHead className="px-4 py-3 text-left font-medium">
+                          Invited by
+                        </TableHead>
+                        <TableHead className="px-4 py-3 text-left font-medium">
+                          Expires at
+                        </TableHead>
+                        <TableHead className="px-4 py-3 text-right font-medium">
+                          Actions
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredInvites.map((inv) => {
+                        const status = inv.status ?? "pending";
+                        const hasCancel =
+                          status === "pending" &&
+                          hasPermission("invite:cancel");
+                        const hasResend =
+                          status === "cancelled" &&
+                          hasPermission("consultancy_user:invite");
 
-                          return (
-                            <tr
-                              key={inv._id}
-                              className="border-b last:border-b-0 hover:bg-muted/30"
-                            >
-                              <td className="px-4 py-3 font-medium">
-                                {inv.email}
-                              </td>
-                              <td className="px-4 py-3 text-muted-foreground">
-                                {inv.role_id?.name ?? "—"}
-                              </td>
-                              <td className="px-4 py-3">
-                                <span
-                                  className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                                    status === "pending"
-                                      ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
-                                      : status === "accepted"
-                                        ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
-                                        : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"
-                                  }`}
-                                >
-                                  {status.charAt(0).toUpperCase() +
-                                    status.slice(1)}
+                        return (
+                          <TableRow key={inv._id}>
+                            <TableCell className="px-4 py-3 font-medium">
+                              {inv.email}
+                            </TableCell>
+                            <TableCell className="px-4 py-3 text-muted-foreground">
+                              {inv.role_id?.name ?? "—"}
+                            </TableCell>
+                            <TableCell className="px-4 py-3">
+                              <span
+                                className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
+                                  status === "pending"
+                                    ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
+                                    : status === "accepted"
+                                      ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
+                                      : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"
+                                }`}
+                              >
+                                {status.charAt(0).toUpperCase() +
+                                  status.slice(1)}
+                              </span>
+                            </TableCell>
+                            <TableCell className="px-4 py-3 text-muted-foreground">
+                              {inv.invited_by?.email ?? "—"}
+                            </TableCell>
+                            <TableCell className="px-4 py-3 text-muted-foreground">
+                              {inv.expires_at &&
+                              status === "pending" &&
+                              new Date(inv.expires_at) < new Date() ? (
+                                <span className="inline-flex rounded-full px-2 py-0.5 text-xs font-medium bg-red-100 text-red-700">
+                                  Expired
                                 </span>
-                              </td>
-                              <td className="px-4 py-3 text-muted-foreground">
-                                {inv.invited_by?.email ?? "—"}
-                              </td>
-                              <td className="px-4 py-3 text-muted-foreground">
-                                {inv.expires_at &&
-                                inv.status === "pending" &&
-                                new Date(inv.expires_at) < new Date() ? (
-                                  <span className="inline-flex rounded-full px-2 py-0.5 text-xs font-medium bg-red-100 text-red-700">
-                                    Expired
-                                  </span>
-                                ) : inv.expires_at ? (
-                                  format(
-                                    new Date(inv.expires_at),
-                                    "dd MMM yyyy, hh:mm a",
-                                  )
-                                ) : (
-                                  "—"
-                                )}
-                              </td>
-                              <td className="px-4 py-3 text-right">
-                                {showActionsDropdown ? (
-                                  <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                      <Button variant="outline" size="sm">
-                                        <MoreHorizontal className="size-4" />
-                                      </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                      {hasActions && (
-                                        <DropdownMenuItem
-                                          variant="destructive"
-                                          onClick={() => setCancelInvite(inv)}
-                                        >
-                                          <X className="size-4" />
-                                          Cancel invite
-                                        </DropdownMenuItem>
-                                      )}
-                                      {hasResend && (
-                                        <DropdownMenuItem
-                                          onClick={() => setResendInvite(inv)}
-                                        >
-                                          <RotateCcw className="size-4" />
-                                          Resend invite
-                                        </DropdownMenuItem>
-                                      )}
-                                    </DropdownMenuContent>
-                                  </DropdownMenu>
-                                ) : (
-                                  <span className="text-muted-foreground">
-                                    —
-                                  </span>
-                                )}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
+                              ) : inv.expires_at ? (
+                                format(
+                                  new Date(inv.expires_at),
+                                  "dd MMM yyyy, hh:mm a",
+                                )
+                              ) : (
+                                "—"
+                              )}
+                            </TableCell>
+                            <TableCell className="px-4 py-3 text-right">
+                              {hasCancel || hasResend ? (
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" size="sm">
+                                      <MoreHorizontal className="size-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    {hasCancel && (
+                                      <DropdownMenuItem
+                                        variant="destructive"
+                                        onClick={() => setCancelInvite(inv)}
+                                      >
+                                        <X className="size-4" />
+                                        Cancel invite
+                                      </DropdownMenuItem>
+                                    )}
+                                    {hasResend && (
+                                      <DropdownMenuItem
+                                        onClick={() => setResendInvite(inv)}
+                                      >
+                                        <RotateCcw className="size-4" />
+                                        Resend invite
+                                      </DropdownMenuItem>
+                                    )}
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              ) : (
+                                <span className="text-muted-foreground">—</span>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
                 )}
               </div>
             </Tabs>
@@ -586,15 +677,26 @@ export default function UsersPage() {
         }
       />
 
-      <ChangeRoleModal
-        user={changeRoleUser}
+      <Dialog
         open={!!changeRoleUser}
-        onClose={() => setChangeRoleUser(null)}
-        onSuccess={() => queryClient.invalidateQueries({ queryKey: ["users"] })}
-        onUpdateRole={(userId, roleId) =>
-          usersApi.updateUserRole(userId, roleId).then(() => undefined)
-        }
-      />
+        onOpenChange={(open) => {
+          if (!open) setChangeRoleUser(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change role</DialogTitle>
+            <DialogDescription>{changeRoleUser?.email}</DialogDescription>
+          </DialogHeader>
+          <ChangeRoleDialogContent
+            user={changeRoleUser}
+            onClose={() => setChangeRoleUser(null)}
+            onSuccess={() =>
+              queryClient.invalidateQueries({ queryKey: ["users"] })
+            }
+          />
+        </DialogContent>
+      </Dialog>
 
       <Dialog
         open={!!archiveUser}
@@ -606,8 +708,9 @@ export default function UsersPage() {
           <DialogHeader>
             <DialogTitle>Archive user</DialogTitle>
             <DialogDescription>
-              Are you sure you want to archive {archiveUser?.email ?? "this user"}? They will lose
-              access to the consultancy.
+              Are you sure you want to archive{" "}
+              {archiveUser?.email ?? "this user"}? They will lose access to the
+              consultancy.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -617,7 +720,9 @@ export default function UsersPage() {
             <Button
               variant="destructive"
               disabled={archiveUserMutation.isPending}
-              onClick={() => archiveUser && archiveUserMutation.mutate(archiveUser._id)}
+              onClick={() =>
+                archiveUser && archiveUserMutation.mutate(archiveUser._id)
+              }
             >
               {archiveUserMutation.isPending ? "Archiving…" : "Archive"}
             </Button>
@@ -647,7 +752,9 @@ export default function UsersPage() {
             <Button
               variant="destructive"
               disabled={deleteMutation.isPending}
-              onClick={() => deleteUser && deleteMutation.mutate(deleteUser._id)}
+              onClick={() =>
+                deleteUser && deleteMutation.mutate(deleteUser._id)
+              }
             >
               {deleteMutation.isPending ? "Deleting…" : "Delete"}
             </Button>
@@ -665,7 +772,9 @@ export default function UsersPage() {
           <DialogHeader>
             <DialogTitle>Cancel invite</DialogTitle>
             <DialogDescription>
-              {cancelInvite ? `Cancel the invite sent to ${cancelInvite.email}?` : ""}
+              {cancelInvite
+                ? `Cancel the invite sent to ${cancelInvite.email}?`
+                : ""}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -674,7 +783,9 @@ export default function UsersPage() {
             </DialogClose>
             <Button
               disabled={cancelInviteMutation.isPending}
-              onClick={() => cancelInvite && cancelInviteMutation.mutate(cancelInvite._id)}
+              onClick={() =>
+                cancelInvite && cancelInviteMutation.mutate(cancelInvite._id)
+              }
             >
               {cancelInviteMutation.isPending ? "Cancelling…" : "Cancel invite"}
             </Button>
@@ -703,7 +814,9 @@ export default function UsersPage() {
             </DialogClose>
             <Button
               disabled={resendInviteMutation.isPending}
-              onClick={() => resendInvite && resendInviteMutation.mutate(resendInvite)}
+              onClick={() =>
+                resendInvite && resendInviteMutation.mutate(resendInvite)
+              }
             >
               {resendInviteMutation.isPending ? "Resending…" : "Resend invite"}
             </Button>

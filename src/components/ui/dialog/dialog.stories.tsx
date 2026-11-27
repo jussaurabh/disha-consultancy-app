@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import { Trash2Icon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,13 +19,15 @@ import {
 /**
  * DC design system — Overlays board (DC DESIGN SYSTEM · V1.0).
  *
- * Spec: radius 16 (rounded-xl) · max-w-[calc(100%-2rem)] on mobile, max-w-sm
- * from sm up · p-4 · ring-1 ring-foreground/10 · 100ms fade + zoom-95 in/out
- * over a black/10 blurred scrim. Overlay and Portal ship inside
- * DialogContent — you rarely render them by hand.
+ * Spec: shell radius 14 (rounded-xl) · widths 360 / 440 / 560 (max-w-90 /
+ * max-w-110 / max-w-140) · scrim 55% · shadow 0 24 64 · bg surface · header
+ * pad 20/24 with a 1px rule · title Archivo 20/26 · 800 · body 13/145% muted
+ * · footer pad 14/24 with a 1px rule · actions ride right on 36px buttons
+ * (size sm) · danger = filled. Overlay and Portal ship inside DialogContent
+ * — you rarely render them by hand.
  *
  * Rules: one primary cta in the footer · Esc and scrim click close · the
- * ghost X in the corner can be dropped with showCloseButton={false}.
+ * bordered X in the corner can be dropped with showCloseButton={false}.
  */
 const meta = {
   title: "UI/Dialog",
@@ -35,7 +38,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Centered modal surface — rounded-xl (radius 16), max-w-sm from sm up, p-4, ring-1 ring-foreground/10, 100ms fade+zoom over a blurred scrim. Header carries the title and description; the footer carries a quiet cancel and the one primary cta.",
+          "Centered modal surface — rounded-xl (radius 14), three widths 360/440/560 (max-w-90/-110/-140), scrim 55%, header and footer on 1px rules, title Archivo 20/800, body 13 muted, actions right on size sm buttons. Header carries the title and description; the footer carries a quiet cancel and the one primary cta.",
       },
     },
   },
@@ -49,14 +52,9 @@ const meta = {
       control: "boolean",
       description: "Locks page scroll and traps focus (default true).",
     },
-    showCloseButton: {
-      control: "boolean",
-      description: "DialogContent — the ghost X in the top corner (default true).",
-    },
   },
   args: {
     modal: true,
-    showCloseButton: true,
   },
 } satisfies Meta<typeof Dialog>
 
@@ -121,6 +119,31 @@ function Screen({ children }: { children: ReactNode }) {
   )
 }
 
+/**
+ * The dialog build sheet's FIELD LABEL register — 11/14 · 600 · caps ·
+ * 0.09em · muted. ui/label stays on the Inputs board spec app-wide; inside
+ * dialogs, pass this register through className.
+ */
+function DialogLabel({
+  htmlFor,
+  required,
+  children,
+}: {
+  htmlFor: string
+  required?: boolean
+  children: ReactNode
+}) {
+  return (
+    <Label
+      htmlFor={htmlFor}
+      required={required}
+      className="text-[11px] leading-3.5 uppercase tracking-[0.09em] text-muted-foreground"
+    >
+      {children}
+    </Label>
+  )
+}
+
 /** The canonical confirm dialog — header, description with a policy link, footer pair. */
 function BasicContent() {
   return (
@@ -137,10 +160,10 @@ function BasicContent() {
       </DialogHeader>
       <DialogFooter>
         <DialogClose asChild>
-          <Button variant="secondary">Cancel</Button>
+          <Button variant="secondary" size="sm">Cancel</Button>
         </DialogClose>
         <DialogClose asChild>
-          <Button variant="destructive">Remove employee</Button>
+          <Button variant="destructive" size="sm">Remove employee</Button>
         </DialogClose>
       </DialogFooter>
     </>
@@ -170,42 +193,120 @@ function OpenBasic() {
   )
 }
 
-/** Wide register — sm:max-w-lg for two-field compositions. */
+/** The alert register — danger icon left of the title, destructive filled cta. */
+function AlertContent() {
+  return (
+    <>
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-2.5">
+          <Trash2Icon className="size-5 shrink-0 text-danger" aria-hidden />
+          Delete pay run?
+        </DialogTitle>
+        <DialogDescription>
+          The November draft and its 46 payslips will be gone. This can't be
+          undone.
+        </DialogDescription>
+      </DialogHeader>
+      <DialogFooter>
+        <DialogClose asChild>
+          <Button variant="secondary" size="sm">Keep it</Button>
+        </DialogClose>
+        <DialogClose asChild>
+          <Button variant="destructive" size="sm">Delete run</Button>
+        </DialogClose>
+      </DialogFooter>
+    </>
+  )
+}
+
+function AlertDialog() {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="destructive">Delete pay run</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <AlertContent />
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function OpenAlertDialog() {
+  return (
+    <Dialog open>
+      <DialogContent>
+        <AlertContent />
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+/** Compact register — max-w-90 (SM 360) for short asks. */
+function CompactDialog({ open }: { open?: boolean }) {
+  return (
+    <Dialog open={open}>
+      {open ? null : (
+        <DialogTrigger asChild>
+          <Button variant="secondary">Compact 360</Button>
+        </DialogTrigger>
+      )}
+      <DialogContent className="max-w-90">
+        <DialogHeader>
+          <DialogTitle>Mark as paid?</DialogTitle>
+          <DialogDescription>
+            The March run closes and the register is locked for editing.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="secondary" size="sm">Cancel</Button>
+          </DialogClose>
+          <DialogClose asChild>
+            <Button size="sm">Mark paid</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+/** Wide register — max-w-140 (LG 560) for two-field compositions. */
 function WideDialog({ open }: { open?: boolean }) {
   return (
     <Dialog open={open}>
       {open ? null : (
         <DialogTrigger asChild>
-          <Button variant="secondary">Invite a client</Button>
+          <Button variant="secondary">Wide 560</Button>
         </DialogTrigger>
       )}
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="max-w-140">
         <DialogHeader>
           <DialogTitle>Invite a client</DialogTitle>
           <DialogDescription>
             They get a login to review their payroll runs — no access to your other clients.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="grid gap-2">
-            <Label htmlFor="dialog-wide-name" required>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-1.5">
+            <DialogLabel htmlFor="dialog-wide-name" required>
               Contact name
-            </Label>
+            </DialogLabel>
             <Input id="dialog-wide-name" placeholder="e.g. Meera Iyer" />
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="dialog-wide-email" required>
+          <div className="grid gap-1.5">
+            <DialogLabel htmlFor="dialog-wide-email" required>
               Work email
-            </Label>
+            </DialogLabel>
             <Input id="dialog-wide-email" type="email" placeholder="meera@venkatestextiles.in" />
           </div>
         </div>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="secondary">Cancel</Button>
+            <Button variant="secondary" size="sm">Cancel</Button>
           </DialogClose>
           <DialogClose asChild>
-            <Button>Send invite</Button>
+            <Button size="sm">Send invite</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>
@@ -231,7 +332,7 @@ function WithoutCloseDialog({ open }: { open?: boolean }) {
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="secondary">Dismiss</Button>
+            <Button variant="secondary" size="sm">Dismiss</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>
@@ -256,7 +357,7 @@ function FooterCloseDialog({ open }: { open?: boolean }) {
           </DialogDescription>
         </DialogHeader>
         <DialogFooter showCloseButton>
-          <Button>Export xlsx</Button>
+          <Button size="sm">Export xlsx</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -278,26 +379,26 @@ function FormInDialog({ open }: { open?: boolean }) {
           <DialogDescription>They join the March run for Unit 1 — Mysuru.</DialogDescription>
         </DialogHeader>
         <form
-          className="grid gap-4"
+          className="grid gap-3"
           onSubmit={(event) => event.preventDefault()}
         >
-          <div className="grid gap-2">
-            <Label htmlFor="dialog-form-name" required>
+          <div className="grid gap-1.5">
+            <DialogLabel htmlFor="dialog-form-name" required>
               Employee name
-            </Label>
+            </DialogLabel>
             <Input id="dialog-form-name" placeholder="e.g. Meera Iyer" />
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="dialog-form-email" required>
+          <div className="grid gap-1.5">
+            <DialogLabel htmlFor="dialog-form-email" required>
               Work email
-            </Label>
+            </DialogLabel>
             <Input id="dialog-form-email" type="email" placeholder="meera@venkatestextiles.in" />
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="secondary">Cancel</Button>
+              <Button variant="secondary" size="sm">Cancel</Button>
             </DialogClose>
-            <Button type="submit">Add employee</Button>
+            <Button type="submit" size="sm">Add employee</Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -336,15 +437,23 @@ function Board() {
           Dialogs
         </h2>
         <p className="mt-2 max-w-xl font-body text-sm leading-6 text-muted-foreground">
-          Centered modal surfaces — radius 16 · max-w-sm from sm up · p-4 · ring-1
-          ring-foreground/10 · 100ms fade + zoom over a blurred scrim. Esc and scrim click close;
-          the footer carries a quiet cancel and the one primary cta.
+          Modal moments above a dimmed page — radius 14 · scrim 55% · three
+          widths 360 / 440 / 560 · header pad 20/24 with a 1px rule · title
+          Archivo 20/800 · body 13 muted · footer pad 14/24 with a 1px rule ·
+          actions right on 36px buttons · danger = filled. Esc and scrim click
+          close; the footer carries a quiet cancel and the one primary cta.
         </p>
         <Block title="Compositions">
-          <Row label="Confirm" note="Header · description · cancel + destructive pair">
+          <Row label="Confirm" note="MD 440 default · cancel + destructive pair">
             <BasicDialog />
           </Row>
-          <Row label="Wide" note="sm:max-w-lg · two-field composition">
+          <Row label="Alert" note="Destructive · danger icon left of title · danger = filled">
+            <AlertDialog />
+          </Row>
+          <Row label="Compact" note="max-w-90 · SM 360 for short asks">
+            <CompactDialog />
+          </Row>
+          <Row label="Wide" note="max-w-140 · LG 560 · two-field composition">
             <WideDialog />
           </Row>
           <Row label="Form inside" note="Fields and footer live inside the form">
@@ -373,7 +482,7 @@ function Board() {
           </Row>
         </Block>
         <p className="mt-12 border-t border-border pt-6 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-          Radius 16 · max-w-sm · p-4 · One primary cta per footer · Esc and scrim close
+          Scrim 55% · Radius 14 · Title 20/800 · Body 13 · Fields 42 · Actions right · Danger = filled · Rules 1px · Buttons 36
         </p>
       </div>
     </div>
@@ -406,25 +515,25 @@ export const Playground: Story = {
         <DialogTrigger asChild>
           <Button>Open dialog</Button>
         </DialogTrigger>
-        <DialogContent showCloseButton={args.showCloseButton}>
+        <DialogContent showCloseButton={true}>
           <DialogHeader>
             <DialogTitle>Create organization</DialogTitle>
             <DialogDescription>
               Add a client organization to this consultancy.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-2">
-            <Label htmlFor="dialog-playground-name" required>
+          <div className="grid gap-1.5">
+            <DialogLabel htmlFor="dialog-playground-name" required>
               Organization name
-            </Label>
+            </DialogLabel>
             <Input id="dialog-playground-name" placeholder="e.g. Sri Venkateswara Textiles" />
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="secondary">Cancel</Button>
+              <Button variant="secondary" size="sm">Cancel</Button>
             </DialogClose>
             <DialogClose asChild>
-              <Button>Create organization</Button>
+              <Button size="sm">Create organization</Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>
@@ -451,7 +560,7 @@ export const Controlled: Story = {
   ),
 }
 
-/** Open by default — the default max-w-sm register (theme follows the toolbar). */
+/** Open by default — the default MD 440 register (theme follows the toolbar). */
 export const OpenDefault: Story = {
   render: () => (
     <div className="flex min-h-52 items-center justify-center bg-background p-10">
@@ -460,7 +569,25 @@ export const OpenDefault: Story = {
   ),
 }
 
-/** Open wide register — sm:max-w-lg. */
+/** Open alert register — danger icon, destructive filled cta. */
+export const OpenAlert: Story = {
+  render: () => (
+    <div className="flex min-h-52 items-center justify-center bg-background p-10">
+      <OpenAlertDialog />
+    </div>
+  ),
+}
+
+/** Open compact register — max-w-90 (SM 360). */
+export const OpenCompact: Story = {
+  render: () => (
+    <div className="flex min-h-52 items-center justify-center bg-background p-10">
+      <CompactDialog open />
+    </div>
+  ),
+}
+
+/** Open wide register — max-w-140 (LG 560). */
 export const OpenWide: Story = {
   render: () => (
     <div className="flex min-h-52 items-center justify-center bg-background p-10">
@@ -501,10 +628,16 @@ export const OnlyCompositions: Story = {
   render: () => (
     <Screen>
       <Block title="Compositions">
-        <Row label="Confirm" note="Header · description · cancel + destructive pair">
+        <Row label="Confirm" note="MD 440 default · cancel + destructive pair">
           <BasicDialog />
         </Row>
-        <Row label="Wide" note="sm:max-w-lg · two-field composition">
+        <Row label="Alert" note="Destructive · danger icon left of title · danger = filled">
+          <AlertDialog />
+        </Row>
+        <Row label="Compact" note="max-w-90 · SM 360 for short asks">
+          <CompactDialog />
+        </Row>
+        <Row label="Wide" note="max-w-140 · LG 560 · two-field composition">
           <WideDialog />
         </Row>
       </Block>
